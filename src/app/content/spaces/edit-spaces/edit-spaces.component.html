@@ -1,0 +1,87 @@
+<div class="container">
+    <p>isLoadingSpaces: {{isLoadingSpaces}}</p>
+    <p>isLoadingSettings: {{isLoadingSettings}}</p>
+    <div class="columns">
+        <div class="column is-half" *ngFor="let space of addingSpaces">
+            {{space.inEditMode}}
+            <div class="card">
+                <header class="card-header">
+                    <div class="card-header-title is-inline-flex">
+                        <figure class="image is-32x32">
+                            <img src="http://bulma.io/images/placeholders/32x32.png">
+                        </figure>
+                        <h4>{{space.name}}</h4>
+                    </div>
+                    <span class="card-header-icon">
+                        <a class="delete" (click)="cancelSpaceAdd(space)"></a>
+                    </span>
+                </header>
+                <datawhore-add-space class="column is-half"></datawhore-add-space>
+            </div>
+        </div>
+
+        <div class="column is-half" *ngFor="let space of spaces">
+            <div class="card is-flex-vertical" [class.in-edit-mode]="space.inEditMode">
+                <header class="card-header">
+                    <div class="card-header-title is-inline-flex">
+                        <figure class="image is-32x32">
+                            <img src="http://bulma.io/images/placeholders/32x32.png">
+                        </figure>
+                        <span>{{space.name}}</span>
+                        <!--<div *ngIf="space.inEditMode">-->
+                            <!--<div class="control">-->
+                                <!--<input class="input" type="text" placeholder="Text input" [(ngModel)]="space.name">-->
+                                <!--&lt;!&ndash;<span class="help is-success">This username is available</span>&ndash;&gt;-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    </div>
+                    <a class="card-header-icon" (click)="toggleEditSpace(space)">
+                        <span class="icon" >
+                          <i class="fa fa-edit"></i>
+                        </span>
+                    </a>
+                </header>
+
+                <div class="card-content stretched">
+                    <div class="content">
+
+                        <div *ngIf="!space.inEditMode && space.oauth">
+                            <ul *ngFor="let spaceProp of space.oauth.settings">
+                                <li>
+                                    <strong>{{spaceProp.label}}</strong>: {{spaceProp.value}}
+                                </li>
+                            </ul>
+                            <small *ngIf="space.oauth.extras">
+                                <ul *ngFor="let spaceProp of space.oauth.extras">
+                                    <li>
+                                        <strong>{{spaceProp.label}}</strong>: {{spaceProp.value}}
+                                    </li>
+                                </ul>
+                            </small>
+                        </div>
+                        <div *ngIf="space.inEditMode && space.oauth">
+                            <ul *ngFor="let spaceProp of space.oauth.settings">
+                                <li class="control">
+                                    <strong>{{spaceProp.label}}</strong>
+                                    <input type="text" class="input" [(ngModel)]="spaceProp.value">
+                                </li>
+                            </ul>
+                            <a class="button is-success" (click)="updateSpaceSettings(space)">
+                                <span class="icon is-small is-outlined"><i class="fa fa-check"></i></span>
+                                <span>Save</span>
+                            </a>
+                            <pre>{{space.oauth | json}}</pre>
+                        </div>
+                        <small>Last modified: {{space.modified | date:'medium'}}</small>
+                    </div>
+                </div>
+                <footer class="card-footer">
+                    <a class="card-footer-item">Connect</a>
+                    <a class="card-footer-item">Reset</a>
+                    <a class="card-footer-item">Delete</a>
+                </footer>
+            </div>
+        </div>
+    </div>
+
+</div>
