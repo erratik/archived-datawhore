@@ -1,10 +1,8 @@
-import {Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
-// import {Input, Output} from '@angular/core/src/metadata/directives';
+import {Component, OnInit, Input} from '@angular/core';
 import {SpacesService} from '../../../services/spaces.service';
 import {SpaceModel} from '../../../models/space.model';
-import {SpaceOauthSettings, OauthSettings} from '../../../models/space-settings.model';
+import {SpaceOauthSettings} from '../../../models/space-settings.model';
 import 'rxjs/add/operator/map';
-import {Observable} from 'rxjs';
 import {Router} from '@angular/router';
 
 @Component({
@@ -42,7 +40,7 @@ export class EditSpacesComponent implements OnInit {
                 this.spaces.filter((space: SpaceModel) => {
                     if (space.name === spaceConfig.name) {
                         space.oauth = settingsRetrieved;
-                        // space.makeSpaceModel({modified: Date.now()});
+                        // console.log(new Date(settingsRetrieved.modified));
                         space.makeSpaceModel({
                             name: spaceConfig.name,
                             modified: settingsRetrieved.modified,
@@ -65,12 +63,10 @@ export class EditSpacesComponent implements OnInit {
 
     public updateSpaceSettings(updatedSpace: SpaceModel): any {
         this.spacesService.updateSpace(updatedSpace).subscribe(updatingSpaceRes => {
-            // console.log(updatingSpaceRes);
             this.spaces = this.spaces.filter(space => {
-                // updatedSpace.modified = updatingSpaceRes.modified;
                 space.inEditMode = false;
                 // debugger
-                return space.makeSpaceModel({modified: updatingSpaceRes.modified});
+                return space.makeSpaceModel({});
             });
         });
     }

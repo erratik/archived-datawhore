@@ -1,6 +1,5 @@
 
-import {SpaceOauthSettings, OauthExtras, OauthSettings} from './space-settings.model';
-import {ApiMessages} from '../classes/strings.class';
+import {SpaceOauthSettings, OauthSettings} from './space-settings.model';
 export class SpaceModel {
     constructor(public name: string,
                 public modified: number,
@@ -25,16 +24,22 @@ export class SpaceModel {
                 if (prop.keyName === 'authorizationUrl') { this.oauth.authorizationUrl = prop.value; }
                 if (prop.keyName === 'middlewareAuthUrl') { this.oauth.middlewareAuthUrl = prop.value; }
             });
-            console.log(`! default/minimal oauth settings are already set for ${options.name}`);
+            // console.log(`! default/minimal oauth settings are already set for ${options.name}`);
         } else {
             // here, we should also check and see what needs to be added to a new space model?
-            console.log(`? no auth settings filled for ${options.name}, find out what fields need to be filled?`);
+            // console.log(`? no auth settings filled for ${options.name}, find out what fields need to be filled?`);
 
             this.fillDefaultSettings();
 
         }
-        console.log(this.oauth);
-        // console.log(options);
+        // console.log(this.oauth);
+        // console.log('> ', new Date (this.oauth.modified));
+        // console.log(options.modified);
+        // console.log(this.oauth.modified);
+
+        // use the modified date from settings, not from space
+        this.modified = this.oauth.modified;
+
 
         // console.log(this);
 
@@ -42,9 +47,11 @@ export class SpaceModel {
     }
 
 
-    public fillDefaultSettings(): void{
+    public fillDefaultSettings(): void {
         // build the default settings here
         this.oauth.settings = [];
+        // this.modified = Date.now();
+        // console.log(this.oauth); // "first", "one"
 
         const defaultOauthValues = {
             'apiKey': 'Consumer key',
