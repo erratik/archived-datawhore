@@ -40,3 +40,6 @@ testem.log
 Thumbs.db
 
 /src2
+/node_modules
+/api/node_modules
+/src/assets/uploads/.tmp

@@ -1,0 +1,82 @@
+<header class="card-header">
+    <div class="card-header-title is-inline-flex">
+        <figure class="image is-32x32">
+            <img src="http://bulma.io/images/placeholders/32x32.png">
+        </figure>
+        <span>{{space.name}}</span>
+        <!--<div *ngIf="spaceName.inEditMode">-->
+        <!--<div class="control">-->
+        <!--<input class="input" type="text" placeholder="Text input" [(ngModel)]="spaceName.name">-->
+        <!--&lt;!&ndash;<span class="help is-success">This username is available</span>&ndash;&gt;-->
+        <!--</div>-->
+        <!--</div>-->
+    </div>
+    <a class="card-header-icon" (click)="toggleEditSpace(space)">
+        <span class="icon">
+          <i class="fa fa-edit"></i>
+        </span>
+    </a>
+    <a class="card-header-icon" (click)="getSpaceModel(space.name)">
+        <span class="icon">
+          <i class="fa fa-cloud-download"></i>
+        </span>
+    </a>
+</header>
+
+<div class="card-content stretched">
+    <div class="content">
+        <div *ngIf="!space.inEditMode && space.oauth">
+
+            <ul>
+                <li *ngFor="let spaceProp of space.oauth.settings">
+                    <div *ngIf="spaceProp.value">
+                        <strong>{{spaceProp.label}}</strong>: {{spaceProp.value}}
+                    </div>
+                    <div *ngIf="!spaceProp.value">
+                        <strong>{{spaceProp.label}}</strong> (<em>{{spaceProp.keyName}}</em>) has not been set yet
+                    </div>
+                </li>
+            </ul>
+            <details *ngIf="space.oauth.extras.length">
+                <summary>Acquired Oauth Settings</summary>
+                <ul *ngFor="let spaceProp of space.oauth.extras">
+                    <li>
+                        <strong>{{spaceProp.label}}</strong>: {{spaceProp.value}}
+                    </li>
+                </ul>
+            </details>
+        </div>
+        <div *ngIf="space.inEditMode && space.oauth">
+
+            <div class="form-group">
+                <label for="single">single</label>
+                <input type="file" class="form-control" name="single" ng2FileSelect
+                       [uploader]="uploader"/>
+                <button type="button" class="btn btn-success btn-s"
+                        (click)="uploader.uploadAll()" [disabled]="!uploader.getNotUploadedItems().length">
+                    <span class="glyphicon glyphicon-upload"></span> Upload all
+                </button>
+                <br/>
+            </div>
+
+            <ul *ngFor="let spaceProp of space.oauth.settings">
+                <li class="control">
+                    <strong>{{spaceProp.label}}</strong>
+                    <input type="text" class="input" [(ngModel)]="spaceProp.value">
+                </li>
+            </ul>
+        </div>
+    </div>
+    <details>
+        <summary class="tag">space | json</summary>
+        <pre>{{space | json}}</pre>
+    </details>
+    <small>Last modified: {{space.modified | date:'medium'}}</small>
+</div>
+<footer class="card-footer">
+    <!--<datawhore-connect-oauth [space]="space" class="card-footer-item"  *ngIf="space.oauth">></datawhore-connect-oauth>-->
+    <a class="card-footer-item is-success" (click)="updateSpaceSettings(space)" *ngIf="space.inEditMode && space.oauth">
+        <span>Save</span>
+    </a>
+    <a class="card-footer-item">Delete</a>
+</footer>
