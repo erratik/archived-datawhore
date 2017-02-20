@@ -1,6 +1,8 @@
 var mongoose = require('mongoose');
 var moment = require('moment');
 var multer = require('multer');
+var fs = require('fs');
+
 
 var Space = require('../models/spaceModel');
 var Setting = require('../models/settingModel');
@@ -22,7 +24,7 @@ module.exports = function(app) {
     });
 
     app.get('/api/space/settings/:space', function(req, res) {
-        Setting.findBySpaceName(req.params.space, function(err, data){
+        Setting.findSettings(req.params.space, function(err, data){
             res.json(data);
         });
     });
@@ -31,7 +33,7 @@ module.exports = function(app) {
         var setting = new Setting(req.body); // instantiated Space
 
         setting.updateSettings(req.body, function() {
-            Setting.findBySpaceName(req.params.space, function(err, space){
+            Setting.findSettings(req.params.space, function(err, space){
                 // console.log('space -> ', space);
                 res.json(space);
             });
@@ -45,7 +47,6 @@ module.exports = function(app) {
         var headers = {
             'Content-Type':     'application/x-www-form-urlencoded'
         };
-
         var options = {
             url: req.body.url,
             method: 'POST',
@@ -61,4 +62,44 @@ module.exports = function(app) {
     });
 
 
+    // var base64image = require('base64-image');
+    // app.post('/base64/:filename', base64image(path.join(__dirname, '../uploads')));
+
+    /** API path that will upload the files */
+    app.post('/api/upload/:space/:folder/:filename', function(req, res) {
+
+        var storage = multer.diskStorage({ //multers disk storage settings
+            destination: function (req, file, cb) {
+                // todo: create folders if they don't exist
+                cb(null, '../public/uploads/'+ req.params.space +'/'+ req.params.folder);
+            },
+            filename: function (req, file, cb) {
+                cb(null, req.params.space + '-' + req.params.filename + '.' + file.originalname.split('.')[file.originalname.split('.').length -1]);
+            }
+        });
+        var upload = multer({ //multer settings
+            storage: storage
+        }).single('file');
+
+        upload(req, res,function(err){
+            console.log(req.file);
+            if(err){
+                res.json({error_code:1,err_desc:err});
+                return;
+            }
+
+            var space = new Space({name: req.params.space}); // instantiated Space
+            // space.icon =
+
+
+            space.updateSpace({icon: req.file.path}, function() {
+                Space.findByName(req.params.space, function(err, space){
+                    console.log('space -> ', space);
+                    // res.json(space);
+                });
+            });
+
+            res.json(req.file);
+        });
+    });
 };

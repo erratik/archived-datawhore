@@ -8,7 +8,7 @@ var SettingSchema = {
         extras: []
     },
     self: {
-        findBySpaceName: function (spaceName, cb) {
+        findSettings: function (spaceName, cb) {
             var _this = this;
             this.find({ space: spaceName }, function (err, retrievedSpace) {
                 var space = retrievedSpace[0];

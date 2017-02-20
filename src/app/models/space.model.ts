@@ -5,8 +5,8 @@ export class SpaceModel {
                 public modified: number,
                 public oauth: SpaceOauthSettings = null,
                 public inEditMode = false,
-                public avatar?: string,
-                public icon?: string) {
+                public icon?: string,
+                public avatar?: string) {
     }
 
     public toSpaceSettings(options: Options): any {
@@ -48,6 +48,7 @@ interface Options {
     modified?: number;
     inEditMode?: boolean;
     name?: string;
+    icon?: string;
     oauth?: SpaceOauthSettings;
     aMethod?: (a: string) => string;
 }

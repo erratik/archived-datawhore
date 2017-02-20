@@ -27,7 +27,11 @@ export class SpacesService {
 
             const spaces = res.json();
             return spaces.map(space => {
-                return new SpaceModel(space.name, space.modified);
+                return new SpaceModel(
+                    space.name,
+                    space.modified,
+                    null, false, space.icon
+                );
 
             });
         }).catch(this.handleError);
@@ -40,6 +44,20 @@ export class SpacesService {
             })
             .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
     }
+/*
+    public connect(space: SpaceModel, authorizationUrl: string): any {
+        console.log(space.name, authorizationUrl);
+
+        // fill up the placeholders by casting the actual key values
+        //
+        // });
+        // return this.http.post(`${authorizationUrl}`)
+        //     .map((res: Response) => {
+        //         console.log(res.json());
+        //         return res.json();
+        //     })
+        //     .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
+    }*/
 
     public requestAccessToken(url: string, space: SpaceModel): Observable<SpaceModel> {
 

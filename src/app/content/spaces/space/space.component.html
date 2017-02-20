@@ -1,7 +1,7 @@
 <header class="card-header">
     <div class="card-header-title is-inline-flex">
         <figure class="image is-32x32">
-            <img src="http://bulma.io/images/placeholders/32x32.png">
+            <img src="{{(space.icon) ? space.icon : 'http://bulma.io/images/placeholders/32x32.png'}}">
         </figure>
         <span>{{space.name}}</span>
         <!--<div *ngIf="spaceName.inEditMode">-->
@@ -53,7 +53,7 @@
                 <input type="file" class="form-control" name="single" ng2FileSelect
                        [uploader]="uploader"/>
                 <button type="button" class="btn btn-success btn-s"
-                        (click)="uploader.uploadAll()" [disabled]="!uploader.getNotUploadedItems().length">
+                        (click)="uploader.uploadAll()" >
                     <span class="glyphicon glyphicon-upload"></span> Upload all
                 </button>
                 <br/>

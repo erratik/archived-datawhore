@@ -20,7 +20,7 @@ export class SpaceComponent implements OnInit {
 
     ngOnInit() {
         this.getSpaceOauthSettings();
-        this.uploader = new FileUploader({url: `${Paths.DATAWHORE_API_URL}/upload/${this.space.name}/space?filename=icon`, itemAlias: 'data[attributes][family_photo]'});
+        this.uploader = new FileUploader({url: `${Paths.DATAWHORE_API_URL}/upload/${this.space.name}/space/icon`});
     }
 
     private getSpaceOauthSettings(): any {

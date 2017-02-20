@@ -9,7 +9,7 @@ const SettingSchema = {
         extras: []
     },
     self: {
-        findBySpaceName: function (spaceName: string, cb) {
+        findSettings: function (spaceName: string, cb) {
             let _this = this;
             this.find({space: spaceName}, function (err, retrievedSpace) {
                 const space = retrievedSpace[0];
