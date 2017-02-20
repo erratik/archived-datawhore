@@ -61,10 +61,6 @@ module.exports = function(app) {
 
     });
 
-
-    // var base64image = require('base64-image');
-    // app.post('/base64/:filename', base64image(path.join(__dirname, '../uploads')));
-
     /** API path that will upload the files */
     app.post('/api/upload/:space/:folder/:filename', function(req, res) {
 
@@ -82,16 +78,13 @@ module.exports = function(app) {
         }).single('file');
 
         upload(req, res,function(err){
-            console.log(req.file);
+
             if(err){
                 res.json({error_code:1,err_desc:err});
                 return;
             }
 
             var space = new Space({name: req.params.space}); // instantiated Space
-            // space.icon =
-
-
             space.updateSpace({icon: req.file.path}, function() {
                 Space.findByName(req.params.space, function(err, space){
                     console.log('space -> ', space);

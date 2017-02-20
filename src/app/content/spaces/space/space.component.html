@@ -4,23 +4,23 @@
             <img src="{{(space.icon) ? space.icon : 'http://bulma.io/images/placeholders/32x32.png'}}">
         </figure>
         <span>{{space.name}}</span>
-        <!--<div *ngIf="spaceName.inEditMode">-->
-        <!--<div class="control">-->
-        <!--<input class="input" type="text" placeholder="Text input" [(ngModel)]="spaceName.name">-->
-        <!--&lt;!&ndash;<span class="help is-success">This username is available</span>&ndash;&gt;-->
-        <!--</div>-->
-        <!--</div>-->
+        <!--<div *ngIf="spaceName.inEditMode">
+        <div class="control">
+        <input class="input" type="text" placeholder="Text input" [(ngModel)]="spaceName.name">
+        &lt;!&ndash;<span class="help is-success">This username is available</span>&ndash;&gt;
+        </div>
+        </div>-->
     </div>
     <a class="card-header-icon" (click)="toggleEditSpace(space)">
         <span class="icon">
           <i class="fa fa-edit"></i>
         </span>
     </a>
-    <a class="card-header-icon" (click)="getSpaceModel(space.name)">
+    <!--<a class="card-header-icon" (click)="getSpaceModel(space.name)">
         <span class="icon">
           <i class="fa fa-cloud-download"></i>
         </span>
-    </a>
+    </a>-->
 </header>
 
 <div class="card-content stretched">
@@ -74,7 +74,7 @@
     <small>Last modified: {{space.modified | date:'medium'}}</small>
 </div>
 <footer class="card-footer">
-    <!--<datawhore-connect-oauth [space]="space" class="card-footer-item"  *ngIf="space.oauth">></datawhore-connect-oauth>-->
+    <datawhore-connect-oauth [space]="space" class="card-footer-item"  *ngIf="space.oauth">></datawhore-connect-oauth>
     <a class="card-footer-item is-success" (click)="updateSpaceSettings(space)" *ngIf="space.inEditMode && space.oauth">
         <span>Save</span>
     </a>
