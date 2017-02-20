@@ -3,7 +3,6 @@ import {SpacesService} from '../../../services/spaces.service';
 import {SpaceModel} from '../../../models/space.model';
 import {SpaceOauthSettings} from '../../../models/space-settings.model';
 import 'rxjs/add/operator/map';
-import {Router} from '@angular/router';
 
 @Component({
     selector: 'datawhore-edit-spaces',
@@ -19,7 +18,7 @@ export class EditSpacesComponent implements OnInit {
     protected isLoadingSettings = true;
     protected spaces: Array<SpaceModel>;
 
-    constructor(private spacesService: SpacesService, private router: Router) {
+    constructor(private spacesService: SpacesService) {
     }
 
     ngOnInit() {
@@ -36,7 +35,9 @@ export class EditSpacesComponent implements OnInit {
     private getSpaceOauthSettings(): any {
 
         return this.spaces.map(spaceConfig => {
+
             this.spacesService.getOauthSettings(spaceConfig.name).subscribe((settingsRetrieved: SpaceOauthSettings) => {
+                // console.log(settingsRetrieved);
                 this.spaces.filter((space: SpaceModel) => {
                     if (space.name === spaceConfig.name) {
                         space.oauth = settingsRetrieved;
@@ -57,6 +58,12 @@ export class EditSpacesComponent implements OnInit {
         space.inEditMode = !space.inEditMode;
     }
 
+    protected getSpaceModel(spaceName: string): any {
+        return this.spacesService.getSpace(spaceName).subscribe(space => {
+            console.log(space);
+        });
+    }
+
     protected cancelSpaceAdd(space: SpaceModel): void {
         this.addingSpaces = this.addingSpaces.filter(spaces => spaces.modified !== space.modified);
     }
@@ -65,7 +72,6 @@ export class EditSpacesComponent implements OnInit {
         this.spacesService.updateSpace(updatedSpace).subscribe(updatingSpaceRes => {
             this.spaces = this.spaces.filter(space => {
                 space.inEditMode = false;
-                // debugger
                 return space.makeSpaceModel({});
             });
         });

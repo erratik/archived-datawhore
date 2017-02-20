@@ -28,9 +28,9 @@
                             <img src="http://bulma.io/images/placeholders/32x32.png">
                         </figure>
                         <span>{{space.name}}</span>
-                        <!--<div *ngIf="space.inEditMode">-->
+                        <!--<div *ngIf="spaceName.inEditMode">-->
                             <!--<div class="control">-->
-                                <!--<input class="input" type="text" placeholder="Text input" [(ngModel)]="space.name">-->
+                                <!--<input class="input" type="text" placeholder="Text input" [(ngModel)]="spaceName.name">-->
                                 <!--&lt;!&ndash;<span class="help is-success">This username is available</span>&ndash;&gt;-->
                             <!--</div>-->
                         <!--</div>-->
@@ -38,6 +38,11 @@
                     <a class="card-header-icon" (click)="toggleEditSpace(space)">
                         <span class="icon" >
                           <i class="fa fa-edit"></i>
+                        </span>
+                    </a>
+                    <a class="card-header-icon" (click)="getSpaceModel(space.name)">
+                        <span class="icon" >
+                          <i class="fa fa-cloud-download"></i>
                         </span>
                     </a>
                 </header>
@@ -51,13 +56,16 @@
                                     <strong>{{spaceProp.label}}</strong>: {{spaceProp.value}}
                                 </li>
                             </ul>
-                            <small *ngIf="space.oauth.extras">
-                                <ul *ngFor="let spaceProp of space.oauth.extras">
-                                    <li>
-                                        <strong>{{spaceProp.label}}</strong>: {{spaceProp.value}}
-                                    </li>
-                                </ul>
-                            </small>
+                            <details *ngIf="space.oauth.extras.length">
+                                <summary>Acquired Oauth Settings</summary>
+                                <small>
+                                    <ul *ngFor="let spaceProp of space.oauth.extras">
+                                        <li>
+                                            <strong>{{spaceProp.label}}</strong>: {{spaceProp.value}}
+                                        </li>
+                                    </ul>
+                                </small>
+                            </details>
                         </div>
                         <div *ngIf="space.inEditMode && space.oauth">
                             <ul *ngFor="let spaceProp of space.oauth.settings">
@@ -66,18 +74,20 @@
                                     <input type="text" class="input" [(ngModel)]="spaceProp.value">
                                 </li>
                             </ul>
-                            <a class="button is-success" (click)="updateSpaceSettings(space)">
-                                <span class="icon is-small is-outlined"><i class="fa fa-check"></i></span>
-                                <span>Save</span>
-                            </a>
-                            <pre>{{space.oauth | json}}</pre>
                         </div>
-                        <small>Last modified: {{space.modified | date:'medium'}}</small>
                     </div>
+                    <details>
+                        <summary>space | json</summary>
+                        <pre>{{space | json}}</pre>
+                    </details>
+                    <small>Last modified: {{space.modified | date:'medium'}}</small>
                 </div>
                 <footer class="card-footer">
-                    <a class="card-footer-item">Connect</a>
-                    <a class="card-footer-item">Reset</a>
+                    <datawhore-connect-oauth [space]="space" class="card-footer-item"  *ngIf="space.inEditMode && space.oauth">></datawhore-connect-oauth>
+                    <a class="card-footer-item is-success" (click)="updateSpaceSettings(space)" *ngIf="space.inEditMode && space.oauth">
+                        <span class="icon is-small is-outlined"><i class="fa fa-check"></i></span>
+                        <span>Save</span>
+                    </a>
                     <a class="card-footer-item">Delete</a>
                 </footer>
             </div>

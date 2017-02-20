@@ -1,44 +1,74 @@
 let mongoose = require('mongoose');
 
-// var moment = require('moment');
-// const _ = require('lodash');
-
 const SettingSchema = {
     schema: {
         space: String,
         modified: Number,
+        connected: Boolean,
         oauth: [],
         extras: []
     },
     self: {
         findBySpaceName: function (spaceName: string, cb) {
-            this.find({space: spaceName}, function(err, retrievedSpace) {
+            let _this = this;
+            this.find({space: spaceName}, function (err, retrievedSpace) {
                 const space = retrievedSpace[0];
-                cb(err, space || `no settings saved for ${spaceName}`);
+                if (!space) {
+
+                    const query = {space: spaceName},
+                        update = {modified: Date.now()},
+                        opts = {multi: false, upsert: true};
+
+                    _this.update(query, update, opts, function (error, modelUpdated) {
+
+                        if (modelUpdated) {
+                            console.log(update);
+                        } else if (error) {
+                            console.log(error);
+                        }
+
+                    });
+                }
+                cb(err, space);
             });
         }
     },
 
     updateSettings: function (update, cb) {
+
         const query = {space: update.name},
             opts = {multi: false, upsert: true};
+
+        delete update._id;
+        update.space = update.name;
         update.modified = Date.now();
+        update.connected = false;
+
+        // stamp the oauth extras with a type
         if (update.oauth.extras) {
+
+            update.connected = update.oauth.extras.filter(extra => {
+                if (extra.label.indexOf('token') >= 0) {
+                    return true;
+                }
+            }).length;
+
             update.extras = update.oauth.extras.map(settings => {
+                if (settings.label.indexOf('token') !== -1) {
+                    update.connected = true;
+                }
                 settings.type = 'oauth';
                 return settings;
             });
         }
 
         update.oauth = update.oauth.settings;
+        console.log('update ->', update);
 
         this.model('Setting').update(query, update, opts, function (err, modelUpdated) {
 
             if (modelUpdated) {
-
-                console.log('updated', update, update.name, update.modified);
-                console.log('----------------------------------');
-
+                console.log('modelUpdated ->', modelUpdated);
                 cb(update);
             } else if (err) {
                 cb(err);
@@ -46,24 +76,9 @@ const SettingSchema = {
 
         });
 
-        // { "_id" : ObjectId( "5715955c3b15d2b156fc4dba" ),
-        //     "space" : "moves",
-        //     "modified" : 1462416395,
-        //     "oauth" : [
-        //     { "value" : "Np70goaQaH27n3n5BrbdENOe5V0IQf9wbVZXT1Ocqop1EULJou",
-        //         "label" : "Consumer Key",
-        //         "keyName" : "apiKey" },
-        //     { "value" : "4Oz4tjYZOCeqcaBbVIiLTaVAaAGF7ajIZCbOgs3JYtSuOjKYCK",
-        //         "label" : "Consumer Secret",
-        //         "keyName" : "apiSecret" },
-        //     { "value" : "/api/callback/moves",
-        //         "label" : "Authorization URL",
-        //         "keyName" : "authorizationUrl" } ],
-        //     "extras" : [
-        //     }
     }
     /*    getProperties: function(trs
-    ype, callback) {
+     ype, callback) {
      return this.model('Setting').find({ name: this.name }, function(err, Setting){
      //console.log(Setting);
      callback(Setting[0][type+'Properties']);
@@ -108,6 +123,6 @@ const SettingSchema = {
 
 };
 
-var Setting = require('./createModel')(mongoose, 'Setting', SettingSchema);
+const Setting = require('./createModel')(mongoose, 'Setting', SettingSchema);
 
 module.exports = Setting;

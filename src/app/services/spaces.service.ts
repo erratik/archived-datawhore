@@ -1,49 +1,45 @@
 import {SpaceModel} from '../models/space.model';
 import {Injectable} from '@angular/core';
-import {Http, Response, Headers, RequestOptions} from '@angular/http';
+import {Http, Response, Headers, RequestOptions, Jsonp} from '@angular/http';
 import 'rxjs/add/operator/map';
 import {Observable} from 'rxjs';
 import {SpaceOauthSettings, OauthSettings, OauthExtras} from '../models/space-settings.model';
+import {Paths} from '../classes/paths.class';
 
 @Injectable()
 export class SpacesService {
 
-    private static readonly API_SERVER = 'http://127.0.0.1:10010/api';
-
     // private instance variable to hold base url
-    private apiServer = 'http://127.0.0.1:10010/api';
+    private apiServer = Paths.DATAWHORE_API_URL;
 
     constructor(private http: Http) {
     }
-/*
 
-    getSpace(spaceName: string): Observable<SpaceModel[]> {
-        console.log(spaceName);
+    getSpace(spaceName: string): Observable<SpaceModel> {
+
         return this.http.get(`${this.apiServer}/space/${spaceName}`).map((res: Response) => {
-
-            console.log('hello');
-            const spaces = res.json();
-            console.log(spaces);
-            return spaces.map(space => {
-                return new SpaceModel(space.name, space.modified);
-
-            });
+            const space = res.json();
+            // console.log(space);
+            return space;
         }).catch(this.handleError);
     }
 
-    public getSpaces(spaces, fetchSettings = false): any {
-        console.log(spaces);
-        spaces.forEach(space => {
+    /*
 
-            this.getSpace(space);
-        });
-        // return spaces.map(space => {
-        //     return this.getSpace(space.name);
-        //     // return new SpaceModel(space.name, space.modified);
-        // }).catch(this.handleError);
-    }
 
-*/
+     public getSpaces(spaces, fetchSettings = false): any {
+     console.log(spaces);
+     spaces.forEach(space => {
+
+     this.getSpace(space);
+     });
+     // return spaces.map(space => {
+     //     return this.getSpace(space.name);
+     //     // return new SpaceModel(space.name, space.modified);
+     // }).catch(this.handleError);
+     }
+
+     */
 
     public getAllSpaces(fetchSettings = false): Observable<SpaceModel[]> {
         return this.http.get(`${this.apiServer}/spaces`).map((res: Response) => {
@@ -59,54 +55,83 @@ export class SpacesService {
     public getOauthSettings(spaceName: string): Observable<SpaceOauthSettings> {
         return this.http.get(`${this.apiServer}/space/settings/${spaceName}`)
             .map((res: Response) => {
-                return this.setupSpace(res);
+                return this.setupSpaceSettings(res);
             })
             .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
     }
-    /* public getSpace(spaceName: string, fetchSettings = false): Observable<SpaceModel> {
-     return this.http.get(`${this.apiServer}/space/${spaceName}`).map((res: Response) => {
 
-     const space = res.json();
-     return space.map(spaceResponse => {
-     let _space = new SpaceModel(spaceResponse.name, spaceResponse.modified || Date.now());
-     return _space as SpaceModel;
+    public connect(space: SpaceModel, authorizationUrl: string): any {
+        console.log(space.name, authorizationUrl);
 
-     });
+        // fill up the placeholders by casting the actual key values
+        //
+        // });
+        // return this.http.post(`${authorizationUrl}`)
+        //     .map((res: Response) => {
+        //         console.log(res.json());
+        //         return res.json();
+        //     })
+        //     .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
+    }
 
-     })
-     .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
-     }*/
+    public requestAccessToken(url: string, space: SpaceModel): Observable<SpaceModel> {
 
-
-    public updateSpace(space: SpaceModel): Observable<any> {
-        const bodyString = JSON.stringify(space); // Stringify payload
+        const bodyString = JSON.stringify({url: url}); // Stringify payload
         const headers = new Headers({'Content-Type': 'application/json'}); // ... Set content type to JSON
         const options = new RequestOptions({headers: headers}); // Create a request option
 
-        return this.http.put(`${this.apiServer}/space/update/${space['name']}`, bodyString, options) // ...using put request
-            .map((res: Response) => {
-                return this.setupSpace(res);
+        return this.http.post(`${this.apiServer}/oauth/middleware`, bodyString, options)
+            .map((res) => {
+                const oauthExtras: Array<OauthExtras> = [];
+                const resExtras = res.json();
+                for (let key of Object.keys(resExtras)) {
+                    oauthExtras.push(new OauthExtras(key, resExtras[key]));
+                }
+
+                space.oauth.connected = !resExtras.hasOwnProperty('error');
+                space.oauth.extras = oauthExtras;
+
+                return space;
             })
-            .catch((error: any) => Observable.throw(error.json().error || 'Server error')); // ...errors if any
+            .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
     }
 
-    private setupSpace(res: Response): any {
-        let spaceResponse = res.json();
 
-        if (spaceResponse.oauth) {
-            const spaceOauth = spaceResponse.oauth;
-            const spaceModified = spaceResponse.modified;
+    public updateSpace(space: SpaceModel): Observable<any> {
 
-            let extras = spaceResponse.extras.filter(extra => extra.type === 'oauth');
-            spaceResponse = new SpaceOauthSettings(
+        const bodyString = JSON.stringify(space);
+        const headers = new Headers({'Content-Type': 'application/json'});
+        const options = new RequestOptions({headers: headers});
+
+        return this.http.put(`${this.apiServer}/space/update/${space['name']}`, bodyString, options)
+            .map((res: Response) => {
+                return this.setupSpaceSettings(res);
+            })
+            .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
+    }
+
+    private setupSpaceSettings(res: Response): any {
+
+        let settingsRes = res.json();
+
+        if (settingsRes.oauth) {
+            const spaceOauth = settingsRes.oauth;
+            const modified = settingsRes.modified;
+            const connected = settingsRes.connected;
+
+            let extras = settingsRes.extras.filter(extra => extra.type === 'oauth');
+            settingsRes = new SpaceOauthSettings(
                 spaceOauth.map(settings => new OauthSettings(settings.label, settings.value, settings.keyName)),
                 extras.map(settings => new OauthExtras(settings.label, settings.value)),
-                spaceModified
+                modified,
+                connected
             );
+
+
         } else {
-            spaceResponse = new SpaceOauthSettings();
+            settingsRes = new SpaceOauthSettings();
         }
-        return spaceResponse;
+        return settingsRes;
     }
 
     private extractData(res: Response) {

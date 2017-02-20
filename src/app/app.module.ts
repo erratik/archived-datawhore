@@ -20,6 +20,8 @@ import { EditSpacesComponent } from './content/spaces/edit-spaces/edit-spaces.co
 
 import { PostsComponent } from './content/posts/posts.component';
 import { ValuesPipePipe } from './shared/pipes/values-pipe.pipe';
+import { ConnectOauthComponent } from './services/connect-oauth/connect-oauth.component';
+import { ConnectCallbackComponent } from './views/connect-callback/connect-callback.component';
 
 const appRoutes: Routes = [
   {
@@ -27,8 +29,18 @@ const appRoutes: Routes = [
     redirectTo: 'configs',
     pathMatch: 'full'
   },
-  { path: 'configs', component: ConfigsViewComponent },
-  { path: 'settings', component: SettingsViewComponent },
+  {
+    path: 'configs',
+    component: ConfigsViewComponent
+  },
+  {
+    path: 'oauth/connect/:space',
+    component: ConnectCallbackComponent
+  },
+  {
+    path: 'settings',
+    component: SettingsViewComponent
+  },
 ];
 
 
@@ -51,7 +63,9 @@ const appRoutes: Routes = [
     AddSpaceComponent,
     AddSpaceComponent,
     EditSpacesComponent,
-    ValuesPipePipe
+    ValuesPipePipe,
+    ConnectOauthComponent,
+    ConnectCallbackComponent
   ],
   providers: [PostsService, SpacesService],
   bootstrap: [AppComponent]

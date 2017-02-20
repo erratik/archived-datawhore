@@ -255,7 +255,6 @@ var ConfigSchema = {
     schema: {
         name: String,
         modified: Number,
-        connected: Boolean,
         avatar: String,
         username: String
     },

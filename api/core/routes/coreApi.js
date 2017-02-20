@@ -5,6 +5,7 @@ var moment = require('moment');
 var Core = require('../models/coreModel');
 var Space = require('../models/spaceModel');
 var Setting = require('../models/settingModel');
+var request = require('request');
 
 // expose the routes to our app with module.exports
 module.exports = function(app) {
@@ -19,8 +20,7 @@ module.exports = function(app) {
 
     app.get('/api/space/:space', function(req, res) {
         Space.findByName(req.params.space, function(err, data){
-            console.log(data);
-            res.json(data);
+            res.json(data[0]);
         });
     });
 
@@ -29,6 +29,19 @@ module.exports = function(app) {
             // console.log(data.extras);
             res.json(data);
         });
+    });
+
+    app.post('/api/oauth/middleware', function(req, res) {
+
+        request.post(
+            req.body.url,
+            { json: { key: 'value' } },
+            function (error, response, body) {
+                res.send(body);
+
+            }
+        );
+
     });
 
     // create network object -------------------------------------------------------*/
@@ -49,6 +62,7 @@ module.exports = function(app) {
     // update network settings in a config -------------------------------------------------------*/
     app.put('/api/space/update/:space', function(req, res) {
         var setting = new Setting(req.body); // instantiated Space
+        console.log('req.body -> ', req.body);
         setting.updateSettings(req.body, function() {
             Setting.findBySpaceName(req.params.space, function(err, space){
                 console.log('space -> ', space);
