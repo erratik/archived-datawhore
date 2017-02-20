@@ -63,12 +63,12 @@ const SettingSchema = {
         }
 
         update.oauth = update.oauth.settings;
-        console.log('update ->', update);
+        // console.log('update ->', update);
 
         this.model('Setting').update(query, update, opts, function (err, modelUpdated) {
 
             if (modelUpdated) {
-                console.log('modelUpdated ->', modelUpdated);
+                // console.log('modelUpdated ->', modelUpdated);
                 cb(update);
             } else if (err) {
                 cb(err);

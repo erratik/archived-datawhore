@@ -1,6 +1,6 @@
-import {Component, OnInit, ElementRef, Output, EventEmitter, ViewChild} from '@angular/core';
-import {SpaceModel} from "../../models/space.model";
-import {EditSpacesComponent} from "../../content/spaces/edit-spaces/edit-spaces.component";
+import {Component, OnInit, ElementRef, ViewChild} from '@angular/core';
+import {SpaceModel} from '../../models/space.model';
+import {EditSpacesComponent} from '../../content/spaces/edit-spaces/edit-spaces.component';
 
 @Component({
   selector: 'datawhore-configs',
@@ -20,7 +20,7 @@ export class ConfigsViewComponent implements OnInit {
     this.el.nativeElement.className = 'content';
   }
 
-  protected addNewSpace() : any {
+  protected addNewSpace(): any {
     this.editSpacesComponent.addingSpaces.push(new SpaceModel(ConfigsViewComponent.NEW_SPACE_VALUE, Date.now()));
     this.editSpacesComponent.isAddingSpaces = true;
   }

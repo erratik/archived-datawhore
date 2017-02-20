@@ -51,20 +51,23 @@
                     <div class="content">
 
                         <div *ngIf="!space.inEditMode && space.oauth">
-                            <ul *ngFor="let spaceProp of space.oauth.settings">
-                                <li>
-                                    <strong>{{spaceProp.label}}</strong>: {{spaceProp.value}}
+                            <ul>
+                                <li *ngFor="let spaceProp of space.oauth.settings">
+                                    <div *ngIf="spaceProp.value">
+                                        <strong>{{spaceProp.label}}</strong>: {{spaceProp.value}}
+                                    </div>
+                                    <div *ngIf="!spaceProp.value">
+                                        <strong>{{spaceProp.label}}</strong> (<em>{{spaceProp.keyName}}</em>) has not been set yet
+                                    </div>
                                 </li>
                             </ul>
                             <details *ngIf="space.oauth.extras.length">
                                 <summary>Acquired Oauth Settings</summary>
-                                <small>
-                                    <ul *ngFor="let spaceProp of space.oauth.extras">
-                                        <li>
-                                            <strong>{{spaceProp.label}}</strong>: {{spaceProp.value}}
-                                        </li>
-                                    </ul>
-                                </small>
+                                <ul *ngFor="let spaceProp of space.oauth.extras">
+                                    <li>
+                                        <strong>{{spaceProp.label}}</strong>: {{spaceProp.value}}
+                                    </li>
+                                </ul>
                             </details>
                         </div>
                         <div *ngIf="space.inEditMode && space.oauth">
@@ -77,15 +80,14 @@
                         </div>
                     </div>
                     <details>
-                        <summary>space | json</summary>
+                        <summary class="tag">space | json</summary>
                         <pre>{{space | json}}</pre>
                     </details>
                     <small>Last modified: {{space.modified | date:'medium'}}</small>
                 </div>
                 <footer class="card-footer">
-                    <datawhore-connect-oauth [space]="space" class="card-footer-item"  *ngIf="space.inEditMode && space.oauth">></datawhore-connect-oauth>
+                    <datawhore-connect-oauth [space]="space" class="card-footer-item"  *ngIf="space.oauth">></datawhore-connect-oauth>
                     <a class="card-footer-item is-success" (click)="updateSpaceSettings(space)" *ngIf="space.inEditMode && space.oauth">
-                        <span class="icon is-small is-outlined"><i class="fa fa-check"></i></span>
                         <span>Save</span>
                     </a>
                     <a class="card-footer-item">Delete</a>

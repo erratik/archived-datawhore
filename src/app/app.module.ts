@@ -34,7 +34,7 @@ const appRoutes: Routes = [
     component: ConfigsViewComponent
   },
   {
-    path: 'oauth/connect/:space',
+    path: 'oauth/connect/:space/',
     component: ConnectCallbackComponent
   },
   {

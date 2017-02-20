@@ -9,10 +9,10 @@ export class SpaceModel {
                 public icon?: string) {
     }
 
-    public makeSpaceModel(options: Options): any {
-
+    public toSpaceSettings(options: Options): any {
         // the spaceName has been configured, so add the auth url... (premature)
-        if (!this.oauth) { // the spaceName has been configured
+
+        if (!this.oauth.settings.length) { // the spaceName has been configured
             this.fillDefaultSettings();
         }
 
@@ -30,7 +30,8 @@ export class SpaceModel {
         const defaultOauthValues = {
             'apiKey': 'Consumer key',
             'apiSecret': 'Consumer secret',
-            'authorizationUrl': 'Authorization URL'
+            'authorizationUrl': 'Authorization URL',
+            'middlewareAuthUrl': 'Middleware URL',
         };
 
         for (let [key, value] of Object.entries(defaultOauthValues)) {

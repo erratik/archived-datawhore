@@ -1,6 +1,6 @@
 import {SpaceModel} from '../models/space.model';
 import {Injectable} from '@angular/core';
-import {Http, Response, Headers, RequestOptions, Jsonp} from '@angular/http';
+import {Http, Response, Headers, RequestOptions} from '@angular/http';
 import 'rxjs/add/operator/map';
 import {Observable} from 'rxjs';
 import {SpaceOauthSettings, OauthSettings, OauthExtras} from '../models/space-settings.model';
@@ -16,11 +16,8 @@ export class SpacesService {
     }
 
     getSpace(spaceName: string): Observable<SpaceModel> {
-
         return this.http.get(`${this.apiServer}/space/${spaceName}`).map((res: Response) => {
-            const space = res.json();
-            // console.log(space);
-            return space;
+            return res.json();
         }).catch(this.handleError);
     }
 
@@ -41,7 +38,7 @@ export class SpacesService {
 
      */
 
-    public getAllSpaces(fetchSettings = false): Observable<SpaceModel[]> {
+    public getAllSpaces(): Observable<SpaceModel[]> {
         return this.http.get(`${this.apiServer}/spaces`).map((res: Response) => {
 
             const spaces = res.json();
@@ -76,7 +73,10 @@ export class SpacesService {
 
     public requestAccessToken(url: string, space: SpaceModel): Observable<SpaceModel> {
 
-        const bodyString = JSON.stringify({url: url}); // Stringify payload
+        const urlSplit = url.split('?');
+        const queryData = JSON.parse('{"' + decodeURI(urlSplit[1].replace(/&/g, '\",\"').replace(/=/g, '\":\"')) + '"}');
+
+        const bodyString = JSON.stringify({url: url, data: queryData}); // Stringify payload
         const headers = new Headers({'Content-Type': 'application/json'}); // ... Set content type to JSON
         const options = new RequestOptions({headers: headers}); // Create a request option
 
@@ -134,10 +134,6 @@ export class SpacesService {
         return settingsRes;
     }
 
-    private extractData(res: Response) {
-        let body = res.json();
-        return body.data || {};
-    }
 
     private handleError(error: Response | any) {
         // In a real world app, we might use a remote logging infrastructure

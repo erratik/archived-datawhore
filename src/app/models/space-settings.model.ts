@@ -15,6 +15,20 @@ export class SpaceOauthSettings {
         });
     }
 
+    public populateMatches(value, oauth) {
+
+        let matchedSettings;
+        let regex = /(\<(.*?)\>)/gm, match;
+        while (match = regex.exec(oauth[value])) {
+            const settingsArr = oauth.settings.filter(settings => settings.keyName === match[2]);
+
+            matchedSettings = settingsArr.map(setting => setting.castValues(oauth[value], match[1], settingsArr[0].value));
+            if (matchedSettings.length) {
+                return matchedSettings[0];
+            }
+        }
+    }
+
 }
 
 export class OauthSettings extends PropObj {

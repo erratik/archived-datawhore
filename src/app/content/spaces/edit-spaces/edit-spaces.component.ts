@@ -26,7 +26,7 @@ export class EditSpacesComponent implements OnInit {
         const getSpaces = this.spacesService.getAllSpaces(true)
             .do((spaces) => this.spaces = spaces)
             .do(() => this.isLoadingSpaces = false)
-            .switchMap(() => this.getSpaceOauthSettings());
+            .switchMap((settings) => this.getSpaceOauthSettings());
 
         getSpaces.subscribe();
 
@@ -37,17 +37,18 @@ export class EditSpacesComponent implements OnInit {
         return this.spaces.map(spaceConfig => {
 
             this.spacesService.getOauthSettings(spaceConfig.name).subscribe((settingsRetrieved: SpaceOauthSettings) => {
-                // console.log(settingsRetrieved);
+
                 this.spaces.filter((space: SpaceModel) => {
                     if (space.name === spaceConfig.name) {
                         space.oauth = settingsRetrieved;
-                        // console.log(new Date(settingsRetrieved.modified));
-                        space.makeSpaceModel({
+
+                        space.toSpaceSettings({
                             name: spaceConfig.name,
                             modified: settingsRetrieved.modified,
                             oauth: settingsRetrieved
                         });
                     }
+
                 });
                 this.isLoadingSettings = false;
             });
@@ -72,7 +73,7 @@ export class EditSpacesComponent implements OnInit {
         this.spacesService.updateSpace(updatedSpace).subscribe(updatingSpaceRes => {
             this.spaces = this.spaces.filter(space => {
                 space.inEditMode = false;
-                return space.makeSpaceModel({});
+                return space.toSpaceSettings({});
             });
         });
     }

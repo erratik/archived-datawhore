@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {Http, Jsonp, ConnectionBackend} from '@angular/http';
 import {SpacesService} from '../../services/spaces.service';
 import 'rxjs/add/operator/map';
 import {SpaceOauthSettings, OauthSettings} from '../../models/space-settings.model';
@@ -19,11 +18,11 @@ export class ConnectCallbackComponent implements OnInit {
     private space: SpaceModel = null;
     protected spaceName: string = null;
     protected isRequestingAccessToken = false;
-    private accessTokenRequestUrl: string = Paths.MOVES_REQUEST_TOKEN_URL;
+    private accessTokenRequestUrl = '';
     protected settings: SpaceOauthSettings = null;
 
+
     constructor(private activatedRoute: ActivatedRoute,
-                private jsonp: Jsonp, private http: Http,
                 private spacesService: SpacesService) {
     }
 
@@ -53,13 +52,17 @@ export class ConnectCallbackComponent implements OnInit {
             .do((spaceRetrieved) => this.space = spaceRetrieved)
             .switchMap(() => this.spacesService.getOauthSettings(this.spaceName))
             .do((oauth) => {
-                this.isRequestingAccessToken = true;
 
+                this.isRequestingAccessToken = true;
+                this.accessTokenRequestUrl = oauth.middlewareAuthUrl;
+
+                console.log(this.accessTokenRequestUrl);
                 // this may only be for moves, so far
                 oauth.settings.push(new OauthSettings('code', this.queryParams.code, 'code'));
-                oauth.settings.push(new OauthSettings('redirectUrl', Paths.DATAWHORE_API_CALLBACK_URL + '/' + this.spaceName, 'redirectUrl'));
+                oauth.settings.push(new OauthSettings('redirectUrl', Paths.DATAWHORE_API_CALLBACK_URL + '/' + this.spaceName + '/', 'redirectUrl'));
 
                 // todo: turn this into a function to share
+                // find all matched <keys> in a string that we have in a [{value ,label ,keyName}] aka PropObj
                 let regex = /(\<(.*?)\>)/gm, match;
                 while (match = regex.exec(this.accessTokenRequestUrl)) {
                     const matchedSetting = oauth.settings.filter(settings => settings.keyName === match[2]);
@@ -75,7 +78,6 @@ export class ConnectCallbackComponent implements OnInit {
                         return settings;
                     }
                 });
-
                 this.settings = oauth;
 
                 this.space.oauth = new SpaceOauthSettings(
@@ -91,15 +93,14 @@ export class ConnectCallbackComponent implements OnInit {
 
                 // save space with api credentials
                 this.spacesService.updateSpace(spaceWithCredentials).subscribe(updatingSpaceRes => {
-
                     console.log(updatingSpaceRes);
+                    this.isRequestingAccessToken = false;
                 });
 
-                // this.space = spaceWithCredentials
+                // todo: redirect user to configs or maybe to a view for the space?
+
             });
 
-        // const accessTokenReq = this.spacesService.requestAccessToken();
-        //
         space.subscribe();
 
     }

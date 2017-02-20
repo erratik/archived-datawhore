@@ -12,11 +12,6 @@ var config = {
     appRoot: __dirname // required config
 };
 
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }));
-
-// parse application/json
-app.use(bodyParser.json());
 
 
 
@@ -39,6 +34,12 @@ app.use(function (req, res, next) {
     // Pass to next layer of middleware
     next();
 });
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// parse application/json
+app.use(bodyParser.json());
 
 
 SwaggerExpress.create(config, function (err, swaggerExpress) {
