@@ -3,10 +3,11 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { RouterModule, Routes } from '@angular/router';
+
+import { FileSelectDirective, FileDropDirective } from 'ng2-file-upload';
+
 import { PostsService } from './services/posts.service';
 import { SpacesService } from './services/spaces.service';
-
-// import { NgSemanticModule } from "ng-semantic";
 
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './wrapper/header/header.component';
@@ -22,6 +23,7 @@ import { PostsComponent } from './content/posts/posts.component';
 import { ValuesPipePipe } from './shared/pipes/values-pipe.pipe';
 import { ConnectOauthComponent } from './services/connect-oauth/connect-oauth.component';
 import { ConnectCallbackComponent } from './views/connect-callback/connect-callback.component';
+import { SpaceComponent } from './content/spaces/space/space.component';
 
 const appRoutes: Routes = [
   {
@@ -60,12 +62,14 @@ const appRoutes: Routes = [
     SettingsViewComponent,
     ConfigsViewComponent,
     PostsComponent,
+    FileSelectDirective,
     AddSpaceComponent,
     AddSpaceComponent,
     EditSpacesComponent,
     ValuesPipePipe,
     ConnectOauthComponent,
-    ConnectCallbackComponent
+    ConnectCallbackComponent,
+    SpaceComponent
   ],
   providers: [PostsService, SpacesService],
   bootstrap: [AppComponent]

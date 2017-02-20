@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 var moment = require('moment');
-
+var multer = require('multer');
 
 var Space = require('../models/spaceModel');
 var Setting = require('../models/settingModel');
@@ -59,4 +59,6 @@ module.exports = function(app) {
         });
 
     });
+
+
 };

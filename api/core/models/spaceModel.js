@@ -256,58 +256,23 @@ var ConfigSchema = {
         name: String,
         modified: Number,
         avatar: String,
-        username: String
+        username: String,
+        icon: String
     },
     self: {
         findByName: function (name, cb) {
             return this.find({name: name}, cb);
         },
-        getOauthSettings: function (name, cb) {
-            // console.log(this.find({ name: name }));
-            return this.find({name: name}, 'settings', cb);
-        },
         getAll: function (cb) {
             return this.find({}, cb);
         }
     },
-    resetConfig: function (options, cb) {
-
-        console.log('<------- resetting ' + options.type + ' config ------->');
-
-        var data = util.mapProperties(options.data);
-
-
-        // testing
-        var entities = _.filter(data, 'entity');
-        console.log(':: ', entities);
-        _.forEach(entities, function (entity) {
-            console.log('');
-            console.log(_.filter(entity.attributes, 'entity'));
-            _.forEach(_.filter(entity.attributes, 'entity'), function (attribute, key) {
-                console.log(attribute.label, '^', attribute.attributes);
-            });
-            // console.log('^',_.filter(entity.content, 'entity'));
-        });
-
-
-        console.log('data? ', data);
-
-
-        this.updateSpace({
-            data: data,
-            type: options.type,
-            reset: true
-        }, function (config) {
-            cb(config);
-        });
-
-    },
-
-    updateSpace: function (cb) {
+    updateSpace: function (update, cb) {
 
         var query = {name: this.name},
-            update = {modified: Date.now()},
             opts = {multi: false, upsert: true};
+
+        update.modified = Date.now();
 
         this.model('Config').update(query, update, opts, function (err, modelUpdated) {
 

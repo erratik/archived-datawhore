@@ -10,7 +10,6 @@ function FileAppender (strategy, req) {
   this.req = req
 
   switch (strategy) {
-    case 'NONE': break
     case 'VALUE': break
     case 'ARRAY': req.files = []; break
     case 'OBJECT': req.files = Object.create(null); break
@@ -24,7 +23,6 @@ FileAppender.prototype.insertPlaceholder = function (file) {
   }
 
   switch (this.strategy) {
-    case 'NONE': break
     case 'VALUE': break
     case 'ARRAY': this.req.files.push(placeholder); break
     case 'OBJECT':
@@ -41,7 +39,6 @@ FileAppender.prototype.insertPlaceholder = function (file) {
 
 FileAppender.prototype.removePlaceholder = function (placeholder) {
   switch (this.strategy) {
-    case 'NONE': break
     case 'VALUE': break
     case 'ARRAY': arrayRemove(this.req.files, placeholder); break
     case 'OBJECT':

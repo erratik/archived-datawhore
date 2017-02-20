@@ -21,22 +21,6 @@ export class SpacesService {
         }).catch(this.handleError);
     }
 
-    /*
-
-
-     public getSpaces(spaces, fetchSettings = false): any {
-     console.log(spaces);
-     spaces.forEach(space => {
-
-     this.getSpace(space);
-     });
-     // return spaces.map(space => {
-     //     return this.getSpace(space.name);
-     //     // return new SpaceModel(space.name, space.modified);
-     // }).catch(this.handleError);
-     }
-
-     */
 
     public getAllSpaces(): Observable<SpaceModel[]> {
         return this.http.get(`${this.apiServer}/spaces`).map((res: Response) => {
@@ -55,20 +39,6 @@ export class SpacesService {
                 return this.setupSpaceSettings(res);
             })
             .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
-    }
-
-    public connect(space: SpaceModel, authorizationUrl: string): any {
-        console.log(space.name, authorizationUrl);
-
-        // fill up the placeholders by casting the actual key values
-        //
-        // });
-        // return this.http.post(`${authorizationUrl}`)
-        //     .map((res: Response) => {
-        //         console.log(res.json());
-        //         return res.json();
-        //     })
-        //     .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
     }
 
     public requestAccessToken(url: string, space: SpaceModel): Observable<SpaceModel> {

@@ -23,14 +23,13 @@ function makeMiddleware (setup) {
     var storage = options.storage
     var fileFilter = options.fileFilter
     var fileStrategy = options.fileStrategy
-    var preservePath = options.preservePath
 
     req.body = Object.create(null)
 
     var busboy
 
     try {
-      busboy = new Busboy({ headers: req.headers, limits: limits, preservePath: preservePath })
+      busboy = new Busboy({ headers: req.headers, limits: limits })
     } catch (err) {
       return next(err)
     }
@@ -58,7 +57,6 @@ function makeMiddleware (setup) {
     }
 
     function abortWithError (uploadError) {
-      if (errorOccured) return
       errorOccured = true
 
       pendingWrites.onceZero(function () {
@@ -161,7 +159,9 @@ function makeMiddleware (setup) {
           pendingWrites.decrement()
           indicateDone()
         })
+
       })
+
     })
 
     busboy.on('error', function (err) { abortWithError(err) })

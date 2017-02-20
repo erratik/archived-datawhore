@@ -5,6 +5,7 @@ var express = require('express');
 var app = require('express')();
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');  // mongoose for mongodb
+var multer = require('multer');
 
 module.exports = app; // for testing
 
@@ -13,13 +14,11 @@ var config = {
 };
 
 
-
-
 // Add headers
 app.use(function (req, res, next) {
 
     // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', 'http://datawhore.erratik.ca:4200');
 
     // Request methods you wish to allow
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
@@ -62,6 +61,34 @@ SwaggerExpress.create(config, function (err, swaggerExpress) {
 
     var port = process.env.PORT || 10010;
 
+
+    var storage = multer.diskStorage({ //multers disk storage settings
+        destination: function (req, file, cb) {
+            cb(null, '../src/assets/uploads/.tmp');
+        },
+        filename: function (req, file, cb) {
+            var datetimestamp = Date.now();
+            cb(null, file.fieldname + '-' + datetimestamp + '.' + file.originalname.split('.')[file.originalname.split('.').length -1]);
+        }
+    });
+
+    var upload = multer({ //multer settings
+        storage: storage
+    }).single('file');
+
+    /** API path that will upload the files */
+    app.post('/api/upload/:space/:folder', function(req, res) {
+
+        upload(req, res,function(err){
+            console.log(req.file);
+            if(err){
+                res.json({error_code:1,err_desc:err});
+                return;
+            }
+
+            res.json(req.file);
+        });
+    });
 
     require('./core/routes/index')(app);
 
