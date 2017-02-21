@@ -44,11 +44,6 @@ export class ConnectCallbackComponent implements OnInit {
 
     }
 
-    // todo: turn this into a function to share
-    private castValues(haystack, needle, replace): string {
-        return haystack.replace(needle, replace);
-    }
-//
     protected getAccessToken(): void {
 
         // get space
@@ -70,13 +65,14 @@ export class ConnectCallbackComponent implements OnInit {
                 }
 
                 if (!this.skipTokenRequest) {
+
                     // todo: turn this into a function to share (enrich string with a PropObj)
                     // find all matched <keys> in a string that we have in a [{value ,label ,keyName}] aka PropObj
                     let regex = /(\<(.*?)\>)/gm, match;
                     while (match = regex.exec(this.accessTokenRequestUrl)) {
                         const matchedSetting = oauth.settings.filter(settings => settings.keyName === match[2]);
                         if (matchedSetting.length) {
-                            this.accessTokenRequestUrl = this.castValues(this.accessTokenRequestUrl, match[1], matchedSetting[0].value);
+                            this.accessTokenRequestUrl = oauth.castValues(this.accessTokenRequestUrl, match[1], matchedSetting[0].value);
                         }
                     }
 
@@ -101,10 +97,7 @@ export class ConnectCallbackComponent implements OnInit {
             .do((spaceWithCredentials) => {
 
                 // save space with api credentials
-                this.spacesService.updateSpace(spaceWithCredentials).subscribe(updatingSpaceRes => {
-                    console.log(updatingSpaceRes);
-                    this.isRequestingAccessToken = false;
-                });
+                this.spacesService.updateSpace(spaceWithCredentials).subscribe(() => this.isRequestingAccessToken = false);
 
                 // todo: redirect user to configs or maybe to a view for the space?
 

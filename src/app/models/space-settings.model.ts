@@ -11,7 +11,7 @@ export class SpaceOauthSettings {
                 public redirectUrl?: string) {
     }
 
-    private castValues(haystack, needle, replace): string {
+    public castValues(haystack, needle, replace): string {
         return haystack.replace(needle, replace);
     }
 
@@ -24,10 +24,8 @@ export class SpaceOauthSettings {
                 if (settingsValue) {
 
                     let regex = /(\<(.*?)\>)/gm, foundKey;
-
                     while (foundKey = regex.exec(settingsValue)) {
                         const matches = this.settings.filter(settings => settings.keyName === foundKey[2]);
-
                         if (matches.length) {
                             settingsValue = this.castValues(settingsValue, foundKey[1], matches[0].value);
                         }
