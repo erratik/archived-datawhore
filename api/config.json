@@ -4,12 +4,33 @@
     "host": "datawhore.erratik.ca:4200"
   },
   "facebook": {
-    "key": "[APP_ID]",
-    "secret": "[APP_SECRET]",
+    "key": "1428921280772005",
+    "secret": "16eee0db280c4d2bbc44e7748fad80ac",
     "callback": "/handle_facebook_callback",
     "scope": [
-      "user_groups",
-      "user_likes"
+      "public_profile",
+      "user_friends",
+      "email",
+      "user_about_me",
+      "user_actions.music",
+      "user_actions.news",
+      "user_actions.video",
+      "user_birthday",
+      "user_education_history",
+      "user_events",
+      "user_hometown",
+      "user_likes",
+      "user_location",
+      "user_photos",
+      "user_posts",
+      "user_relationships",
+      "user_relationship_details",
+      "user_religion_politics",
+      "user_tagged_places",
+      "user_videos",
+      "user_website",
+      "user_work_history",
+      "publish_actions"
     ]
   },
   "twitter": {

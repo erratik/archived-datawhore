@@ -8,14 +8,16 @@ module.exports = function (app) {
             'Content-Type':     'application/x-www-form-urlencoded'
         };
         var options = {
-            url: req.body.url,
+            uri: req.body.url,
             method: 'POST',
             headers: headers,
             form: req.body.data
         };
 
-        request.post(options, function (error, response, body) {
-            // console.log(body);
+        request(options, function (error, response, body) {
+            if ( error){
+                res.send(error);
+            }
             res.send(body);
         });
 

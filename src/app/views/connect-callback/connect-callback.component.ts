@@ -53,7 +53,9 @@ export class ConnectCallbackComponent implements OnInit {
             .switchMap(() => this.spacesService.getOauthSettings(this.spaceName))
             .do((oauth) => {
 
+
                 this.isRequestingAccessToken = true;
+
                 this.accessTokenRequestUrl = oauth.middlewareAuthUrl;
 
                 for (let keyName of Object.keys(this.queryParams)) {
@@ -65,27 +67,9 @@ export class ConnectCallbackComponent implements OnInit {
                     }
                 }
 
-                if (!this.skipTokenRequest) {
-
-                    // todo: turn this into a function to share (enrich string with a PropObj)
-                    // find all matched <keys> in a string that we have in a [{value ,label ,keyName}] aka PropObj
-                    let regex = /(\<(.*?)\>)/gm, match;
-                    while (match = regex.exec(this.accessTokenRequestUrl)) {
-                        const matchedSetting = oauth.settings.filter(settings => settings.keyName === match[2]);
-                        if (matchedSetting.length) {
-                            this.accessTokenRequestUrl = oauth.castValues(this.accessTokenRequestUrl, match[1], matchedSetting[0].value);
-                        }
-                    }
-
-                    // remove the code because fuck that noise
-                    oauth.settings = oauth.settings.filter(settings => {
-                        if (settings.label !== 'code') {
-                            return settings;
-                        }
-                    });
-                }
-
                 this.settings = oauth;
+
+                this.space = new SpaceModel(this.spaceName, this.space.modified);
 
                 this.space.oauth = new SpaceOauthSettings(
                     oauth.settings.map(settings => new OauthSettings(settings.label, settings.value, settings.keyName)),
@@ -93,14 +77,23 @@ export class ConnectCallbackComponent implements OnInit {
                     this.space.modified
                 );
 
+                this.space.toSpaceSettings({
+                    name: this.spaceName,
+                    modified: this.space.modified,
+                    oauth: this.space.oauth
+                });
+
+                this.space.oauth.populateMatches(['authorizationUrl', 'middlewareAuthUrl']);
+                console.log(this.space.oauth.middlewareAuthUrl);
+
             })
-            .switchMap(() => this.spacesService.requestAccessToken(this.accessTokenRequestUrl, this.space))
+            .switchMap(() => this.spacesService.requestAccessToken(this.space, this.skipTokenRequest))
             .do((spaceWithCredentials) => {
 
                 // save space with api credentials
                 this.spacesService.updateSpace(spaceWithCredentials).subscribe(() => {
                     this.isRequestingAccessToken = false;
-                    this.router.navigate(['/']);
+                    // this.router.navigate(['/']);
                 });
 
             });

@@ -59,16 +59,18 @@ export class SpacesService {
         //     .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
     }*/
 
-    public requestAccessToken(url: string, space: SpaceModel): Observable<SpaceModel> {
-        let queryData = '', urlSplit;
-        const skipTokenRequest = typeof url === 'undefined';
+    public requestAccessToken(space: SpaceModel, skip = false): Observable<SpaceModel> {
+        let queryData = '', urlSplit =[];
+        const skipTokenRequest = skip;
 
         if (!skipTokenRequest) {
-            urlSplit = url.split('?');
+            urlSplit = space.oauth.middlewareAuthUrl.split('?');
             queryData = JSON.parse('{"' + decodeURI(urlSplit[1].replace(/&/g, '\",\"').replace(/=/g, '\":\"')) + '"}');
+        } else {
+            urlSplit[0] = '';
         }
 
-        const bodyString = JSON.stringify({url: url, data: queryData}); // Stringify payload
+        const bodyString = JSON.stringify({url: urlSplit[0], data: queryData}); // Stringify payload
 
         const headers = new Headers({'Content-Type': 'application/json'}); // ... Set content type to JSON
         const options = new RequestOptions({headers: headers}); // Create a request option
