@@ -38,8 +38,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
 
-
-
 SwaggerExpress.create(config, function (err, swaggerExpress) {
     if (err) {
         throw err;

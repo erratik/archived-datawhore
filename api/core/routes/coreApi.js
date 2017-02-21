@@ -60,7 +60,7 @@ module.exports = function(app) {
         });
 
     });
-
+    
     /** API path that will upload the files */
     app.post('/api/upload/:space/:folder/:filename', function(req, res) {
 

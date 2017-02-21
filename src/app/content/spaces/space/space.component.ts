@@ -21,6 +21,12 @@ export class SpaceComponent implements OnInit {
     ngOnInit() {
         this.getSpaceOauthSettings();
         this.uploader = new FileUploader({url: `${Paths.DATAWHORE_API_URL}/upload/${this.space.name}/space/icon`});
+        this.uploader.onCompleteItem = (item, response, status, header) => {
+            if (status === 200) {
+                console.log(item);
+                console.log(response);
+            }
+        };
     }
 
     private getSpaceOauthSettings(): any {
