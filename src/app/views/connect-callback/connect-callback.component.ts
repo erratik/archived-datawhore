@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {SpacesService} from '../../services/spaces.service';
 import {SpaceOauthSettings, OauthSettings, OauthExtras} from '../../models/space-settings.model';
 import {SpaceModel} from '../../models/space.model';
@@ -23,6 +23,7 @@ export class ConnectCallbackComponent implements OnInit {
 
 
     constructor(private activatedRoute: ActivatedRoute,
+                private router: Router,
                 private spacesService: SpacesService) {
     }
 
@@ -97,9 +98,10 @@ export class ConnectCallbackComponent implements OnInit {
             .do((spaceWithCredentials) => {
 
                 // save space with api credentials
-                this.spacesService.updateSpace(spaceWithCredentials).subscribe(() => this.isRequestingAccessToken = false);
-
-                // todo: redirect user to configs or maybe to a view for the space?
+                this.spacesService.updateSpace(spaceWithCredentials).subscribe(() => {
+                    this.isRequestingAccessToken = false;
+                    this.router.navigate(['/']);
+                });
 
             });
 
