@@ -7,7 +7,8 @@ export class SpaceOauthSettings {
                 public modified: number = null,
                 public connected = false,
                 public authorizationUrl?: string,
-                public middlewareAuthUrl?: string) {
+                public middlewareAuthUrl?: string,
+                public redirectUrl?: string) {
 
         this.settings.filter(prop => {
             if (prop.keyName === 'authorizationUrl') { this.authorizationUrl = prop.value; }

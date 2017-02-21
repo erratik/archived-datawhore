@@ -1,5 +1,6 @@
-
 import {SpaceOauthSettings, OauthSettings} from './space-settings.model';
+import {Paths} from '../classes/paths.class';
+
 export class SpaceModel {
     constructor(public name: string,
                 public modified: number,
@@ -9,22 +10,7 @@ export class SpaceModel {
                 public avatar?: string) {
     }
 
-    public toSpaceSettings(options: Options): any {
-        // the spaceName has been configured, so add the auth url... (premature)
-
-        if (!this.oauth.settings.length) { // the spaceName has been configured
-            this.fillDefaultSettings();
-        }
-
-        // use the modified date from settings, not from spaceName
-        this.modified = this.oauth.modified;
-
-        return this;
-    }
-
-
-    public fillDefaultSettings(): void {
-
+    private fillDefaultOauthSettings(params): void {
         this.oauth.settings = [];
 
         const defaultOauthValues = {
@@ -32,14 +18,26 @@ export class SpaceModel {
             'apiSecret': 'Consumer secret',
             'authorizationUrl': 'Authorization URL',
             'middlewareAuthUrl': 'Middleware URL',
+            'redirectUrl': 'Redirect URL'
         };
 
-        for (let [key, value] of Object.entries(defaultOauthValues)) {
-            this.oauth.settings.push(new OauthSettings(value, '', key));
+        for (let [keyName, label] of Object.entries(defaultOauthValues)) {
+            const value = keyName === 'redirectUrl' ? `${Paths.DATAWHORE_API_CALLBACK_URL}/${this.name}/` : '';
+            this.oauth.settings.push(new OauthSettings(label, value, keyName));
         }
 
-        // console.log(this.oauth); // "first", "one"
+    }
 
+    public toSpaceSettings(options: Options): any {
+
+        if (!this.oauth.settings.length) { // the spaceName has been configured
+            this.fillDefaultOauthSettings(options);
+        }
+
+        // use the modified date from settings, not from spaceName
+        this.modified = this.oauth.modified;
+
+        return this;
     }
 
 }
@@ -50,5 +48,5 @@ interface Options {
     name?: string;
     icon?: string;
     oauth?: SpaceOauthSettings;
-    aMethod?: (a: string) => string;
+    // aMethod?: (a: string) => string;
 }
