@@ -6,7 +6,6 @@ var fs = require('fs');
 
 var Space = require('../models/spaceModel');
 var Setting = require('../models/settingModel');
-var request = require('request');
 
 
 module.exports = function(app) {
@@ -37,26 +36,6 @@ module.exports = function(app) {
                 // console.log('space -> ', space);
                 res.json(space);
             });
-        });
-
-    });
-
-    // todo: move this to its own api file
-    app.post('/api/oauth/middleware', function(req, res) {
-
-        var headers = {
-            'Content-Type':     'application/x-www-form-urlencoded'
-        };
-        var options = {
-            url: req.body.url,
-            method: 'POST',
-            headers: headers,
-            form: req.body.data
-        };
-
-        request.post(options, function (error, response, body) {
-            console.log(body);
-            res.send(body);
         });
 
     });

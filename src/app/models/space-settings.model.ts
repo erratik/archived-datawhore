@@ -9,25 +9,34 @@ export class SpaceOauthSettings {
                 public authorizationUrl?: string,
                 public middlewareAuthUrl?: string,
                 public redirectUrl?: string) {
-
-        this.settings.filter(prop => {
-            if (prop.keyName === 'authorizationUrl') { this.authorizationUrl = prop.value; }
-            if (prop.keyName === 'middlewareAuthUrl') { this.middlewareAuthUrl = prop.value; }
-        });
     }
 
-    public populateMatches(value, oauth) {
+    private castValues(haystack, needle, replace): string {
+        return haystack.replace(needle, replace);
+    }
 
-        let matchedSettings;
-        let regex = /(\<(.*?)\>)/gm, match;
-        while (match = regex.exec(oauth[value])) {
-            const settingsArr = oauth.settings.filter(settings => settings.keyName === match[2]);
+    public populateMatches(keys: Array<string>) {
 
-            matchedSettings = settingsArr.map(setting => setting.castValues(oauth[value], match[1], settingsArr[0].value));
-            if (matchedSettings.length) {
-                return matchedSettings[0];
+        this.settings.map(params => {
+
+            if (keys.indexOf(params.keyName) !== -1) {
+                let settingsValue = params.value;
+                if (settingsValue) {
+
+                    let regex = /(\<(.*?)\>)/gm, foundKey;
+
+                    while (foundKey = regex.exec(settingsValue)) {
+                        const matches = this.settings.filter(settings => settings.keyName === foundKey[2]);
+
+                        if (matches.length) {
+                            settingsValue = this.castValues(settingsValue, foundKey[1], matches[0].value);
+                        }
+                    }
+                    const oauthKey = keys[keys.indexOf(params.keyName)];
+                    this[oauthKey] = settingsValue;
+                }
             }
-        }
+        });
     }
 
 }

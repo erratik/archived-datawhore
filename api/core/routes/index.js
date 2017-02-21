@@ -1,9 +1,10 @@
 module.exports = function (app) {
 
     require('./coreApi')(app);
+    require('./connectApi')(app);
 
-    require('./configApi')(app);
-    require('./profileApi')(app);
+    // require('./configApi')(app);
+    // require('./profileApi')(app);
 
     // require('./api/instagramApi')(app);
     // require('./api/lastfmApi')(app);

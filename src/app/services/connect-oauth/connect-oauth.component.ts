@@ -16,11 +16,8 @@ export class ConnectOauthComponent implements OnInit {
 
     ngOnInit() {
 
-        this.space.oauth['authorizationUrl'] = this.space.oauth.populateMatches('authorizationUrl', this.space.oauth);
-        this.space.oauth['middlewareAuthUrl'] = this.space.oauth.populateMatches('middlewareAuthUrl', this.space.oauth);
-
+        this.space.oauth.populateMatches(['authorizationUrl', 'middlewareAuthUrl']);
     }
-
 
     // handle response
 

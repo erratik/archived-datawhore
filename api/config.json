@@ -1,0 +1,20 @@
+{
+  "server": {
+    "protocol": "http",
+    "host": "datawhore.erratik.ca:4200"
+  },
+  "facebook": {
+    "key": "[APP_ID]",
+    "secret": "[APP_SECRET]",
+    "callback": "/handle_facebook_callback",
+    "scope": [
+      "user_groups",
+      "user_likes"
+    ]
+  },
+  "twitter": {
+    "key": "2dpM9pZiWpvo0fA1DkGHBpxzT",
+    "secret": "8EkxwpGi0Y0zMOucDSoMZBRq5yV39Rh85zaV09EOWUVIZ9wPuU",
+    "callback": "/handle_twitter_callback"
+  }
+}

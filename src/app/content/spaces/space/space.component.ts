@@ -43,10 +43,7 @@ export class SpaceComponent implements OnInit {
                 oauth: settingsRetrieved
             });
 
-            //   }
-            //
-            // });
-            // this.isLoadingSettings = false;
+            this.space.oauth.populateMatches(['authorizationUrl', 'middlewareAuthUrl']);
         });
     }
 

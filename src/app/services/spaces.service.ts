@@ -60,24 +60,33 @@ export class SpacesService {
     }*/
 
     public requestAccessToken(url: string, space: SpaceModel): Observable<SpaceModel> {
+        let queryData = '', urlSplit;
+        const skipTokenRequest = typeof url === 'undefined';
 
-        const urlSplit = url.split('?');
-        const queryData = JSON.parse('{"' + decodeURI(urlSplit[1].replace(/&/g, '\",\"').replace(/=/g, '\":\"')) + '"}');
+        if (!skipTokenRequest) {
+            urlSplit = url.split('?');
+            queryData = JSON.parse('{"' + decodeURI(urlSplit[1].replace(/&/g, '\",\"').replace(/=/g, '\":\"')) + '"}');
+        }
 
         const bodyString = JSON.stringify({url: url, data: queryData}); // Stringify payload
+
         const headers = new Headers({'Content-Type': 'application/json'}); // ... Set content type to JSON
         const options = new RequestOptions({headers: headers}); // Create a request option
 
         return this.http.post(`${this.apiServer}/oauth/middleware`, bodyString, options)
             .map((res) => {
-                const oauthExtras: Array<OauthExtras> = [];
-                const resExtras = res.json();
-                for (let key of Object.keys(resExtras)) {
-                    oauthExtras.push(new OauthExtras(key, resExtras[key]));
+                console.log(space.oauth);
+                let resExtras = space.oauth.extras;
+                if (!skipTokenRequest) {
+                    const oauthExtras: Array<OauthExtras> = [];
+                    resExtras = res.json();
+                    for (let key of Object.keys(resExtras)) {
+                        oauthExtras.push(new OauthExtras(key, resExtras[key]));
+                    }
+                    space.oauth.extras = oauthExtras;
                 }
 
                 space.oauth.connected = !resExtras.hasOwnProperty('error');
-                space.oauth.extras = oauthExtras;
 
                 return space;
             })

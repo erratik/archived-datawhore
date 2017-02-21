@@ -40,6 +40,10 @@ const appRoutes: Routes = [
     component: ConnectCallbackComponent
   },
   {
+    path: 'connect/:space/callback',
+    component: ConnectCallbackComponent
+  },
+  {
     path: 'settings',
     component: SettingsViewComponent
   },

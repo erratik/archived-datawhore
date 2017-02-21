@@ -5,12 +5,30 @@ var express = require('express');
 var app = require('express')();
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');  // mongoose for mongodb
+var logger = require('morgan');
+var session = require('express-session');
+
+var Grant = require('grant-express'),
+    grant = new Grant(require('./config.json'));
+
 module.exports = app; // for testing
 
 var config = {
     appRoot: __dirname
 };
 
+app.use(logger('dev'));
+// REQUIRED:
+app.use(session({secret:'very secret'}));
+
+// mount grant
+app.use(grant);
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// parse application/json
+app.use(bodyParser.json());
 
 // Add headers
 app.use(function (req, res, next) {
@@ -31,12 +49,6 @@ app.use(function (req, res, next) {
     // Pass to next layer of middleware
     next();
 });
-
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }));
-
-// parse application/json
-app.use(bodyParser.json());
 
 SwaggerExpress.create(config, function (err, swaggerExpress) {
     if (err) {

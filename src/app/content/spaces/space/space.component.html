@@ -74,7 +74,8 @@
     <small>Last modified: {{space.modified | date:'medium'}}</small>
 </div>
 <footer class="card-footer">
-    <datawhore-connect-oauth [space]="space" class="card-footer-item"  *ngIf="space.oauth">></datawhore-connect-oauth>
+    <datawhore-connect-oauth [space]="space" class="card-footer-item"
+                             *ngIf="space.oauth && space.oauth.authorizationUrl"></datawhore-connect-oauth>
     <a class="card-footer-item is-success" (click)="updateSpaceSettings(space)" *ngIf="space.inEditMode && space.oauth">
         <span>Save</span>
     </a>

@@ -1,10 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {SpacesService} from '../../services/spaces.service';
-import 'rxjs/add/operator/map';
-import {SpaceOauthSettings, OauthSettings} from '../../models/space-settings.model';
-import {Paths} from '../../classes/paths.class';
+import {SpaceOauthSettings, OauthSettings, OauthExtras} from '../../models/space-settings.model';
 import {SpaceModel} from '../../models/space.model';
+import 'rxjs/add/operator/map';
 
 @Component({
     selector: 'datawhore-connect-callback',
@@ -19,6 +18,7 @@ export class ConnectCallbackComponent implements OnInit {
     protected spaceName: string = null;
     protected isRequestingAccessToken = false;
     private accessTokenRequestUrl = '';
+    private skipTokenRequest = false;
     protected settings: SpaceOauthSettings = null;
 
 
@@ -37,6 +37,10 @@ export class ConnectCallbackComponent implements OnInit {
             this.spaceName = this.params.space;
         });
 
+        const retrieveSpace$ = this.spacesService.getSpace(this.spaceName)
+            .do((spaceRetrieved) => this.space = spaceRetrieved);
+
+        retrieveSpace$.subscribe();
 
     }
 
@@ -47,8 +51,8 @@ export class ConnectCallbackComponent implements OnInit {
 //
     protected getAccessToken(): void {
 
-        // get spaceName
-        const space = this.spacesService.getSpace(this.spaceName)
+        // get space
+        const retrieveToken$ = this.spacesService.getSpace(this.spaceName)
             .do((spaceRetrieved) => this.space = spaceRetrieved)
             .switchMap(() => this.spacesService.getOauthSettings(this.spaceName))
             .do((oauth) => {
@@ -56,36 +60,41 @@ export class ConnectCallbackComponent implements OnInit {
                 this.isRequestingAccessToken = true;
                 this.accessTokenRequestUrl = oauth.middlewareAuthUrl;
 
-                console.log(this.accessTokenRequestUrl);
-                // this may only be for moves, so far
-                oauth.settings.push(new OauthSettings('code', this.queryParams.code, 'code'));
-                oauth.settings.push(new OauthSettings('redirectUrl', Paths.DATAWHORE_API_CALLBACK_URL + '/' + this.spaceName + '/', 'redirectUrl'));
-
-                // todo: turn this into a function to share
-                // find all matched <keys> in a string that we have in a [{value ,label ,keyName}] aka PropObj
-                let regex = /(\<(.*?)\>)/gm, match;
-                while (match = regex.exec(this.accessTokenRequestUrl)) {
-                    const matchedSetting = oauth.settings.filter(settings => settings.keyName === match[2]);
-                    if (matchedSetting.length) {
-                        this.accessTokenRequestUrl = this.castValues(this.accessTokenRequestUrl, match[1], matchedSetting[0].value);
+                for (let keyName of Object.keys(this.queryParams)) {
+                    if (keyName.indexOf('token') !== -1 || keyName.indexOf('oauth') !== -1) {
+                        this.skipTokenRequest = true;
+                        oauth.extras.push(new OauthExtras(keyName, this.queryParams[keyName]));
+                    } else {
+                        oauth.settings.push(new OauthSettings(keyName, this.queryParams[keyName], keyName));
                     }
                 }
 
-                // remove the added items
-                oauth.settings = oauth.settings.filter(settings => {
-                    if (settings.label !== 'code'
-                        && settings.label !== 'redirectUrl') {
-                        return settings;
+                if (!this.skipTokenRequest) {
+                    // todo: turn this into a function to share (enrich string with a PropObj)
+                    // find all matched <keys> in a string that we have in a [{value ,label ,keyName}] aka PropObj
+                    let regex = /(\<(.*?)\>)/gm, match;
+                    while (match = regex.exec(this.accessTokenRequestUrl)) {
+                        const matchedSetting = oauth.settings.filter(settings => settings.keyName === match[2]);
+                        if (matchedSetting.length) {
+                            this.accessTokenRequestUrl = this.castValues(this.accessTokenRequestUrl, match[1], matchedSetting[0].value);
+                        }
                     }
-                });
+
+                    // remove the code because fuck that noise
+                    oauth.settings = oauth.settings.filter(settings => {
+                        if (settings.label !== 'code') {
+                            return settings;
+                        }
+                    });
+                }
+
                 this.settings = oauth;
 
                 this.space.oauth = new SpaceOauthSettings(
                     oauth.settings.map(settings => new OauthSettings(settings.label, settings.value, settings.keyName)),
-                    null,
+                    oauth.extras.map(settings => new OauthExtras(settings.label, settings.value)),
                     this.space.modified
                 );
-
 
             })
             .switchMap(() => this.spacesService.requestAccessToken(this.accessTokenRequestUrl, this.space))
@@ -101,7 +110,7 @@ export class ConnectCallbackComponent implements OnInit {
 
             });
 
-        space.subscribe();
+        retrieveToken$.subscribe();
 
     }
 
