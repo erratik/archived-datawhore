@@ -42,4 +42,5 @@ Thumbs.db
 /src2
 /node_modules
 /api/node_modules
+/api/config.json
 /src/assets/uploads/.tmp
