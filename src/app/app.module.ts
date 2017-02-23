@@ -14,7 +14,7 @@ import { ContainerComponent } from './wrapper/container/container.component';
 import { FooterComponent } from './wrapper/footer/footer.component';
 
 import { SettingsViewComponent } from './views/settings/settings.component';
-import { ConfigsViewComponent } from './views/configs/configs.component';
+import { SpacesViewComponent } from './views/spaces/spaces.component';
 import { AddSpaceComponent } from './content/spaces/edit-spaces/add-space/add-space.component';
 import { EditSpacesComponent } from './content/spaces/edit-spaces/edit-spaces.component';
 
@@ -25,12 +25,12 @@ import { EditSpaceComponent } from './content/spaces/edit-spaces/space/space.com
 const appRoutes: Routes = [
   {
     path: '',
-    redirectTo: 'configs',
+    redirectTo: 'spaces',
     pathMatch: 'full'
   },
   {
-    path: 'configs',
-    component: ConfigsViewComponent
+    path: 'spaces',
+    component: SpacesViewComponent
   },
   {
     path: 'oauth/connect/:space/',
@@ -61,7 +61,7 @@ const appRoutes: Routes = [
     ContainerComponent,
     FooterComponent,
     SettingsViewComponent,
-    ConfigsViewComponent,
+    SpacesViewComponent,
     FileSelectDirective,
     AddSpaceComponent,
     AddSpaceComponent,

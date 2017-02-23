@@ -3,12 +3,12 @@ import {SpaceModel} from '../../models/space.model';
 import {EditSpacesComponent} from '../../content/spaces/edit-spaces/edit-spaces.component';
 
 @Component({
-  selector: 'datawhore-configs',
-  templateUrl: './configs.component.html',
-  styleUrls: ['./configs.component.less']
+  selector: 'datawhore-spaces',
+  templateUrl: 'spaces.component.html',
+  styleUrls: ['spaces.component.less']
 })
 
-export class ConfigsViewComponent implements OnInit {
+export class SpacesViewComponent implements OnInit {
 
   private static readonly NEW_SPACE_VALUE = '';
 
@@ -21,7 +21,7 @@ export class ConfigsViewComponent implements OnInit {
   }
 
   protected addNewSpace(): any {
-    this.editSpacesComponent.addingSpaces.push(new SpaceModel(ConfigsViewComponent.NEW_SPACE_VALUE, Date.now()));
+    this.editSpacesComponent.addingSpaces.push(new SpaceModel(SpacesViewComponent.NEW_SPACE_VALUE, Date.now()));
     this.editSpacesComponent.isAddingSpaces = true;
   }
 
