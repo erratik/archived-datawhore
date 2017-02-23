@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {SpaceModel} from "../../../models/space.model";
+import {SpaceModel} from '../../../../models/space.model';
 
 @Component({
   selector: 'datawhore-add-space',

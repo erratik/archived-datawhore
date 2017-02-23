@@ -60,7 +60,7 @@ export class SpacesService {
     }*/
 
     public requestAccessToken(space: SpaceModel, skip = false): Observable<SpaceModel> {
-        let queryData = '', urlSplit =[];
+        let queryData = '', urlSplit = [];
         const skipTokenRequest = skip;
 
         if (!skipTokenRequest) {

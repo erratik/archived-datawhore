@@ -6,7 +6,6 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { FileSelectDirective, FileDropDirective } from 'ng2-file-upload';
 
-import { PostsService } from './services/posts.service';
 import { SpacesService } from './services/spaces.service';
 
 import { AppComponent } from './app.component';
@@ -16,14 +15,12 @@ import { FooterComponent } from './wrapper/footer/footer.component';
 
 import { SettingsViewComponent } from './views/settings/settings.component';
 import { ConfigsViewComponent } from './views/configs/configs.component';
-import { AddSpaceComponent } from './content/spaces/add-space/add-space.component';
+import { AddSpaceComponent } from './content/spaces/edit-spaces/add-space/add-space.component';
 import { EditSpacesComponent } from './content/spaces/edit-spaces/edit-spaces.component';
 
-import { PostsComponent } from './content/posts/posts.component';
 import { ValuesPipePipe } from './shared/pipes/values-pipe.pipe';
-import { ConnectOauthComponent } from './services/connect-oauth/connect-oauth.component';
 import { ConnectCallbackComponent } from './views/connect-callback/connect-callback.component';
-import { SpaceComponent } from './content/spaces/space/space.component';
+import { EditSpaceComponent } from './content/spaces/edit-spaces/space/space.component';
 
 const appRoutes: Routes = [
   {
@@ -65,17 +62,15 @@ const appRoutes: Routes = [
     FooterComponent,
     SettingsViewComponent,
     ConfigsViewComponent,
-    PostsComponent,
     FileSelectDirective,
     AddSpaceComponent,
     AddSpaceComponent,
     EditSpacesComponent,
     ValuesPipePipe,
-    ConnectOauthComponent,
     ConnectCallbackComponent,
-    SpaceComponent
+    EditSpaceComponent
   ],
-  providers: [PostsService, SpacesService],
+  providers: [SpacesService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

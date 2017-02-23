@@ -4,6 +4,7 @@ import {SpacesService} from '../../services/spaces.service';
 import {SpaceOauthSettings, OauthSettings, OauthExtras} from '../../models/space-settings.model';
 import {SpaceModel} from '../../models/space.model';
 import 'rxjs/add/operator/map';
+import {Http} from '@angular/http';
 
 @Component({
     selector: 'datawhore-connect-callback',
@@ -53,14 +54,11 @@ export class ConnectCallbackComponent implements OnInit {
             .switchMap(() => this.spacesService.getOauthSettings(this.spaceName))
             .do((oauth) => {
 
-
                 this.isRequestingAccessToken = true;
-
-                this.accessTokenRequestUrl = oauth.middlewareAuthUrl;
 
                 for (let keyName of Object.keys(this.queryParams)) {
                     if (keyName.indexOf('token') !== -1 || keyName.indexOf('oauth') !== -1) {
-                        this.skipTokenRequest = true;
+                        this.skipTokenRequest = this.spaceName !== 'facebook';
                         oauth.extras.push(new OauthExtras(keyName, this.queryParams[keyName]));
                     } else {
                         oauth.settings.push(new OauthSettings(keyName, this.queryParams[keyName], keyName));
@@ -69,12 +67,14 @@ export class ConnectCallbackComponent implements OnInit {
 
                 this.settings = oauth;
 
-                this.space = new SpaceModel(this.spaceName, this.space.modified);
-
-                this.space.oauth = new SpaceOauthSettings(
-                    oauth.settings.map(settings => new OauthSettings(settings.label, settings.value, settings.keyName)),
-                    oauth.extras.map(settings => new OauthExtras(settings.label, settings.value)),
-                    this.space.modified
+                this.space = new SpaceModel(
+                    this.spaceName,
+                    this.space.modified,
+                    new SpaceOauthSettings(
+                        oauth.settings.map(settings => new OauthSettings(settings.label, settings.value, settings.keyName)),
+                        oauth.extras.map(settings => new OauthExtras(settings.label, settings.value)),
+                        this.space.modified
+                    )
                 );
 
                 this.space.toSpaceSettings({
@@ -82,9 +82,14 @@ export class ConnectCallbackComponent implements OnInit {
                     modified: this.space.modified,
                     oauth: this.space.oauth
                 });
-
                 this.space.oauth.populateMatches(['authorizationUrl', 'middlewareAuthUrl']);
-                console.log(this.space.oauth.middlewareAuthUrl);
+
+                // remove the code because fuck that noise
+                this.space.oauth.settings = oauth.settings.filter(settings => {
+                    if (settings.label !== 'code') {
+                        return settings;
+                    }
+                });
 
             })
             .switchMap(() => this.spacesService.requestAccessToken(this.space, this.skipTokenRequest))
@@ -93,7 +98,7 @@ export class ConnectCallbackComponent implements OnInit {
                 // save space with api credentials
                 this.spacesService.updateSpace(spaceWithCredentials).subscribe(() => {
                     this.isRequestingAccessToken = false;
-                    // this.router.navigate(['/']);
+                    this.router.navigate(['/']);
                 });
 
             });

@@ -1,16 +1,16 @@
 import {Component, OnInit, Input} from '@angular/core';
-import {SpaceModel} from '../../../models/space.model';
-import {SpacesService} from '../../../services/spaces.service';
-import {SpaceOauthSettings} from '../../../models/space-settings.model';
+import {SpaceModel} from '../../../../models/space.model';
+import {SpacesService} from '../../../../services/spaces.service';
+import {SpaceOauthSettings} from '../../../../models/space-settings.model';
 import {FileUploader} from 'ng2-file-upload';
-import {Paths} from '../../../classes/paths.class';
+import {Paths} from '../../../../classes/paths.class';
 
 @Component({
     selector: 'datawhore-space',
-    templateUrl: './space.component.html',
-    styleUrls: ['./space.component.less']
+    templateUrl: 'space.component.html',
+    styleUrls: ['space.component.less']
 })
-export class SpaceComponent implements OnInit {
+export class EditSpaceComponent implements OnInit {
 
     @Input() protected space: SpaceModel;
 

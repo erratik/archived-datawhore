@@ -77,49 +77,6 @@ const SettingSchema = {
         });
 
     }
-    /*    getProperties: function(trs
-     ype, callback) {
-     return this.model('Setting').find({ name: this.name }, function(err, Setting){
-     //console.log(Setting);
-     callback(Setting[0][type+'Properties']);
-     });
-     },
-     update: function(options, callback){
-
-     var query = { name: this.name},
-     update = {last_modified : moment().format('X')},
-     opts = {multi: false, upsert: true};
-
-     var that = this.model('Setting');
-
-     this.model('Setting').findOne({name: query.name}, function (err, currentProperties) {
-
-     // console.log('------------ current (raw) ---------------');
-     var properties = currentProperties[options.type+'Properties'];
-     // console.log(properties);
-     // console.log('------------ saving (raw) ---------------');
-     // console.log(options.data);
-
-     if (options.updateFromConfig) {
-     // console.log('updating from config!');
-     _.forEach(options.data, function (prop, key) {
-     if (!_.isNil(properties[key])) {
-     // if the drop property has been saved already (friendlyName is not
-     // the same as the pathName key), don't overwrite
-     // console.log('$ ', key, ': ', properties[key]);
-     if (key != properties[key].friendlyName) {
-     options.data[key] = properties[key];
-     // console.log('* * * ', key + ' will be saved from current properties', options.data[key]);
-     }
-     }
-     });
-     }
-     update[options.type+'Properties'] = options.data;
-     // callback();
-     that.update(query, update, opts, callback);
-     });
-
-     }*/
 
 };
 
