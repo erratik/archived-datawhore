@@ -18,7 +18,6 @@ export class ConnectCallbackComponent implements OnInit {
     private space: SpaceModel = null;
     protected spaceName: string = null;
     protected isRequestingAccessToken = false;
-    private accessTokenRequestUrl = '';
     private skipTokenRequest = false;
     protected settings: SpaceOauthSettings = null;
 
@@ -42,13 +41,13 @@ export class ConnectCallbackComponent implements OnInit {
         const retrieveSpace$ = this.spacesService.getSpace(this.spaceName)
             .do((spaceRetrieved) => this.space = spaceRetrieved);
 
-        retrieveSpace$.subscribe();
+        retrieveSpace$.subscribe(() => this.getAccessToken());
 
     }
 
     protected getAccessToken(): void {
 
-        // get space
+        // get view-space-config
         const retrieveToken$ = this.spacesService.getSpace(this.spaceName)
             .do((spaceRetrieved) => this.space = spaceRetrieved)
             .switchMap(() => this.spacesService.getOauthSettings(this.spaceName))
@@ -82,6 +81,7 @@ export class ConnectCallbackComponent implements OnInit {
                     modified: this.space.modified,
                     oauth: this.space.oauth
                 });
+
                 this.space.oauth.populateMatches(['authorizationUrl', 'middlewareAuthUrl']);
 
                 // remove the code because fuck that noise
@@ -98,7 +98,7 @@ export class ConnectCallbackComponent implements OnInit {
                 // save space with api credentials
                 this.spacesService.updateSpace(spaceWithCredentials).subscribe(() => {
                     this.isRequestingAccessToken = false;
-                    this.router.navigate(['/']);
+                    this.router.navigate([`/space/${this.space.name}`]);
                 });
 
             });

@@ -1,0 +1,50 @@
+
+<section class="section">
+    <div class="container">
+        <div class="columns">
+            <div class="column is-half" *ngFor="let space of addingSpaces">
+                {{space.inEditMode}}
+                <div class="card">
+                    <header class="card-header">
+                        <div class="card-header-title is-inline-flex">
+                            <figure class="image is-32x32">
+                                <img src="http://bulma.io/images/placeholders/32x32.png">
+                            </figure>
+                            <h4>{{space.name}}</h4>
+                        </div>
+                        <span class="card-header-icon">
+                        <a class="delete" (click)="cancelSpaceAdd(space)"></a>
+                    </span>
+                    </header>
+                    <datawhore-add-space class="column is-half"></datawhore-add-space>
+                </div>
+            </div>
+
+            <div class="" *ngFor="let space of spaces">
+                <article class="media">
+                    <figure class="media-left">
+                        <p class="image is-32x32">
+                            <img src="{{(space.icon) ? space.icon : 'http://bulma.io/images/placeholders/32x32.png'}}">
+                        </p>
+                    </figure>
+                    <div class="media-content">
+                        <div class="content">
+                            <p>
+                                <strong>{{space.name}}</strong> <small *ngIf="space.username">@{{space.username}}</small>
+                                <br>
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ornare magna eros, eu pellentesque tortor vestibulum ut. Maecenas non massa sem. Etiam finibus odio quis feugiat facilisis.
+                            </p>
+
+                            <small>Last modified: {{space.modified | date:'medium'}}</small>
+                        </div>
+                    </div>
+                    <div class="media-right">
+                        <a routerLink="/space/{{space.name}}">Edit Space</a>
+                    </div>
+                </article>
+                <hr>
+            </div>
+        </div>
+
+    </div>
+</section>

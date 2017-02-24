@@ -1,0 +1,83 @@
+<section class="hero is-dark">
+    <div class="hero-body">
+        <div class="container">
+
+            <div class="heading">
+                <h2 class="is-flex">
+                    <figure class="image is-32x32">
+                        <img src="{{(space?.icon) ? space?.icon : 'http://bulma.io/images/placeholders/32x32.png'}}">
+                    </figure>
+                    {{space?.name}}
+                </h2>
+            </div>
+            <small>Last modified: {{space?.modified | date:'medium'}}</small>
+        </div>
+    </div>
+</section>
+<section class="hero-body">
+    <div class="container" *ngIf="space?.oauth">
+        <div *ngIf="!space?.inEditMode">
+            <small *ngIf="hasExpiryToken">Token expires on {{tokenExpiryDate | date:'medium'}}</small>
+            <details *ngIf="space?.oauth.extras.length">
+                <summary>Oauth Settings</summary>
+                <ul>
+                    <li *ngFor="let spaceProp of space?.oauth.settings">
+                        <div *ngIf="spaceProp.value">
+                            <strong>{{spaceProp.label}}</strong>: {{spaceProp.value}}
+                        </div>
+                        <div *ngIf="!spaceProp.value">
+                            <strong>{{spaceProp.label}}</strong> (<em>{{spaceProp.keyName}}</em>) has not been
+                            set yet
+                        </div>
+                    </li>
+                </ul>
+            </details>
+            <details *ngIf="space?.oauth.extras.length">
+                <summary>Acquired Oauth Settings</summary>
+                <ul *ngFor="let spaceProp of space?.oauth.extras">
+                    <li>
+                        <strong>{{spaceProp.label}}</strong>: {{spaceProp.value}}
+                    </li>
+                </ul>
+            </details>
+            <a class="button" (click)="toggleEditSpace(space)">Edit Oauth Settings</a>
+        </div>
+        <div *ngIf="space?.inEditMode">
+
+            <div class="form-group">
+                <input type="file" class="form-control" name="single" ng2FileSelect
+                       [uploader]="uploader"/>
+                <button type="button" class="btn btn-success btn-s"
+                        (click)="uploader.uploadAll()">
+                    <span class="glyphicon glyphicon-upload"></span> Upload all
+                </button>
+                <br/>
+            </div>
+
+            <ul *ngFor="let spaceProp of space?.oauth.settings">
+                <li class="control">
+                    <strong>{{spaceProp.label}}</strong>
+                    <input type="text" class="input" [(ngModel)]="spaceProp.value">
+                </li>
+            </ul>
+
+            <a class="button is-primary" href="{{space.oauth.authorizationUrl}}"
+               *ngIf="space.oauth && space.oauth.authorizationUrl">
+                <span *ngIf="!space.connected">Connect</span>
+                <span *ngIf="space.connected">Reconnect</span>
+            </a>
+            <a class="button is-success" (click)="updateSpaceSettings(space)">
+                <span>Save</span>
+            </a>
+            <a class="button" (click)="space.inEditMode = false">
+                <span>Cancel</span>
+            </a>
+        </div>
+        <hr>
+        <div class="heading"><h2>profile settings</h2></div>
+        <a class="button" (click)="getSpaceProfile()">
+            get proile
+        </a>
+
+    </div>
+</section>

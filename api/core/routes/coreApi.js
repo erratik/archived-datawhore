@@ -2,11 +2,11 @@ var mongoose = require('mongoose');
 var moment = require('moment');
 var multer = require('multer');
 var fs = require('fs');
-
+var mkdirp = require('mkdirp');
+var request = require('request');
 
 var Space = require('../models/spaceModel');
 var Setting = require('../models/settingModel');
-
 
 module.exports = function(app) {
 
@@ -39,14 +39,40 @@ module.exports = function(app) {
         });
 
     });
-    
+
+    app.post('/api/space/endpoint', function(req, res) {
+
+        var headers = {
+            'Content-Type':     'application/x-www-form-urlencoded'
+        };
+        var options = {
+            method: 'POST',
+            headers: headers,
+            uri: req.body.url,
+            form: req.body.data
+        };
+
+        request(options, function (error, response, body) {
+            if ( error){
+                res.send(error);
+            }
+            res.send(body);
+        });
+
+    });
+
+
     /** API path that will upload the files */
     app.post('/api/upload/:space/:folder/:filename', function(req, res) {
 
         var storage = multer.diskStorage({ //multers disk storage settings
             destination: function (req, file, cb) {
-                // todo: create folders if they don't exist
-                cb(null, '../public/uploads/'+ req.params.space +'/'+ req.params.folder);
+
+                var folderName = '../public/uploads/'+ req.params.space +'/'+ req.params.folder;
+                mkdirp(folderName, function(err) {
+                    cb(null, folderName);
+                });
+
             },
             filename: function (req, file, cb) {
                 cb(null, req.params.space + '-' + req.params.filename + '.' + file.originalname.split('.')[file.originalname.split('.').length -1]);
@@ -64,14 +90,14 @@ module.exports = function(app) {
             }
 
             var space = new Space({name: req.params.space}); // instantiated Space
-            space.updateSpace({icon: req.file.path}, function() {
+            space.updateSpace({icon: req.file.path, modified: Date.now()}, function() {
                 Space.findByName(req.params.space, function(err, space){
-                    console.log('space -> ', space);
-                    // res.json(space);
+                    // console.log('space -> ', space);
+                    res.json(space[0]);
                 });
             });
 
-            res.json(req.file);
+            // res.json(req.file);
         });
     });
 };

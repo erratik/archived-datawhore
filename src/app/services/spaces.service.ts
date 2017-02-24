@@ -15,7 +15,7 @@ export class SpacesService {
     constructor(private http: Http) {
     }
 
-    getSpace(spaceName: string): Observable<SpaceModel> {
+    public getSpace(spaceName: string): Observable<SpaceModel> {
         return this.http.get(`${this.apiServer}/space/${spaceName}`).map((res: Response) => {
             return res.json();
         }).catch(this.handleError);
@@ -36,28 +36,6 @@ export class SpacesService {
             });
         }).catch(this.handleError);
     }
-
-    public getOauthSettings(spaceName: string): Observable<SpaceOauthSettings> {
-        return this.http.get(`${this.apiServer}/space/settings/${spaceName}`)
-            .map((res: Response) => {
-                return this.setupSpaceSettings(res);
-            })
-            .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
-    }
-/*
-    public connect(space: SpaceModel, authorizationUrl: string): any {
-        console.log(space.name, authorizationUrl);
-
-        // fill up the placeholders by casting the actual key values
-        //
-        // });
-        // return this.http.post(`${authorizationUrl}`)
-        //     .map((res: Response) => {
-        //         console.log(res.json());
-        //         return res.json();
-        //     })
-        //     .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
-    }*/
 
     public requestAccessToken(space: SpaceModel, skip = false): Observable<SpaceModel> {
         let queryData = '', urlSplit = [];
@@ -95,6 +73,13 @@ export class SpacesService {
             .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
     }
 
+    public getOauthSettings(spaceName: string): Observable<SpaceOauthSettings> {
+        return this.http.get(`${this.apiServer}/space/settings/${spaceName}`)
+            .map((res: Response) => {
+                return this.setupSpaceSettings(res);
+            })
+            .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
+    }
 
     public updateSpace(space: SpaceModel): Observable<any> {
 
@@ -133,6 +118,17 @@ export class SpacesService {
         return settingsRes;
     }
 
+    public spaceEndpoint(url: string, queryData): Observable<SpaceModel> {
+        const bodyString = JSON.stringify({url: url, data: queryData}); // Stringify
+        // payload
+
+        const headers = new Headers({'Content-Type': 'application/json'}); // ... Set content type to JSON
+        const options = new RequestOptions({headers: headers}); // Create a request option
+
+        return this.http.post(`${this.apiServer}/space/endpoint`, bodyString, options).map((res: Response) => {
+            return res.json();
+        }).catch(this.handleError);
+    }
 
     private handleError(error: Response | any) {
         // In a real world app, we might use a remote logging infrastructure
