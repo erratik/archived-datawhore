@@ -1,6 +1,7 @@
-var mongoose = require('mongoose');
-var SpaceSchema = {
-    schema: {
+let mongoose = require('mongoose');
+
+let SpaceSchema = {
+    doc: {
         name: String,
         modified: Number,
         avatar: String,
@@ -9,7 +10,7 @@ var SpaceSchema = {
     },
     self: {
         findByName: function (name, cb) {
-            return this.find({ name: name }, cb);
+            return this.find({name: name}, cb);
         },
         getAll: function (cb) {
             return this.find({}, cb);
@@ -29,17 +30,24 @@ var SpaceSchema = {
                 cb(updated);
             });
         */
-        var query = { name: this.name }, opts = { multi: false, upsert: true };
+        const query = {name: this.name},
+            opts = {multi: false, upsert: true};
+
         update.modified = Date.now();
+
         this.model('Config').update(query, update, opts, function (err, modelUpdated) {
+
             if (modelUpdated) {
                 cb(update);
-            }
-            else if (err) {
+            } else if (err) {
                 cb(err);
             }
+
         });
+
     }
 };
-var Space = require('./createModel')(mongoose, 'Spaces', SpaceSchema);
+
+let Space = require('./createModel')(mongoose, 'Spaces', SpaceSchema);
+
 module.exports = Space;

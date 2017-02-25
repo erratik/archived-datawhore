@@ -23,7 +23,6 @@ import {ValuesPipePipe} from './shared/pipes/values-pipe.pipe';
 import {ConnectCallbackComponent} from './views/connect-callback/connect-callback.component';
 import {SpaceViewComponent} from './views/spaces/view-space/view-space.component';
 import {SpaceConfigComponent} from './shared/component/space-config/space-config.component';
-import { TreeViewComponent } from './shared/component/tree-view/tree-view.component';
 
 const appRoutes: Routes = [
     {
@@ -70,8 +69,7 @@ const appRoutes: Routes = [
         ValuesPipePipe,
         ConnectCallbackComponent,
         SpaceViewComponent,
-        SpaceConfigComponent,
-        TreeViewComponent
+        SpaceConfigComponent
     ],
     providers: [SpacesService, OauthSettingsService],
     bootstrap: [AppComponent]
