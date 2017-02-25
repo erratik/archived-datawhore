@@ -75,9 +75,21 @@
         </div>
         <hr>
         <div class="heading"><h2>profile settings</h2></div>
-        <a class="button" (click)="getSpaceProfile()">
-            get proile
+        <a class="button" (click)="resetRawProfile()">
+            get profile
         </a>
-
+        <datawhore-tree-view [treeData]="myTree"></datawhore-tree-view>
+        <div *ngIf="profileSchema?.propertyBucket">
+            <details>
+                <summary>Space Properties (RAW)</summary>
+                <pre>{{ profileSchema.propertyBucket | json }}</pre>
+            </details>
+        </div>
+        <div *ngIf="profileSchema">
+            <details>
+                <summary>Space Profile (RAW)</summary>
+                <pre>{{ profileSchema | json }}</pre>
+            </details>
+        </div>
     </div>
 </section>

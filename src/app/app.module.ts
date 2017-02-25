@@ -8,6 +8,7 @@ import {MomentModule} from 'angular2-moment';
 import {FileSelectDirective, FileDropDirective} from 'ng2-file-upload';
 
 import {SpacesService} from './services/spaces.service';
+import {OauthSettingsService} from './services/space/oauth-settings.service';
 
 import {AppComponent} from './app.component';
 import {HeaderComponent} from './wrapper/header/header.component';
@@ -22,6 +23,7 @@ import {ValuesPipePipe} from './shared/pipes/values-pipe.pipe';
 import {ConnectCallbackComponent} from './views/connect-callback/connect-callback.component';
 import {SpaceViewComponent} from './views/spaces/view-space/view-space.component';
 import {SpaceConfigComponent} from './shared/component/space-config/space-config.component';
+import { TreeViewComponent } from './shared/component/tree-view/tree-view.component';
 
 const appRoutes: Routes = [
     {
@@ -68,9 +70,10 @@ const appRoutes: Routes = [
         ValuesPipePipe,
         ConnectCallbackComponent,
         SpaceViewComponent,
-        SpaceConfigComponent
+        SpaceConfigComponent,
+        TreeViewComponent
     ],
-    providers: [SpacesService],
+    providers: [SpacesService, OauthSettingsService],
     bootstrap: [AppComponent]
 })
 export class AppModule {

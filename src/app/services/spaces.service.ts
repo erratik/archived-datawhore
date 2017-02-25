@@ -3,7 +3,6 @@ import {Injectable} from '@angular/core';
 import {Http, Response, Headers, RequestOptions} from '@angular/http';
 import 'rxjs/add/operator/map';
 import {Observable} from 'rxjs';
-import {SpaceOauthSettings, OauthSettings, OauthExtras} from '../models/space-settings.model';
 import {Paths} from '../classes/paths.class';
 
 @Injectable()
@@ -21,7 +20,6 @@ export class SpacesService {
         }).catch(this.handleError);
     }
 
-
     public getAllSpaces(): Observable<SpaceModel[]> {
         return this.http.get(`${this.apiServer}/spaces`).map((res: Response) => {
 
@@ -37,95 +35,19 @@ export class SpacesService {
         }).catch(this.handleError);
     }
 
-    public requestAccessToken(space: SpaceModel, skip = false): Observable<SpaceModel> {
-        let queryData = '', urlSplit = [];
-        const skipTokenRequest = skip;
+    public spaceEndpoint(space: SpaceModel, queryData, endpointPath = ''): Observable<SpaceModel> {
 
-        if (!skipTokenRequest) {
-            urlSplit = space.oauth.middlewareAuthUrl.split('?');
-            queryData = JSON.parse('{"' + decodeURI(urlSplit[1].replace(/&/g, '\",\"').replace(/=/g, '\":\"')) + '"}');
-        } else {
-            urlSplit[0] = '';
-        }
-
-        const bodyString = JSON.stringify({url: urlSplit[0], data: queryData}); // Stringify payload
+        endpointPath = (endpointPath === '') ? 'space/endpoint' : endpointPath;
+        const url = `${this.apiServer}/${endpointPath}`;
+        const bodyString = JSON.stringify({
+            data: queryData,
+            space: space.name
+        });
 
         const headers = new Headers({'Content-Type': 'application/json'}); // ... Set content type to JSON
         const options = new RequestOptions({headers: headers}); // Create a request option
 
-        return this.http.post(`${this.apiServer}/oauth/middleware`, bodyString, options)
-            .map((res) => {
-                console.log(space.oauth);
-                let resExtras = space.oauth.extras;
-                if (!skipTokenRequest) {
-                    const oauthExtras: Array<OauthExtras> = [];
-                    resExtras = res.json();
-                    for (let key of Object.keys(resExtras)) {
-                        oauthExtras.push(new OauthExtras(key, resExtras[key]));
-                    }
-                    space.oauth.extras = oauthExtras;
-                }
-
-                space.oauth.connected = !resExtras.hasOwnProperty('error');
-
-                return space;
-            })
-            .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
-    }
-
-    public getOauthSettings(spaceName: string): Observable<SpaceOauthSettings> {
-        return this.http.get(`${this.apiServer}/space/settings/${spaceName}`)
-            .map((res: Response) => {
-                return this.setupSpaceSettings(res);
-            })
-            .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
-    }
-
-    public updateSpace(space: SpaceModel): Observable<any> {
-
-        const bodyString = JSON.stringify(space);
-        const headers = new Headers({'Content-Type': 'application/json'});
-        const options = new RequestOptions({headers: headers});
-
-        return this.http.put(`${this.apiServer}/space/update/${space['name']}`, bodyString, options)
-            .map((res: Response) => {
-                return this.setupSpaceSettings(res);
-            })
-            .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
-    }
-
-    private setupSpaceSettings(res: Response): any {
-
-        let settingsRes = res.json();
-
-        if (settingsRes.oauth) {
-            const spaceOauth = settingsRes.oauth;
-            const modified = settingsRes.modified;
-            const connected = settingsRes.connected;
-
-            let extras = settingsRes.extras.filter(extra => extra.type === 'oauth');
-            settingsRes = new SpaceOauthSettings(
-                spaceOauth.map(settings => new OauthSettings(settings.label, settings.value, settings.keyName)),
-                extras.map(settings => new OauthExtras(settings.label, settings.value)),
-                modified,
-                connected
-            );
-
-
-        } else {
-            settingsRes = new SpaceOauthSettings();
-        }
-        return settingsRes;
-    }
-
-    public spaceEndpoint(url: string, queryData): Observable<SpaceModel> {
-        const bodyString = JSON.stringify({url: url, data: queryData}); // Stringify
-        // payload
-
-        const headers = new Headers({'Content-Type': 'application/json'}); // ... Set content type to JSON
-        const options = new RequestOptions({headers: headers}); // Create a request option
-
-        return this.http.post(`${this.apiServer}/space/endpoint`, bodyString, options).map((res: Response) => {
+        return this.http.post(url, bodyString, options).map((res: Response) => {
             return res.json();
         }).catch(this.handleError);
     }

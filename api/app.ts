@@ -57,29 +57,29 @@ SwaggerExpress.create(config, function (err, swaggerExpress) {
         console.log(error);
     });
 
-    let port = process.env.PORT || 10010;
+    const port = process.env.PORT || 10010;
 
 
     /** API path that will upload the files */
     app.post('/api/upload/:space/:folder/:filename', function(req, res) {
-        console.log(req.query);
-        let storage = multer.diskStorage({
+        console.log('$%^#$@#$ from app.js NEED TO MOVE! @#!@$#');
+        const storage = multer.diskStorage({
             destination: function (request, file, cb) {
                 cb(null, `../src/assets/uploads/${request.params.space}/${request.params.folder}`);
             },
             filename: function (request, file, cb) {
-                let datetimestamp = Date.now();
+                const datetimestamp = Date.now();
                 cb(null, request.params.space + '-' + request.params.filename + '.' + file.originalname.split('.')[file.originalname.split('.').length - 1]);
             }
         });
 
         // multer settings
-        let upload = multer({
+        const upload = multer({
             storage: storage
         }).single('file');
 
         upload(req, res, function(error) {
-            console.log(req.file);
+            // console.log(req.file);
             if (error) {
                 res.json({error_code: 1, err_desc: error});
                 return;

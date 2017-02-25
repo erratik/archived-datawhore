@@ -4,7 +4,8 @@ import {SpacesService} from '../../services/spaces.service';
 import {SpaceOauthSettings, OauthSettings, OauthExtras} from '../../models/space-settings.model';
 import {SpaceModel} from '../../models/space.model';
 import 'rxjs/add/operator/map';
-import {Http} from '@angular/http';
+import {Paths} from '../../classes/paths.class';
+import {OauthSettingsService} from '../../services/space/oauth-settings.service';
 
 @Component({
     selector: 'datawhore-connect-callback',
@@ -20,10 +21,11 @@ export class ConnectCallbackComponent implements OnInit {
     protected isRequestingAccessToken = false;
     private skipTokenRequest = false;
     protected settings: SpaceOauthSettings = null;
+    private oauth2 = {};
 
 
     constructor(private activatedRoute: ActivatedRoute,
-                private router: Router,
+                private oauthService: OauthSettingsService,
                 private spacesService: SpacesService) {
     }
 
@@ -50,12 +52,12 @@ export class ConnectCallbackComponent implements OnInit {
         // get view-space-config
         const retrieveToken$ = this.spacesService.getSpace(this.spaceName)
             .do((spaceRetrieved) => this.space = spaceRetrieved)
-            .switchMap(() => this.spacesService.getOauthSettings(this.spaceName))
+            .switchMap(() => this.oauthService.getOauthSettings(this.spaceName))
             .do((oauth) => {
 
                 this.isRequestingAccessToken = true;
 
-                for (let keyName of Object.keys(this.queryParams)) {
+                for (const keyName of Object.keys(this.queryParams)) {
                     if (keyName.indexOf('token') !== -1 || keyName.indexOf('oauth') !== -1) {
                         this.skipTokenRequest = this.spaceName !== 'facebook';
                         oauth.extras.push(new OauthExtras(keyName, this.queryParams[keyName]));
@@ -91,14 +93,23 @@ export class ConnectCallbackComponent implements OnInit {
                     }
                 });
 
-            })
-            .switchMap(() => this.spacesService.requestAccessToken(this.space, this.skipTokenRequest))
-            .do((spaceWithCredentials) => {
+                if (this.skipTokenRequest) {
+                    console.log('skipping token request?');
+                    this.oauth2 = {
+                        apiKey: this.space.oauth.settings.filter(settings => settings.keyName === 'apiKey')[0].value,
+                        apiSecret: this.space.oauth.settings.filter(settings => settings.keyName === 'apiSecret')[0].value,
+                        apiUrl: `https://${Paths.SPACE_API_URL[this.space.name]}/`
+                    };
+                }
 
+            })
+            .switchMap(() => this.oauthService.requestAccessToken(this.space, this.skipTokenRequest, this.oauth2))
+            .do((spaceWithCredentials) => {
+                console.log(spaceWithCredentials);
                 // save space with api credentials
-                this.spacesService.updateSpace(spaceWithCredentials).subscribe(() => {
+                this.oauthService.updateSpaceSettings(spaceWithCredentials).subscribe(() => {
                     this.isRequestingAccessToken = false;
-                    this.router.navigate([`/space/${this.space.name}`]);
+                    // this.router.navigate([`/space/${this.space.name}`]);
                 });
 
             });

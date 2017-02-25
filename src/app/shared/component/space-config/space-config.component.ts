@@ -1,12 +1,11 @@
-import {Component, OnInit, Output, EventEmitter} from '@angular/core';
+import {Component} from '@angular/core';
 import {SpaceModel} from '../../../models/space.model';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute} from '@angular/router';
 import {SpacesService} from '../../../services/spaces.service';
 import {SpaceOauthSettings, OauthSettings, OauthExtras} from '../../../models/space-settings.model';
-import {FileUploader} from 'ng2-file-upload';
 import {Paths} from '../../../classes/paths.class';
 import {Observable} from 'rxjs';
-import * as moment from 'moment';
+import {OauthSettingsService} from '../../../services/space/oauth-settings.service';
 
 @Component({
     selector: 'datawhore-space',
@@ -16,18 +15,18 @@ import * as moment from 'moment';
 export class SpaceConfigComponent {
 
     public space: SpaceModel = null;
-    public uploader: FileUploader;
-    public retrieveSpace$: Observable<any> = new Observable<any>();
     public hasExpiryToken: boolean;
     public tokenExpiryDate: number;
+    public oauth2 = {};
+    public retrieveSpace$: Observable<any> = new Observable<any>();
 
     public toggleEditSpace(): void {
         this.space.inEditMode = !this.space.inEditMode;
     }
 
-
-    constructor(private activatedRoute: ActivatedRoute,
-                public spacesService: SpacesService) {
+    constructor(public spacesService: SpacesService,
+                public oauthService: OauthSettingsService,
+                private activatedRoute?: ActivatedRoute) {
 
         this.retrieveSpace$ = this.activatedRoute.params.do(params => {
                 return params;
@@ -35,16 +34,8 @@ export class SpaceConfigComponent {
             .mergeMap(params => this.spacesService.getSpace(params['space']))
             .switchMap(spaceModel => {
                 this.space = spaceModel;
-                this.uploader = new FileUploader({url: `${Paths.DATAWHORE_API_URL}/upload/${this.space.name}/space/icon`});
-                this.uploader.onCompleteItem = (item, response, status, header) => {
-                    if (status === 200) {
-                        const res = JSON.parse(response);
-                        this.space.icon = res.icon;
-                        this.space.modified = res.modified;
-                    }
-                };
 
-                return this.spacesService.getOauthSettings(spaceModel.name);
+                return this.oauthService.getOauthSettings(spaceModel.name);
             })
             .do(oauth => {
 
@@ -63,20 +54,29 @@ export class SpaceConfigComponent {
 
                 this.space.oauth.populateMatches(['authorizationUrl', 'middlewareAuthUrl']);
 
-                // check if we have refresh token data
-                const extras = this.space.oauth.extras.filter(extra => {
+                // check if we have refresh token data and when it expires
+                this.space.oauth.extras.filter(extra => {
                     if (extra.label.indexOf('expire') !== -1) {
                         this.hasExpiryToken = true;
                         this.tokenExpiryDate = oauth.modified + Number(extra.value) * 1000;
                     }
                     return extra.value;
                 });
-                const a = moment(oauth.modified);
-                const b = moment(this.tokenExpiryDate);
-                console.log(a.to(b), new Date(oauth.modified), new Date(this.tokenExpiryDate), new Date());
+
                 if (this.tokenExpiryDate < Date.now()) {
+                    // todo: offer a manual way to do refresh token
+                    // todo: display warning when less than 30 minutes
+                    // todo: make sure it happens when we start working and loading posts, etc
                     window.location.href = this.space.oauth.authorizationUrl;
                 }
+
+                this.oauth2 = {
+                    accessToken: this.space.oauth.extras.filter(settings => settings.label === 'accessToken')[0].value,
+                    apiKey: this.space.oauth.settings.filter(settings => settings.keyName === 'apiKey')[0].value,
+                    apiSecret: this.space.oauth.settings.filter(settings => settings.keyName === 'apiSecret')[0].value,
+                    apiUrl: Paths.SPACE_API_URL[this.space.name]
+                };
+
                 return this.space;
             });
     }
