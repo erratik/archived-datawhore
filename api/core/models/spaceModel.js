@@ -31,7 +31,7 @@ var SpaceSchema = {
         */
         var query = { name: this.name }, opts = { multi: false, upsert: true };
         update.modified = Date.now();
-        this.model('Config').update(query, update, opts, function (err, modelUpdated) {
+        this.model('Space').update(query, update, opts, function (err, modelUpdated) {
             if (modelUpdated) {
                 cb(update);
             }

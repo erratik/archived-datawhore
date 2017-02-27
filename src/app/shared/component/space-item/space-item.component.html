@@ -1,0 +1,7 @@
+
+<ul>
+  <li *ngFor="let property of properties">
+    ({{property.friendlyName}})
+    {{property.schemaPath | schemaValue: 'profile': schema}}
+  </li>
+</ul>

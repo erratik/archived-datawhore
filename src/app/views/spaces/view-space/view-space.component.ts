@@ -41,7 +41,7 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
             });
 
         spaceConfig$.subscribe(() => {
-            this.profile.enablePropertyBucket(this.profileSchema.propertyBucket);
+            this.profile.createPropertyBucket(this.profileSchema.propertyBucket);
 
             this.uploader = new FileUploader({url: `${Paths.DATAWHORE_API_URL}/upload/${this.space.name}/space/icon`});
             this.uploader.onCompleteItem = (item, response, status) => {
@@ -57,7 +57,7 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
     private getProfile(): any {
 
-        return this.profileService.getProfile(this.space).do((profile) => {
+        return this.profileService.getProfile(this.space.name).do((profile) => {
             this.profile = new Profile(profile.space, profile.profile, profile.modified);
         });
 
@@ -65,7 +65,7 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
     private getRawProfile(): any {
 
-        return this.profileService.fetchRaw(this.space).do((profileSchema) => {
+        return this.profileService.fetchRaw(this.space.name).do((profileSchema) => {
             this.profileSchema = new DimensionSchema(profileSchema['type'], profileSchema['content'], profileSchema.modified);
         });
 

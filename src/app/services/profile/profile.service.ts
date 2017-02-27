@@ -13,13 +13,13 @@ export class ProfileService extends SpaceItemService {
         super(http);
     }
 
-    public getProfile(space: Space): Observable<any> {
+    public getProfile(space: string): Observable<any> {
 
         const url = `${this.apiServer}/space/profile`;
         const bodyString = JSON.stringify({
             action: 'profile.get',
             type: 'profile',
-            space: space.name
+            space: space
         });
 
         const headers = new Headers({'Content-Type': 'application/json'}); // ... Set content type to JSON
@@ -30,13 +30,13 @@ export class ProfileService extends SpaceItemService {
         }).catch(this.handleError);
     }
 
-    public fetchRaw(space: Space): Observable<any> {
+    public fetchRaw(space: string): Observable<any> {
 
         const url = `${this.apiServer}/space/schemas`;
         const bodyString = JSON.stringify({
             action: 'schemas.get',
             type: 'profile',
-            space: space.name
+            space: space
         });
 
         const headers = new Headers({'Content-Type': 'application/json'}); // ... Set content type to JSON

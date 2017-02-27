@@ -5,6 +5,7 @@ var request = require('request');
 var https = require('https');
 var Space = require('../models/spaceModel');
 var Setting = require('../models/settingModel');
+var Schema = require('../models/schemaModel');
 var endpoints = require('./endpoints');
 var objectPath = require('object-path');
 // my own endpoints, read/write in mongo docs

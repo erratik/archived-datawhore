@@ -1,8 +1,7 @@
-
-
 export class Dimension {
     constructor(public friendlyName: string,
-                public schemaPath: string) {}
+                public schemaPath: string) {
+    }
 }
 
 export class Profile {
@@ -16,7 +15,9 @@ export class Profile {
         return this.properties.map(dim => new Dimension(dim.friendlyName, dim.schemaPath));
     }
 
-    public enablePropertyBucket(propertyBucket) {
+    public createPropertyBucket(propertyBucket) {
+        // find all properties on the profile and make them enabled
+        // 1. needed for this dimension form to display values as enabled
         this.properties.map(property => {
 
             propertyBucket.filter(bucketProp => {
@@ -28,5 +29,5 @@ export class Profile {
         });
 
         return propertyBucket;
-       }
+    }
 }
