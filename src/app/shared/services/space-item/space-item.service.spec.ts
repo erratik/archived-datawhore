@@ -1,14 +1,14 @@
 import { TestBed, inject } from '@angular/core/testing';
-import { DimensionsService } from './space-item.service';
+import { SpaceItemService } from './space-item.service';
 
-describe('DimensionsService', () => {
+describe('SpaceItemService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [DimensionsService]
+      providers: [SpaceItemService]
     });
   });
 
-  it('should ...', inject([DimensionsService], (service: DimensionsService) => {
+  it('should ...', inject([SpaceItemService], (service: SpaceItemService) => {
     expect(service).toBeTruthy();
   }));
 });

@@ -12,7 +12,21 @@ export class Profile {
         this.properties = this.assignProperties();
     }
 
-    private assignProperties() {
+    private assignProperties(): Array<Dimension> {
         return this.properties.map(dim => new Dimension(dim.friendlyName, dim.schemaPath));
     }
+
+    public enablePropertyBucket(propertyBucket) {
+        this.properties.map(property => {
+
+            propertyBucket.filter(bucketProp => {
+                if (bucketProp && bucketProp.content.schemaPath === property.schemaPath) {
+                    bucketProp.content.enabled = true;
+                }
+            })
+
+        });
+
+        return propertyBucket;
+       }
 }

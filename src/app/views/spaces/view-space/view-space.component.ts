@@ -41,7 +41,7 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
             });
 
         spaceConfig$.subscribe(() => {
-            console.log(this);
+            this.profile.enablePropertyBucket(this.profileSchema.propertyBucket);
 
             this.uploader = new FileUploader({url: `${Paths.DATAWHORE_API_URL}/upload/${this.space.name}/space/icon`});
             this.uploader.onCompleteItem = (item, response, status) => {

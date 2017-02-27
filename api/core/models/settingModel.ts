@@ -1,16 +1,27 @@
 let mongoose = require('mongoose');
 
+let oauthSchema =  new mongoose.Schema({
+    label: String,
+    value: String,
+    keyName: String
+});
+
+let extraSchema =  new mongoose.Schema({
+    label: String,
+    value: String
+});
+
 const SettingSchema = {
     schema: {
         space: String,
         modified: Number,
         connected: Boolean,
-        oauth: [],
-        extras: []
+        oauth: [oauthSchema],
+        extras: [extraSchema]
     },
     self: {
         findSettings: function (spaceName: string, cb) {
-            let _this = this;
+            const _this = this;
             this.find({space: spaceName}, function (err, retrievedSpace) {
                 const space = retrievedSpace[0];
                 if (!space) {
@@ -19,15 +30,7 @@ const SettingSchema = {
                         update = {modified: Date.now()},
                         opts = {multi: false, upsert: true};
 
-                    _this.update(query, update, opts, function (error, modelUpdated) {
-
-                        if (modelUpdated) {
-                            console.log(update);
-                        } else if (error) {
-                            console.log(error);
-                        }
-
-                    });
+                    _this.update(query, update, opts);
                 }
                 cb(err, space);
             });

@@ -1,11 +1,20 @@
 var mongoose = require('mongoose');
+var oauthSchema = new mongoose.Schema({
+    label: String,
+    value: String,
+    keyName: String
+});
+var extraSchema = new mongoose.Schema({
+    label: String,
+    value: String
+});
 var SettingSchema = {
     schema: {
         space: String,
         modified: Number,
         connected: Boolean,
-        oauth: [],
-        extras: []
+        oauth: [oauthSchema],
+        extras: [extraSchema]
     },
     self: {
         findSettings: function (spaceName, cb) {
@@ -13,15 +22,8 @@ var SettingSchema = {
             this.find({ space: spaceName }, function (err, retrievedSpace) {
                 var space = retrievedSpace[0];
                 if (!space) {
-                    var query = { space: spaceName }, update_1 = { modified: Date.now() }, opts = { multi: false, upsert: true };
-                    _this.update(query, update_1, opts, function (error, modelUpdated) {
-                        if (modelUpdated) {
-                            console.log(update_1);
-                        }
-                        else if (error) {
-                            console.log(error);
-                        }
-                    });
+                    var query = { space: spaceName }, update = { modified: Date.now() }, opts = { multi: false, upsert: true };
+                    _this.update(query, update, opts);
                 }
                 cb(err, space);
             });
