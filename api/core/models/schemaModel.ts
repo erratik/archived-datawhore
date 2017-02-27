@@ -21,12 +21,12 @@ const SchemaSchema = {
                 }
             );
         },
-        writeSchema: function (spaceName: string, schema: string, cb) {
+        writeSchema: function (spaceName: string, schema: any, cb) {
 
             this.findOneAndUpdate(
                 {space: spaceName},
                 {modified: Date.now(), schemas: [schema]},
-                {upsert: true, setDefaultsOnInsert: true},
+                {upsert: true, returnNewDocument: true},
                 function (err, updated) {
                     console.log();
                     cb(updated);

@@ -1,12 +1,14 @@
-import {Component, OnInit, EventEmitter} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {SpacesService} from '../../../services/spaces.service';
 import {ActivatedRoute} from '@angular/router';
 import {SpaceConfigComponent} from '../../../shared/component/space-config/space-config.component';
-import {SpaceModel} from '../../../models/space.model';
+import {Space} from '../../../models/space.model';
 import {Paths} from '../../../classes/paths.class';
 import {DimensionSchema} from '../../../models/dimension-schema.model';
 import {OauthSettingsService} from '../../../services/space/oauth-settings.service';
 import {FileUploader} from 'ng2-file-upload';
+import {ProfileService} from '../../../services/profile/profile.service';
+import {Profile} from '../../../models/profile.model';
 
 @Component({
     selector: 'datawhore-view-space',
@@ -16,21 +18,30 @@ import {FileUploader} from 'ng2-file-upload';
 
 export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
-    public space: SpaceModel = null;
+    public space: Space = null;
+    public profile: Profile = null;
     public profileSchema: any = null;
     public uploader: FileUploader;
-    public isLoading = new EventEmitter<boolean>();
+    // @Output() onNewDims
 
     constructor(spacesService: SpacesService,
                 oauthService: OauthSettingsService,
+                profileService: ProfileService,
                 activatedRoute: ActivatedRoute) {
-        super(spacesService, oauthService, activatedRoute);
+        super(spacesService, oauthService, profileService, activatedRoute);
     }
 
     ngOnInit() {
 
-        this.retrieveSpace$.subscribe(() => {
-            this.fetchRawProfile();
+        const spaceConfig$ = this.retrieveSpace$
+            .switchMap(() => this.getProfile())
+            .mergeMap(() => this.getRawProfile())
+            .do((profileSchema) => {
+                this.profileSchema = new DimensionSchema(profileSchema['type'], profileSchema['content'], profileSchema['modified']);
+            });
+
+        spaceConfig$.subscribe(() => {
+            console.log(this);
 
             this.uploader = new FileUploader({url: `${Paths.DATAWHORE_API_URL}/upload/${this.space.name}/space/icon`});
             this.uploader.onCompleteItem = (item, response, status) => {
@@ -40,29 +51,22 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
                     this.space.modified = res.modified;
                 }
             };
-
         });
 
     }
 
-    public toggleEditSpace(): void {
-        this.space.inEditMode = !this.space.inEditMode;
+    private getProfile(): any {
+
+        return this.profileService.getProfile(this.space).do((profile) => {
+            this.profile = new Profile(profile.space, profile.profile, profile.modified);
+        });
+
     }
 
-    private fetchRawProfile(): any {
+    private getRawProfile(): any {
 
-        const data = {
-            action: 'schemas.get',
-            type: 'profile',
-            space: this.space.name
-        };
-
-        const profileSchema$ = this.spacesService.spaceEndpoint(this.space, data, encodeURI('space/schemas')).do((profileSchema) => {
-                this.profileSchema = new DimensionSchema(profileSchema['type'], profileSchema['content'], profileSchema.modified);
-            });
-
-        profileSchema$.subscribe(() => {
-            console.log(this.profileSchema.propertyBucket);
+        return this.profileService.fetchRaw(this.space).do((profileSchema) => {
+            this.profileSchema = new DimensionSchema(profileSchema['type'], profileSchema['content'], profileSchema.modified);
         });
 
     }
@@ -77,8 +81,8 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
         data['space'] = this.space.name;
 
         const profileSchema$ = this.spacesService.spaceEndpoint(this.space, data).do((profileSchema) => {
-                this.profileSchema = new DimensionSchema(profileSchema['type'], profileSchema['content'], profileSchema.modified);
-            });
+            this.profileSchema = new DimensionSchema(profileSchema['type'], profileSchema['content'], profileSchema.modified);
+        });
 
         profileSchema$.subscribe(() => {
             console.log(this.profileSchema.propertyBucket);
@@ -86,5 +90,8 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
     }
 
+    public toggleEditSpace(): void {
+        this.space.inEditMode = !this.space.inEditMode;
+    }
 
 }

@@ -11,6 +11,21 @@ let Schema = require('../models/schemaModel');
 let endpoints = require('./endpoints');
 let objectPath = require('object-path');
 
+// my own endpoints, read/write in mongo docs
+let getEndpoint = (data, cb) => {
+    const endpointAction = objectPath.get(endpoints, data.action);
+    return endpointAction(data.space, data.type, function (resp) {
+        cb(resp);
+    });
+};
+
+let postEndpoint = (data, content, cb) => {
+    const endpointAction = objectPath.get(endpoints, data.action);
+    return endpointAction(data.space, content, data.type, function (resp) {
+        cb(resp);
+    });
+};
+
 module.exports = function (app) {
 
     // SPACES
@@ -33,8 +48,8 @@ module.exports = function (app) {
 
         const data = req.body.data;
 
+        // requests to apis that need oauth2 shit
         if (data.apiEndpointUrl) {
-
             const options = {
                 hostname: data.apiUrl,
                 path: data.apiEndpointUrl,
@@ -51,6 +66,7 @@ module.exports = function (app) {
                 });
                 result.on('end', function () {
                     const response = JSON.parse(buffer);
+
                     const endpointAction = objectPath.get(endpoints, data.action);
                     endpointAction(data.space, response, data.type, function (updatedResponse) {
                         res.json(updatedResponse);
@@ -59,12 +75,12 @@ module.exports = function (app) {
             });
 
         } else {
-
-            const endpointAction = objectPath.get(endpoints, data.action);
-            endpointAction(data.space, data.type, function (resp) {
-                res.json(resp);
-            });
-            // res.json('hjk');
+            // fallbacks when there are not specific routes set for the action
+            if (data.action.includes('.write')) {
+                postEndpoint(req.body.data, req.body.data.content, (resp) => res.json(resp));
+            } else {
+                getEndpoint(req.body.data, (resp) => res.json(resp));
+            }
         }
 
     });
@@ -89,15 +105,8 @@ module.exports = function (app) {
     });
 
     // SCHEMAS (PROFILES, POSTS FOR SPACES)
-    app.post('/api/space/schemas', function (req, res) {
-
-        const data = req.body.data;
-
-        const endpointAction = objectPath.get(endpoints, data.action);
-        endpointAction(data.space, data.type, function (resp) {
-            res.json(resp);
-        });
-    });
+    app.post('/api/space/schemas', (req, res) => getEndpoint(req.body, (resp) => res.json(resp)));
+    app.post('/api/space/profile', (req, res) => getEndpoint(req.body, (resp) => res.json(resp)));
 
     // UPLOADS
     // todo: see if i can change this to a put?

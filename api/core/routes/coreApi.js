@@ -7,6 +7,19 @@ var Space = require('../models/spaceModel');
 var Setting = require('../models/settingModel');
 var endpoints = require('./endpoints');
 var objectPath = require('object-path');
+// my own endpoints, read/write in mongo docs
+var getEndpoint = function (data, cb) {
+    var endpointAction = objectPath.get(endpoints, data.action);
+    return endpointAction(data.space, data.type, function (resp) {
+        cb(resp);
+    });
+};
+var postEndpoint = function (data, content, cb) {
+    var endpointAction = objectPath.get(endpoints, data.action);
+    return endpointAction(data.space, content, data.type, function (resp) {
+        cb(resp);
+    });
+};
 module.exports = function (app) {
     // SPACES
     app.get('/api/spaces', function (req, res) {
@@ -23,6 +36,7 @@ module.exports = function (app) {
     app.post('/api/space/endpoint', function (req, res) {
         // console.log('data', req.body.data);
         var data = req.body.data;
+        // requests to apis that need oauth2 shit
         if (data.apiEndpointUrl) {
             var options = {
                 hostname: data.apiUrl,
@@ -47,10 +61,13 @@ module.exports = function (app) {
             });
         }
         else {
-            var endpointAction = objectPath.get(endpoints, data.action);
-            endpointAction(data.space, data.type, function (resp) {
-                res.json(resp);
-            });
+            // fallbacks when there are not specific routes set for the action
+            if (data.action.includes('.write')) {
+                postEndpoint(req.body.data, req.body.data.content, function (resp) { return res.json(resp); });
+            }
+            else {
+                getEndpoint(req.body.data, function (resp) { return res.json(resp); });
+            }
         }
     });
     // SPACES: SETTINGS (MOSTLY OAUTH, FOR NOW)
@@ -69,13 +86,8 @@ module.exports = function (app) {
         });
     });
     // SCHEMAS (PROFILES, POSTS FOR SPACES)
-    app.post('/api/space/schemas', function (req, res) {
-        var data = req.body.data;
-        var endpointAction = objectPath.get(endpoints, data.action);
-        endpointAction(data.space, data.type, function (resp) {
-            res.json(resp);
-        });
-    });
+    app.post('/api/space/schemas', function (req, res) { return getEndpoint(req.body, function (resp) { return res.json(resp); }); });
+    app.post('/api/space/profile', function (req, res) { return getEndpoint(req.body, function (resp) { return res.json(resp); }); });
     // UPLOADS
     // todo: see if i can change this to a put?
     app.post('/api/upload/:space/:folder/:filename', function (req, res) {

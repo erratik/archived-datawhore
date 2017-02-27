@@ -1,7 +1,7 @@
 import {SpaceOauthSettings, OauthSettings} from './space-settings.model';
 import {Paths} from '../classes/paths.class';
 
-export class SpaceModel {
+export class Space {
     constructor(public name: string,
                 public modified: number,
                 public oauth: SpaceOauthSettings = null,

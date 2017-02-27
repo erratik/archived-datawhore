@@ -1,4 +1,4 @@
-import {SpaceModel} from '../models/space.model';
+import {Space} from '../models/space.model';
 import {Injectable} from '@angular/core';
 import {Http, Response, Headers, RequestOptions} from '@angular/http';
 import 'rxjs/add/operator/map';
@@ -14,18 +14,18 @@ export class SpacesService {
     constructor(private http: Http) {
     }
 
-    public getSpace(spaceName: string): Observable<SpaceModel> {
+    public getSpace(spaceName: string): Observable<Space> {
         return this.http.get(`${this.apiServer}/space/${spaceName}`).map((res: Response) => {
             return res.json();
         }).catch(this.handleError);
     }
 
-    public getAllSpaces(): Observable<SpaceModel[]> {
+    public getAllSpaces(): Observable<Space[]> {
         return this.http.get(`${this.apiServer}/spaces`).map((res: Response) => {
 
             const spaces = res.json();
             return spaces.map(space => {
-                return new SpaceModel(
+                return new Space(
                     space.name,
                     space.modified,
                     null, false, space.icon
@@ -35,7 +35,7 @@ export class SpacesService {
         }).catch(this.handleError);
     }
 
-    public spaceEndpoint(space: SpaceModel, queryData, endpointPath = ''): Observable<SpaceModel> {
+    public spaceEndpoint(space: Space, queryData, endpointPath = ''): Observable<any> {
 
         endpointPath = (endpointPath === '') ? 'space/endpoint' : endpointPath;
         const url = `${this.apiServer}/${endpointPath}`;

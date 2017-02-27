@@ -1,6 +1,6 @@
 import {Component, OnInit, Input} from '@angular/core';
 import {SpacesService} from '../../../services/spaces.service';
-import {SpaceModel} from '../../../models/space.model';
+import {Space} from '../../../models/space.model';
 import 'rxjs/add/operator/map';
 
 @Component({
@@ -11,10 +11,10 @@ import 'rxjs/add/operator/map';
 })
 export class EditSpacesComponent implements OnInit {
 
-    public addingSpaces: Array<SpaceModel>;
+    public addingSpaces: Array<Space>;
     @Input() public isAddingSpaces = false;
     protected isLoadingSpaces = true;
-    protected spaces: Array<SpaceModel>;
+    protected spaces: Array<Space>;
 
     constructor(private spacesService: SpacesService) {
     }
@@ -30,7 +30,7 @@ export class EditSpacesComponent implements OnInit {
     }
 
 
-    protected cancelSpaceAdd(space: SpaceModel): void {
+    protected cancelSpaceAdd(space: Space): void {
         this.addingSpaces = this.addingSpaces.filter(spaces => spaces.modified !== space.modified);
     }
 

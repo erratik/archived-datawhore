@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {SpaceModel} from '../../../../models/space.model';
+import {Space} from '../../../../models/space.model';
 
 @Component({
   selector: 'datawhore-add-space',
@@ -8,9 +8,9 @@ import {SpaceModel} from '../../../../models/space.model';
 })
 export class AddSpaceComponent implements OnInit {
 
-  protected newSpace: SpaceModel = null;
+  protected newSpace: Space = null;
 
-  model = new SpaceModel('', Date.now());
+  model = new Space('', Date.now());
 
   submitted = false;
 

@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 var SpaceSchema = {
-    schema: {
+    doc: {
         name: String,
         modified: Number,
         avatar: String,

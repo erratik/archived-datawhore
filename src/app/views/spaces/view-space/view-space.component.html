@@ -1,24 +1,30 @@
 <section class="hero is-dark">
     <div class="hero-body">
         <div class="container">
-
             <div class="heading">
                 <h2 class="is-flex">
-                    <figure class="image is-32x32">
+                    <a (click)="uploadImage=!uploadImage">
+                        <figure class="image is-32x32">
                         <img src="{{(space?.icon) ? space?.icon : 'http://bulma.io/images/placeholders/32x32.png'}}">
-                    </figure>
+                        </figure>
+                    </a>
                     {{space?.name}}
                 </h2>
             </div>
             <small>Last modified: {{space?.modified | date:'medium'}}</small>
+            <div *ngIf="uploadImage" >
+                <input type="file" class="form-control" name="single" ng2FileSelect
+                       [uploader]="uploader"/>
+                <a type="button" class="btn btn-success btn-s" (click)="uploader.uploadAll()">
+                    <span class="fa fa-cloud-upload"></span>
+                </a>
+            </div>
         </div>
     </div>
 </section>
 <section class="hero-body">
     <div class="container" *ngIf="space?.oauth">
-        <div *ngIf="!space?.inEditMode">
-            <small *ngIf="hasExpiryToken">Token expires on {{tokenExpiryDate | date:'medium'}}</small>
-            <details *ngIf="space?.oauth.extras.length">
+        <div *ngIf="!space?.inEditMode"><details *ngIf="space?.oauth.extras.length">
                 <summary>Oauth Settings</summary>
                 <ul>
                     <li *ngFor="let spaceProp of space?.oauth.settings">
@@ -41,18 +47,10 @@
                 </ul>
             </details>
             <a class="button" (click)="toggleEditSpace(space)">Edit Oauth Settings</a>
+            <small *ngIf="hasExpiryToken">Token expires on {{tokenExpiryDate | date:'medium'}}</small>
+
         </div>
         <div *ngIf="space?.inEditMode">
-
-            <div class="form-group">
-                <input type="file" class="form-control" name="single" ng2FileSelect
-                       [uploader]="uploader"/>
-                <button type="button" class="btn btn-success btn-s"
-                        (click)="uploader.uploadAll()">
-                    <span class="glyphicon glyphicon-upload"></span> Upload all
-                </button>
-                <br/>
-            </div>
 
             <ul *ngFor="let spaceProp of space?.oauth.settings">
                 <li class="control">
@@ -74,16 +72,29 @@
             </a>
         </div>
         <hr>
-        <div class="heading"><h2>profile settings</h2></div>
-        <a class="button" (click)="resetRawProfile()">
-            get profile
-        </a>
-        <datawhore-tree-view [treeData]="myTree"></datawhore-tree-view>
-        <div *ngIf="profileSchema?.propertyBucket">
-            <details>
-                <summary>Space Properties (RAW)</summary>
-                <pre>{{ profileSchema.propertyBucket | json }}</pre>
-            </details>
+        <div class="heading">
+            <h2>profile settings</h2>
+            <a class="button" (click)="resetRawProfile()">
+                get profile
+            </a>
+
+        </div>
+        <div *ngIf="profile">
+            <pre>{{ profile | json }}</pre>
+            <hr>
+        </div>
+        <div  class="columns" *ngIf="profileSchema?.propertyBucket">
+            <div class="column is-half">
+                <details>
+                    <summary>Space Properties (RAW)</summary>
+                    <pre>{{ profileSchema.propertyBucket | json }}</pre>
+                </details>
+            </div>
+            <div class="column is-half">
+                <datawhore-dim-form [model]="profileSchema.propertyBucket" [dimType]="'profile'"
+                                    [space]="space" (onNewDimensions)="newDimensions($event)"></datawhore-dim-form>
+            </div>
+            <hr>
         </div>
         <div *ngIf="profileSchema">
             <details>

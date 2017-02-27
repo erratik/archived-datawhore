@@ -1,11 +1,11 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {SpacesService} from '../../services/spaces.service';
-import {SpaceOauthSettings, OauthSettings, OauthExtras} from '../../models/space-settings.model';
-import {SpaceModel} from '../../models/space.model';
-import 'rxjs/add/operator/map';
-import {Paths} from '../../classes/paths.class';
+import {Space} from '../../models/space.model';
 import {OauthSettingsService} from '../../services/space/oauth-settings.service';
+import {SpaceOauthSettings, OauthSettings, OauthExtras} from '../../models/space-settings.model';
+import {Paths} from '../../classes/paths.class';
+import 'rxjs/add/operator/map';
 
 @Component({
     selector: 'datawhore-connect-callback',
@@ -16,7 +16,7 @@ export class ConnectCallbackComponent implements OnInit {
 
     private params: any = null;
     private queryParams: any = null;
-    private space: SpaceModel = null;
+    private space: Space = null;
     protected spaceName: string = null;
     protected isRequestingAccessToken = false;
     private skipTokenRequest = false;
@@ -26,7 +26,8 @@ export class ConnectCallbackComponent implements OnInit {
 
     constructor(private activatedRoute: ActivatedRoute,
                 private oauthService: OauthSettingsService,
-                private spacesService: SpacesService) {
+                private spacesService: SpacesService,
+                private router: Router) {
     }
 
     ngOnInit() {
@@ -68,7 +69,7 @@ export class ConnectCallbackComponent implements OnInit {
 
                 this.settings = oauth;
 
-                this.space = new SpaceModel(
+                this.space = new Space(
                     this.spaceName,
                     this.space.modified,
                     new SpaceOauthSettings(
@@ -109,7 +110,7 @@ export class ConnectCallbackComponent implements OnInit {
                 // save space with api credentials
                 this.oauthService.updateSpaceSettings(spaceWithCredentials).subscribe(() => {
                     this.isRequestingAccessToken = false;
-                    // this.router.navigate([`/space/${this.space.name}`]);
+                    this.router.navigate([`/space/${this.space.name}`]);
                 });
 
             });

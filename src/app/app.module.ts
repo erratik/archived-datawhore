@@ -9,6 +9,8 @@ import {FileSelectDirective, FileDropDirective} from 'ng2-file-upload';
 
 import {SpacesService} from './services/spaces.service';
 import {OauthSettingsService} from './services/space/oauth-settings.service';
+import {ProfileService} from './services/profile/profile.service';
+import {SpaceItemService} from './shared/services/space-item/space-item.service';
 
 import {AppComponent} from './app.component';
 import {HeaderComponent} from './wrapper/header/header.component';
@@ -23,6 +25,8 @@ import {ValuesPipePipe} from './shared/pipes/values-pipe.pipe';
 import {ConnectCallbackComponent} from './views/connect-callback/connect-callback.component';
 import {SpaceViewComponent} from './views/spaces/view-space/view-space.component';
 import {SpaceConfigComponent} from './shared/component/space-config/space-config.component';
+import {DimensionListComponent} from './shared/component/dimensions/dimensions-list/dimensions-list.component';
+import { DimensionFormComponent } from './shared/component/dimensions/dimensions-form/dimensions-form.component';
 
 const appRoutes: Routes = [
     {
@@ -69,9 +73,11 @@ const appRoutes: Routes = [
         ValuesPipePipe,
         ConnectCallbackComponent,
         SpaceViewComponent,
-        SpaceConfigComponent
+        SpaceConfigComponent,
+        DimensionListComponent,
+        DimensionFormComponent
     ],
-    providers: [SpacesService, OauthSettingsService],
+    providers: [SpacesService, OauthSettingsService, SpaceItemService, ProfileService],
     bootstrap: [AppComponent]
 })
 export class AppModule {
