@@ -41,5 +41,5 @@ var SpaceSchema = {
         });
     }
 };
-var Space = require('./createModel')(mongoose, 'Spaces', SpaceSchema);
+var Space = require('./createModel')(mongoose, 'Space', SpaceSchema);
 module.exports = Space;

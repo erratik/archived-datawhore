@@ -23,6 +23,10 @@ export class Profile {
             propertyBucket.filter(bucketProp => {
                 if (bucketProp && bucketProp.content.schemaPath === property.schemaPath) {
                     bucketProp.content.enabled = true;
+                    bucketProp.content.friendlyName = property.friendlyName;
+                }
+                if (bucketProp && bucketProp.grouped) {
+                    this.createPropertyBucket(bucketProp.content.value);
                 }
             })
 

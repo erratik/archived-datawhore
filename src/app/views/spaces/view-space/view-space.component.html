@@ -19,37 +19,22 @@
                     <span class="fa fa-cloud-upload"></span>
                 </a>
             </div>
+            <div>
+                <a href="">+ add avatar</a>
+                <span class="tag" *ngFor="let property of profile?.properties"
+                      (click)="updateSpace('avatar', property.schemaPath, 'profile')">
+                    {{property.friendlyName}}
+                </span>
+                <!--{{profile?.properties | json}}-->
+                <a href="">+ add username</a>
+            </div>
         </div>
     </div>
 </section>
 <section class="hero-body">
     <div class="container" *ngIf="space?.oauth">
-        <div *ngIf="!space?.inEditMode">
-            <details *ngIf="space?.oauth.extras.length">
-                <summary>Oauth Settings</summary>
-                <ul>
-                    <li *ngFor="let spaceProp of space?.oauth.settings">
-                        <div *ngIf="spaceProp.value">
-                            <strong>{{spaceProp.label}}</strong>: {{spaceProp.value}}
-                        </div>
-                        <div *ngIf="!spaceProp.value">
-                            <strong>{{spaceProp.label}}</strong> (<em>{{spaceProp.keyName}}</em>) has not been
-                            set yet
-                        </div>
-                    </li>
-                </ul>
-            </details>
-            <details *ngIf="space?.oauth.extras.length">
-                <summary>Acquired Oauth Settings</summary>
-                <ul *ngFor="let spaceProp of space?.oauth.extras">
-                    <li>
-                        <strong>{{spaceProp.label}}</strong>: {{spaceProp.value}}
-                    </li>
-                </ul>
-            </details>
-            <a class="button" (click)="toggleEditSpace(space)">Edit Oauth Settings</a>
-            <small *ngIf="hasExpiryToken">Token expires on {{tokenExpiryDate | date:'medium'}}</small>
-
+        <div class="header">
+            <h2 class="is-pulled-left heading">Profile Settings</h2>
         </div>
         <div *ngIf="space?.inEditMode">
 
@@ -72,16 +57,34 @@
                 <span>Cancel</span>
             </a>
         </div>
-        <hr>
-        <div>
-            <div class="header">
-                <h2 class="is-pulled-left heading">Profile Settings</h2>
-                <a class="button is-warning" (click)="resetRawProfile()">
-                    <span class="icon is-small is-outlined"><i class="fa fa-refresh"></i></span>
-                    <span>Reset profile</span>
-                </a>
-            </div>
+        <div *ngIf="!space?.inEditMode">
+            <details>
+                <summary>Oauth Settings</summary>
+                <ul>
+                    <li *ngFor="let spaceProp of space?.oauth.settings">
+                        <div *ngIf="spaceProp.value">
+                            <strong>{{spaceProp.label}}</strong>: {{spaceProp.value}}
+                        </div>
+                        <div *ngIf="!spaceProp.value">
+                            <strong>{{spaceProp.label}}</strong> (<em>{{spaceProp.keyName}}</em>) has not been
+                            set yet
+                        </div>
+                    </li>
+                </ul>
+            </details>
+            <details>
+                <summary>Acquired Oauth Settings</summary>
+                <ul *ngFor="let spaceProp of space?.oauth.extras">
+                    <li>
+                        <strong>{{spaceProp.label}}</strong>: {{spaceProp.value}}
+                    </li>
+                </ul>
+            </details>
+            <a class="button" (click)="toggleEditSpace(space)">Edit Oauth Settings</a>
+            <small *ngIf="hasExpiryToken">Token expires on {{tokenExpiryDate | date:'medium'}}</small>
+
         </div>
+        <hr>
         <div *ngIf="profile" class="columns">
             <div class="column is-half">
                 <div class="structure">
@@ -102,12 +105,21 @@
             <hr>
         </div>
         <hr>
+        <div class="header">
+            <h2 class="is-pulled-left heading">Profile Schema</h2>
+            <a class="button is-warning" [class.is-loading]="isFetchingSchema" (click)="resetRawProfile()">
+                <span class="icon is-small is-outlined"><i class="fa fa-refresh"></i></span>
+                <span>Reset schema</span>
+            </a>
+        </div>
         <div class="columns" *ngIf="profileSchema?.propertyBucket">
             <div class="column is-half">
-                <!--<details>
-                    <summary>Space Properties (RAW)</summary>
-                    <pre>{{ profileSchema.propertyBucket | json }}</pre>
-                </details>-->
+                <article class="message is-warning">
+                    <div class="message-body">
+                        <p>Resetting the profile doesn't affect the structure, but will edit the items available in
+                            it, and so the example space item.</p>
+                    </div>
+                </article>
                 <details>
                     <summary>Space Profile (RAW)</summary>
                     <pre>{{ profileSchema | json }}</pre>

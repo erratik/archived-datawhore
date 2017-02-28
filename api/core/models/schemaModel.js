@@ -11,16 +11,20 @@ var SchemaSchema = {
     },
     self: {
         findSchema: function (spaceName, schemaType, cb) {
-            this.findOne({ 'schemas.type': schemaType }, { 'schemas.$': 1 }, function (err, docs) {
+            this.findOne({ space: spaceName, 'schemas.type': schemaType }, { 'schemas.$': 1 }, function (err, docs) {
                 if (docs) {
                     cb(docs.schemas[0]);
                 }
             });
         },
         writeSchema: function (spaceName, schema, cb) {
-            this.findOneAndUpdate({ space: spaceName }, { modified: Date.now(), schemas: [schema] }, { upsert: true, returnNewDocument: true }, function (err, updated) {
-                console.log();
-                cb(updated);
+            var that = this;
+            this.findOneAndUpdate({ space: spaceName }, { modified: Date.now(), schemas: [schema] }, { upsert: true, setDefaultsOnInsert: true }, function (err, updated) {
+                that.findOne({ space: spaceName, 'schemas.type': schema.type }, { 'schemas.$': 1 }, function (_err, docs) {
+                    if (docs) {
+                        cb(docs.schemas[0]);
+                    }
+                });
             });
         }
     }

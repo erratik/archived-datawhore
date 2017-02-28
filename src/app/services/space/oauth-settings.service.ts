@@ -37,7 +37,7 @@ export class OauthSettingsService {
           if (!isOauth2) {
             const oauthExtras: Array<OauthExtras> = [];
             resExtras = res.json();
-            for (let key of Object.keys(resExtras)) {
+            for (const key of Object.keys(resExtras)) {
               oauthExtras.push(new OauthExtras(key, resExtras[key]));
             }
             space.oauth.extras = oauthExtras;

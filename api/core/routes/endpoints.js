@@ -3,12 +3,16 @@ var Profile = require('../models/profileModel');
 module.exports = {
     schemas: {
         write: function (space, content, type, cb) {
+            // then we have other type of schema, using request(), instead of https(),
+            // so... not twitter, so far...
+            content = (typeof content === 'string') ? JSON.parse(content) : content;
             var schema = {
                 type: type,
-                content: content
+                content: typeof content.data !== 'undefined' ? content.data : content
             };
             Schema.writeSchema(space, schema, function (updatedSchema) {
-                cb(updatedSchema.schemas.filter(function (s) { return s.type === type; })[0]);
+                console.log('[profile.write callback]', updatedSchema);
+                cb(updatedSchema);
             });
         },
         get: function (space, type, cb) {
@@ -33,7 +37,12 @@ module.exports = {
         },
         get: function (space, type, cb) {
             Profile.findProfile(space, type, function (schema) {
-                console.log('[endpoints] get profile', schema);
+                if (!schema) {
+                    console.log("[endpoints] no profile found for " + space);
+                }
+                else {
+                    console.log('[endpoints] get profile', schema);
+                }
                 cb(schema);
             });
         }

@@ -35,6 +35,22 @@ export class SpacesService {
         }).catch(this.handleError);
     }
 
+    public updateSpace(space: Space): Observable<any> {
+
+        const url = `${this.apiServer}/space/update/${space.name}`;
+        const bodyString = JSON.stringify({
+            space: space.name,
+            data: space
+        });
+
+        const headers = new Headers({'Content-Type': 'application/json'}); // ... Set content type to JSON
+        const options = new RequestOptions({headers: headers}); // Create a request option
+
+        return this.http.put(url, bodyString, options).map((res: Response) => {
+            return res.json();
+        }).catch(this.handleError);
+    }
+
     public spaceEndpoint(space: Space, queryData, endpointPath = ''): Observable<any> {
 
         endpointPath = (endpointPath === '') ? 'space/endpoint' : endpointPath;

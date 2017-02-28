@@ -9,6 +9,7 @@ import {OauthSettingsService} from '../../../services/space/oauth-settings.servi
 import {FileUploader} from 'ng2-file-upload';
 import {ProfileService} from '../../../services/profile/profile.service';
 import {Profile} from '../../../models/profile.model';
+import {SchemaValuePipe} from '../../../shared/pipes/schema-value.pipe';
 
 @Component({
     selector: 'datawhore-view-space',
@@ -22,12 +23,14 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
     public profile: Profile = null;
     public profileSchema: any = null;
     public uploader: FileUploader;
+    protected isFetchingSchema = false;
     // @Output() onNewDims
 
     constructor(spacesService: SpacesService,
                 oauthService: OauthSettingsService,
                 profileService: ProfileService,
-                activatedRoute: ActivatedRoute) {
+                activatedRoute: ActivatedRoute,
+                private schemaValuePipe: SchemaValuePipe) {
         super(spacesService, oauthService, profileService, activatedRoute);
     }
 
@@ -73,6 +76,8 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
     protected resetRawProfile(): any {
 
+        this.isFetchingSchema = true;
+
         // strat with oauth2 values, for most /api/space/endpoint usages
         const data = Object.assign(this.oauth2);
         data['apiEndpointUrl'] = Paths.PROFILE_FETCH_URL[this.space.name];
@@ -85,9 +90,16 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
         });
 
         profileSchema$.subscribe(() => {
-            console.log(this.profileSchema.propertyBucket);
+            this.profile.createPropertyBucket(this.profileSchema.propertyBucket);
+            this.isFetchingSchema = false;
         });
 
+    }
+
+    public updateSpace(keyName, value, fromType): void {
+        this.space[keyName] = this.schemaValuePipe.transform(value, fromType, this.profileSchema);
+        const saveSpace$ = this.spacesService.updateSpace(this.space).subscribe();
+        // | schemaValue: 'profile': schema
     }
 
     public toggleEditSpace(): void {

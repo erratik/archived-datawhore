@@ -73,7 +73,7 @@ export class SpaceConfigComponent {
                     // todo: make sure it happens when we start working and loading posts, etc
                     window.location.href = this.space.oauth.authorizationUrl;
                 }
-
+                // console.log(this.space.oauth.extras.filter(settings => settings.label === 'accessToken'))
                 this.oauth2 = {
                     accessToken: this.space.oauth.extras.filter(settings => settings.label === 'accessToken')[0].value,
                     apiKey: this.space.oauth.settings.filter(settings => settings.keyName === 'apiKey')[0].value,
@@ -89,7 +89,5 @@ export class SpaceConfigComponent {
         console.log(data[0]);
         this[data[1]].properties = data[0];
     }
-
-
 
 }

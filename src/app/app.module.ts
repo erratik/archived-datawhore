@@ -81,7 +81,7 @@ const appRoutes: Routes = [
         SpaceItemComponent,
         SchemaValuePipe
     ],
-    providers: [SpacesService, OauthSettingsService, SpaceItemService, ProfileService],
+    providers: [SpacesService, OauthSettingsService, SpaceItemService, ProfileService, SchemaValuePipe],
     bootstrap: [AppComponent]
 })
 export class AppModule {
