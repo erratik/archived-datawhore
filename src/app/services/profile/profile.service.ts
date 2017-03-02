@@ -14,35 +14,20 @@ export class ProfileService extends SpaceItemService {
     }
 
     public getProfile(space: string): Observable<any> {
-
-        const url = `${this.apiServer}/space/profile`;
-        const bodyString = JSON.stringify({
-            action: 'profile.get',
-            type: 'profile',
-            space: space
-        });
-
-        const headers = new Headers({'Content-Type': 'application/json'}); // ... Set content type to JSON
-        const options = new RequestOptions({headers: headers}); // Create a request option
-
-        return this.http.post(url, bodyString, options).map((res: Response) => {
-            return res.json();
-        }).catch(this.handleError);
+        return this.http.get(`${this.apiServer}/get/profile/${space}`)
+            .map((res: Response) => res.json())
+            .catch(this.handleError);
     }
 
-    public fetchRaw(space: string): Observable<any> {
-
-        const url = `${this.apiServer}/space/schemas`;
+    public updateProfile(space: string, profile: any): Observable<any> {
         const bodyString = JSON.stringify({
-            action: 'schemas.get',
-            type: 'profile',
-            space: space
+            data: profile
         });
 
         const headers = new Headers({'Content-Type': 'application/json'}); // ... Set content type to JSON
         const options = new RequestOptions({headers: headers}); // Create a request option
 
-        return this.http.post(url, bodyString, options).map((res: Response) => {
+        return this.http.put(`${this.apiServer}/update/profile/${space}`, bodyString, options).map((res: Response) => {
             return res.json();
         }).catch(this.handleError);
     }

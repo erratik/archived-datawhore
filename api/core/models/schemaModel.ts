@@ -5,7 +5,7 @@ let childSchema = new mongoose.Schema({
     modified: Number,
     content: {}
 });
-
+let Schema;
 const SchemaSchema = {
     schema: {
         space: String,
@@ -13,11 +13,24 @@ const SchemaSchema = {
     },
     self: {
         findSchema: function (spaceName: string, schemaType: string, cb) {
-            this.findOne({space: spaceName, 'schemas.type': schemaType}, {'schemas.$': 1},
+            console.log(`finding ${spaceName} ${schemaType} schema`);
+
+            this.find({space: spaceName},
                 function (err, docs) {
-                    if (docs) {
-                        cb(docs.schemas[0]);
+                    if (!docs.length) {
+
+                        const schema = new Schema({
+                            space: spaceName,
+                            schemas: [{
+                                type: schemaType,
+                                modified: Date.now()
+                            }]
+                        });
+
+                        docs.push(schema);
+
                     }
+                    cb(docs[0].schemas.filter(schema => schema.type === schemaType)[0]);
                 }
             );
         },
@@ -41,6 +54,6 @@ const SchemaSchema = {
 
 };
 
-const Schema = require('./createModel')(mongoose, 'Schema', SchemaSchema);
+Schema = require('./createModel')(mongoose, 'Schema', SchemaSchema);
 
 module.exports = Schema;

@@ -10,7 +10,7 @@ export class SpaceItemService {
     public apiServer: string = Paths.DATAWHORE_API_URL;
     public type: string = null;
 
-    constructor(public http?: Http) {
+    constructor(public http: Http) {
     }
 
     private getSpaceDimensions(space: Space): Observable<Space> {
@@ -25,6 +25,26 @@ export class SpaceItemService {
         const options = new RequestOptions({headers: headers}); // Create a request option
 
         return this.http.post(url, bodyString, options).map((res: Response) => {
+            return res.json();
+        }).catch(this.handleError);
+    }
+
+    public fetchSchema(space: string): Observable<any> {
+        return this.http.get(`${this.apiServer}/get/schema/${space}?type=${this.type}`).map((res: Response) => {
+            return res.json();
+        }).catch(this.handleError);
+    }
+
+    public updateSchema(space: string, schema: any): Observable<any> {
+        const bodyString = JSON.stringify({
+            data: schema,
+            type: this.type
+        });
+
+        const headers = new Headers({'Content-Type': 'application/json'}); // ... Set content type to JSON
+        const options = new RequestOptions({headers: headers}); // Create a request option
+
+        return this.http.put(`${this.apiServer}/update/schema/${space}`, bodyString, options).map((res: Response) => {
             return res.json();
         }).catch(this.handleError);
     }

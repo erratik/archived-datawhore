@@ -1,0 +1,19 @@
+<datawhore-dim-list [model]="model"></datawhore-dim-list>
+<a (click)="saveProfile()" class="button is-success is-small" *ngIf="haveDimsChanged()">Save</a>
+
+<div *ngIf="isProfileReset">
+    <hr>
+    <label class="label is-primary">
+        <span class="icon"><i class="fa fa-exclamation-circle"></i></span>
+        Override object path to profile schema
+    </label>
+    <div class="control is-flex">
+        <input #override class="input" type="text" placeholder="Enter object path (a.b.c)"
+               [(ngModel)]="schemaObjectOverride">
+        <a class="button is-success" *ngIf="override.value"
+           (click)="saveRawProfile(schemaObjectOverride)">
+            Save
+        </a>
+    </div>
+    <hr>
+</div>

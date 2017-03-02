@@ -12,12 +12,14 @@ const ProfileSchema = {
         profile: [dimensionSchema]
     },
     self: {
-        findProfile: function (spaceName: string, schemaType: string, cb) {
+        findProfile: function (spaceName: string, cb) {
+            const that = this;
             this.find({space: spaceName},
                 function (err, docs) {
-                    if (docs) {
-                        cb(docs[0]);
+                    if (!docs.length) {
+                        docs = [{space: spaceName, modified: Date.now()}];
                     }
+                    cb(docs[0]);
                 }
             );
         },
@@ -28,7 +30,6 @@ const ProfileSchema = {
                 update,
                 {upsert: true, returnNewDocument: true},
                 function (err, updated) {
-                    console.log('updated profile -> ', updated);
                     cb(updated);
                 });
         }

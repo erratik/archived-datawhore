@@ -10,17 +10,18 @@ var ProfileSchema = {
         profile: [dimensionSchema]
     },
     self: {
-        findProfile: function (spaceName, schemaType, cb) {
+        findProfile: function (spaceName, cb) {
+            var that = this;
             this.find({ space: spaceName }, function (err, docs) {
-                if (docs) {
-                    cb(docs[0]);
+                if (!docs.length) {
+                    docs = [{ space: spaceName, modified: Date.now() }];
                 }
+                cb(docs[0]);
             });
         },
         writeProfile: function (spaceName, profileBucket, cb) {
             var update = { modified: Date.now(), profile: profileBucket };
             this.findOneAndUpdate({ space: spaceName }, update, { upsert: true, returnNewDocument: true }, function (err, updated) {
-                console.log('updated profile -> ', updated);
                 cb(updated);
             });
         }

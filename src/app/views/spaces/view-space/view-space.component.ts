@@ -10,6 +10,7 @@ import {FileUploader} from 'ng2-file-upload';
 import {ProfileService} from '../../../services/profile/profile.service';
 import {Profile} from '../../../models/profile.model';
 import {SchemaValuePipe} from '../../../shared/pipes/schema-value.pipe';
+const objectPath = require('object-path');
 
 @Component({
     selector: 'datawhore-view-space',
@@ -24,6 +25,8 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
     public profileSchema: any = null;
     public uploader: FileUploader;
     protected isFetchingSchema = false;
+    protected isProfileReset = false;
+    protected schemaObjectOverride: string = null;
     // @Output() onNewDims
 
     constructor(spacesService: SpacesService,
@@ -44,7 +47,10 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
             });
 
         spaceConfig$.subscribe(() => {
-            this.profile.createPropertyBucket(this.profileSchema.propertyBucket);
+
+            if (this.profileSchema.propertyBucket) {
+                this.profile.createPropertyBucket(this.profileSchema.propertyBucket);
+            }
 
             this.uploader = new FileUploader({url: `${Paths.DATAWHORE_API_URL}/upload/${this.space.name}/space/icon`});
             this.uploader.onCompleteItem = (item, response, status) => {
@@ -59,29 +65,40 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
     }
 
     private getProfile(): any {
-
         return this.profileService.getProfile(this.space.name).do((profile) => {
             this.profile = new Profile(profile.space, profile.profile, profile.modified);
         });
-
     }
 
     private getRawProfile(): any {
+        return this.profileService.fetchSchema(this.space.name).do((profileSchema) => {
+            this.profileSchema = new DimensionSchema(profileSchema['type'], profileSchema['content'], profileSchema.modified);
+        });
+    }
 
-        return this.profileService.fetchRaw(this.space.name).do((profileSchema) => {
+    protected saveRawProfile(schema): any {
+
+        schema = objectPath.get(this.profileSchema, `content.${schema}`);
+
+        const profileSchema$ = this.profileService.updateSchema(this.space.name, schema).do((profileSchema) => {
             this.profileSchema = new DimensionSchema(profileSchema['type'], profileSchema['content'], profileSchema.modified);
         });
 
+        profileSchema$.subscribe(() => {
+            this.isFetchingSchema = false;
+            this.isProfileReset = false;
+        });
     }
 
     protected resetRawProfile(): any {
 
+        this.isProfileReset = true;
         this.isFetchingSchema = true;
 
         // strat with oauth2 values, for most /api/space/endpoint usages
         const data = Object.assign(this.oauth2);
         data['apiEndpointUrl'] = Paths.PROFILE_FETCH_URL[this.space.name];
-        data['action'] = 'schemas.write';
+        data['action'] = 'schema.write';
         data['type'] = 'profile';
         data['space'] = this.space.name;
 

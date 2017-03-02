@@ -1,5 +1,4 @@
 
-const objectPath = require('object-path');
 
 export class DimensionSchema {
     constructor(public type: string,
@@ -12,7 +11,7 @@ export class DimensionSchema {
 
     public assignValues(schema = null, prefix = null) {
         if (!schema) {
-            schema = this.content;
+            schema = this.content || [];
             prefix = 'content';
         }
 

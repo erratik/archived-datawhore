@@ -13,14 +13,14 @@ let objectPath = require('object-path');
 
 // my own endpoints, read/write in mongo docs
 let getEndpoint = (data, cb) => {
-    console.log(data)
-    const endpointAction = objectPath.get(endpoints, data.action);
-    return endpointAction(data.space, data.type, function (resp) {
+    console.log(`[getEndpoint] ${data.action} -> `, data);
+    return objectPath.get(endpoints, data.action)(data.space, data.type, function (resp) {
         cb(resp);
     });
 };
 
 let postEndpoint = (data, content, cb) => {
+    console.log(`[postEndpoint] ${data.action} -> `, data);
     const endpointAction = objectPath.get(endpoints, data.action);
     return endpointAction(data.space, content, data.type, function (resp) {
         cb(resp);
@@ -42,8 +42,40 @@ module.exports = function (app) {
         });
     });
 
-    // SPACES: ENDPOINTS TO GET DATA
-    app.post('/api/space/endpoint', function (req, res) {
+    // SPACES: SETTINGS (MOSTLY OAUTH, FOR NOW)
+    app.get('/api/space/settings/:space', function (req, res) {
+        Setting.findSettings(req.params.space, function (err, data) {
+            res.json(data);
+        });
+    });
+
+    app.put('/api/space/update/:space', function (req, res) {
+        const space = new Space({name: req.params.space}); // instantiated Space
+        req.body.data.modified = Date.now();
+        console.log(req.body);
+        space.updateSpace(req.body.data, function () {
+            Space.findByName(req.params.space, function (error, _space) {
+                res.json(_space[0]);
+            });
+        });
+
+    });
+
+    // todo: this should be deprecated to merge with the lower endpoint
+    app.put('/api/space/update/settings/:space', function (req, res) {
+        const setting = new Setting(req.body); // instantiated Space
+
+        Setting.updateSettings(req.body, function () {
+            Setting.findSettings(req.params.space, function (err, space) {
+                // console.log('space -> ', space);
+                res.json(space);
+            });
+        });
+
+    });
+
+    // SPACES: ENDPOINTS TO GET DATA FROM SPACES (TWITTER, INSTAGRAM, ETC)
+    app.post('/api/endpoint/space', function (req, res) {
 
         console.log('data', req.body.data);
 
@@ -82,7 +114,7 @@ module.exports = function (app) {
                     break;
                 default:
                     options = {
-                        uri: `https://${data.apiUrl}${data.apiEndpointUrl}?access_token=${data.accessToken}`,
+                        uri: `https://${data.apiUrl}${data.apiEndpointUrl}?access_token=${data.accessToken}&oauth_token=${data.accessToken}&v=${Date.now()}&m=swarm`,
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'
@@ -105,51 +137,46 @@ module.exports = function (app) {
         } else {
             // fallbacks when there are not specific routes set for the action
             if (data.action.includes('.write')) {
+                console.log('[ALERT: THIS NEED TO BE SHITCANNED]');
                 postEndpoint(req.body.data, req.body.data.content, (resp) => res.json(resp));
             } else {
+                console.log('[ALERT: THIS NEED TO BE SHITCANNED]');
                 getEndpoint(req.body.data, (resp) => res.json(resp));
             }
         }
 
     });
 
-    // SPACES: SETTINGS (MOSTLY OAUTH, FOR NOW)
-    app.get('/api/space/settings/:space', function (req, res) {
-        Setting.findSettings(req.params.space, function (err, data) {
-            res.json(data);
-        });
+    // SPACES: ENDPOINTS TO GET DATA FROM DATAWHORE API
+    app.get('/api/get/:endpoint/:space', (req, res) => {
+
+        const data = {
+            space: req.params.space,
+            type: req.query.type ? req.query.type : req.params.endpoint,
+            action: `${req.params.endpoint}.get`
+        };
+
+
+        getEndpoint(data, (resp) => {
+            console.log(`[endpoints.${data.action} response]`, resp);
+            res.json(resp);
+        })
     });
 
-    app.put('/api/space/update/:space', function (req, res) {
-        const space = new Space({name: req.params.space}); // instantiated Space
-        req.body.data.modified = Date.now();
-        console.log(req.body);
-        space.updateSpace(req.body.data, function () {
-            Space.findByName(req.params.space, function (error, _space) {
-                res.json(_space[0]);
-            });
-        });
+    app.put('/api/update/:endpoint/:space', (req, res) => {
 
+        const data = {
+            space: req.params.space,
+            type: req.query.type ? req.query.type : req.params.endpoint,
+            action: `${req.params.endpoint}.write`
+        };
+
+        postEndpoint(data, req.body.data, (resp) => {
+            console.log(`[endpoints.${data.action} response]`, resp);
+            res.json(resp);
+        })
     });
 
-    app.put('/api/space/update/settings/:space', function (req, res) {
-        const setting = new Setting(req.body); // instantiated Space
-
-        Setting.updateSettings(req.body, function () {
-            Setting.findSettings(req.params.space, function (err, space) {
-                // console.log('space -> ', space);
-                res.json(space);
-            });
-        });
-
-    });
-
-    // SCHEMAS (PROFILES, POSTS FOR SPACES)
-    app.post('/api/space/schemas', (req, res) => getEndpoint(req.body, (resp) => res.json(resp)));
-    app.post('/api/space/profile', (req, res) => getEndpoint(req.body, (resp) => {
-        console.log(resp)
-        res.json(resp);
-    }));
 
     // UPLOADS
     // todo: see if i can change this to a put?

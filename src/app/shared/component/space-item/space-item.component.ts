@@ -17,7 +17,7 @@ export class SpaceItemComponent implements OnInit {
   constructor(private profileService: ProfileService) { }
 
   ngOnInit() {
-    const itemSchema$ = this.profileService.fetchRaw(this.space).do((rawSchema) => this.schema = rawSchema);
+    const itemSchema$ = this.profileService.fetchSchema(this.space).do((rawSchema) => this.schema = rawSchema);
     itemSchema$.subscribe();
   }
 

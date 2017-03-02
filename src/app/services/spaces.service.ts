@@ -53,7 +53,7 @@ export class SpacesService {
 
     public spaceEndpoint(space: Space, queryData, endpointPath = ''): Observable<any> {
 
-        endpointPath = (endpointPath === '') ? 'space/endpoint' : endpointPath;
+        endpointPath = (endpointPath === '') ? 'endpoint/space' : endpointPath;
         const url = `${this.apiServer}/${endpointPath}`;
         const bodyString = JSON.stringify({
             data: queryData,

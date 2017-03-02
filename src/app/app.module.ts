@@ -29,6 +29,7 @@ import {DimensionListComponent} from './shared/component/dimensions/dimensions-l
 import {DimensionFormComponent} from './shared/component/dimensions/dimensions-form/dimensions-form.component';
 import {SpaceItemComponent} from './shared/component/space-item/space-item.component';
 import {SchemaValuePipe} from './shared/pipes/schema-value.pipe';
+import {ProfileFormComponent} from './views/profile/profile-form/profile-form.component';
 
 const appRoutes: Routes = [
     {
@@ -79,7 +80,8 @@ const appRoutes: Routes = [
         DimensionListComponent,
         DimensionFormComponent,
         SpaceItemComponent,
-        SchemaValuePipe
+        SchemaValuePipe,
+        ProfileFormComponent
     ],
     providers: [SpacesService, OauthSettingsService, SpaceItemService, ProfileService, SchemaValuePipe],
     bootstrap: [AppComponent]

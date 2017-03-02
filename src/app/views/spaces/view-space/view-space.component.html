@@ -34,7 +34,7 @@
 <section class="hero-body">
     <div class="container" *ngIf="space?.oauth">
         <div class="header">
-            <h2 class="is-pulled-left heading">Profile Settings</h2>
+            <h2 class="is-pulled-left heading">Space Oauth Settings</h2>
         </div>
         <div *ngIf="space?.inEditMode">
 
@@ -82,53 +82,67 @@
             </details>
             <a class="button" (click)="toggleEditSpace(space)">Edit Oauth Settings</a>
             <small *ngIf="hasExpiryToken">Token expires on {{tokenExpiryDate | date:'medium'}}</small>
-
         </div>
         <hr>
-        <div *ngIf="profile" class="columns">
-            <div class="column is-half">
+        <div class="header">
+            <h2 class="is-pulled-left heading">Space Item: Profile</h2>
+        </div>
+        <div class="columns">
+            <div class="column is-half" *ngIf="profile">
+
+                <div class="header">
+                    <h3 class="is-pulled-left heading">Profile Structure & Example</h3>
+                </div>
+                <hr>
                 <div class="structure">
                     <ul>
                         <li *ngFor="let property of profile.properties">
                             {{property.friendlyName}} ⇢ <cite>{{property.schemaPath}}</cite>
                         </li>
                     </ul>
+                    <p *ngIf="!profile?.properties">
+                        No profile properties yet
+                    </p>
                 </div>
-                <!--<pre>{{ profile.properties | json }}</pre>-->
-            </div>
-            <div class="column is-half">
-                <div class="example">
+
+                <div class="example" *ngIf="profile?.properties">
                     <datawhore-space-item [properties]="profile.properties" [type]="'profile'"
                                           [space]="space.name"></datawhore-space-item>
                 </div>
             </div>
-            <hr>
-        </div>
-        <hr>
-        <div class="header">
-            <h2 class="is-pulled-left heading">Profile Schema</h2>
-            <a class="button is-warning" [class.is-loading]="isFetchingSchema" (click)="resetRawProfile()">
-                <span class="icon is-small is-outlined"><i class="fa fa-refresh"></i></span>
-                <span>Reset schema</span>
-            </a>
-        </div>
-        <div class="columns" *ngIf="profileSchema?.propertyBucket">
             <div class="column is-half">
-                <article class="message is-warning">
-                    <div class="message-body">
-                        <p>Resetting the profile doesn't affect the structure, but will edit the items available in
-                            it, and so the example space item.</p>
-                    </div>
-                </article>
-                <details>
-                    <summary>Space Profile (RAW)</summary>
-                    <pre>{{ profileSchema | json }}</pre>
-                </details>
+                <div class="header">
+                    <h3 class="is-pulled-left heading">Profile Schema</h3>
+                    <a class="button is-small is-warning" [class.is-loading]="isFetchingSchema"
+                       (click)="resetRawProfile()">
+                        <span class="icon is-small"><i class="fa fa-refresh"></i></span>
+                        <span>Reset schema</span>
+                    </a>
+                </div>
+                <hr>
+                <div [class.is-loading]="isFetchingSchema">
+                    <!--<details>
+                        <summary>Space Profile (RAW)</summary>
+                        <pre>{{ profileSchema | json }}</pre>
+                    </details>-->
+
+                    <datawhore-profile-form class="column is-half"
+                                            [model]="profileSchema?.propertyBucket"
+                                            [dimType]="'profile'" [space]="space"
+                                            (onNewDimensions)="newDimensions($event)"></datawhore-profile-form>
+                    <hr>
+                    <article class="message is-warning">
+                        <div class="message-body is-inline-flex">
+                            <small>
+                                Resetting the profile doesn't affect the structure, but will edit the items available in
+                                it, and so the example space item.</small>
+                        </div>
+                    </article>
+                </div>
+
             </div>
-            <div class="column is-half">
-                <datawhore-dim-form [model]="profileSchema.propertyBucket" [dimType]="'profile'"
-                                    [space]="space" (onNewDimensions)="newDimensions($event)"></datawhore-dim-form>
-            </div>
+
+
             <hr>
         </div>
         <div *ngIf="profileSchema">

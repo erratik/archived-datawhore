@@ -2,7 +2,7 @@ let Schema = require('../models/schemaModel');
 let Profile = require('../models/profileModel');
 
 module.exports = {
-    schemas: {
+    schema: {
         write: function (space, content, type, cb) {
 
             // then we have other type of schema, using request(), instead of https(),
@@ -15,26 +15,21 @@ module.exports = {
             };
 
             Schema.writeSchema(space, schema, (updatedSchema) => {
-                console.log('[profile.write callback]', updatedSchema);
+                console.log('[schema.write callback]', updatedSchema);
                 cb(updatedSchema);
             });
         },
         get: function (space, type, cb) {
 
             Schema.findSchema(space, type, (schema) => {
-                cb(schema);
+                console.log(schema)
+                cb(schema)
             });
 
         }
     },
     profile: {
         write: function (space, content, type = null, cb) {
-            console.log('content ', content);
-           /* const schema = {
-                type: type,
-                content: content
-            };
-            */
             Profile.writeProfile(space, content, (updatedProfile) => {
                 // console.log(updatedProfile);
                 cb(content);
@@ -42,14 +37,7 @@ module.exports = {
         },
         get: function (space, type, cb) {
 
-            Profile.findProfile(space, type, (schema) => {
-                if (!schema) {
-                    console.log(`[endpoints] no profile found for ${space}`);
-                } else {
-                    console.log('[endpoints] get profile', schema);
-                }
-                cb(schema);
-            });
+            Profile.findProfile(space, (profile) => cb(profile));
 
         }
     }
