@@ -1,6 +1,7 @@
-
+@import "assets/styles/less/bulma-vars";
 html, body, main {
   height: 100%;
+  word-wrap: break-word;
 }
 
 main {
@@ -10,6 +11,19 @@ main {
 
 button, summary {
   outline: none;
+}
+
+.is-danger { color: @danger; }
+.is-warning { color: @warning; }
+.is-success { color: @success; }
+.is-primary { color: @primary; }
+.is-info { color: @info; }
+
+.icon + *, i + * {
+  margin-left: 5px;
+  .button & {
+    margin-left: inherit;
+  }
 }
 
 .columns {

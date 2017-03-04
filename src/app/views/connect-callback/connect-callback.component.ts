@@ -79,17 +79,13 @@ export class ConnectCallbackComponent implements OnInit {
                     )
                 );
 
-                this.space.toSpaceSettings({
-                    name: this.spaceName,
-                    modified: this.space.modified,
-                    oauth: this.space.oauth
-                });
-
+                // need the middleware url to request token
                 this.space.oauth.populateMatches(['authorizationUrl', 'middlewareAuthUrl']);
 
                 // remove the code because fuck that noise
+                // todo: check against defaults from SpaceOauthSettings
                 this.space.oauth.settings = oauth.settings.filter(settings => {
-                    if (settings.label !== 'code') {
+                    if (settings.label !== 'code' && !settings.label.includes('oauth')) {
                         return settings;
                     }
                 });

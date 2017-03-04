@@ -20,7 +20,7 @@ export class SpaceConfigComponent {
     public profile: Profile = null;
     public hasExpiryToken: boolean;
     public tokenExpiryDate: number;
-    public oauth2 = {};
+    public spaceOauthSettings = null;
     public retrieveSpace$: Observable<SpaceOauthSettings> = new Observable<SpaceOauthSettings>();
 
     public toggleEditSpace(): void {
@@ -38,51 +38,56 @@ export class SpaceConfigComponent {
             .mergeMap(params => this.spacesService.getSpace(params['space']))
             .switchMap(spaceModel => {
                 this.space = spaceModel;
-
                 return this.oauthService.getOauthSettings(spaceModel.name);
             })
             .do(oauth => {
 
+
                 this.space = new Space(
                     this.space.name,
                     this.space.modified,
-                    new SpaceOauthSettings(
-                        oauth.settings.map(settings => new OauthSettings(settings.label, settings.value, settings.keyName)),
-                        oauth.extras.map(settings => new OauthExtras(settings.label, settings.value)),
-                        oauth.modified,
-                        oauth.connected
-                    ),
+                    oauth,
                     false,
                     this.space.icon
                 );
 
                 this.space.oauth.populateMatches(['authorizationUrl', 'middlewareAuthUrl']);
 
-                // check if we have refresh token data and when it expires
-                this.space.oauth.extras.filter(extra => {
-                    if (extra.label.indexOf('expire') !== -1) {
-                        this.hasExpiryToken = true;
-                        this.tokenExpiryDate = oauth.modified + Number(extra.value) * 1000;
-                    }
-                    return extra.value;
-                });
-
-                if (this.tokenExpiryDate < Date.now()) {
-                    // todo: offer a manual way to do refresh token
-                    // todo: display warning when less than 30 minutes
-                    // todo: make sure it happens when we start working and loading posts, etc
-                    window.location.href = this.space.oauth.authorizationUrl;
-                }
                 // console.log(this.space.oauth.extras.filter(settings => settings.label === 'accessToken'))
-                this.oauth2 = {
-                    accessToken: this.space.oauth.extras.filter(settings => settings.label === 'accessToken')[0].value,
-                    apiKey: this.space.oauth.settings.filter(settings => settings.keyName === 'apiKey')[0].value,
-                    apiSecret: this.space.oauth.settings.filter(settings => settings.keyName === 'apiSecret')[0].value,
-                    apiUrl: Paths.SPACE_API_URL[this.space.name]
-                };
+                if (this.space.oauth.connected) {
 
+                    // check if we have refresh token data and when it expires
+                    this.space.oauth.extras.filter(extra => {
+                        if (extra.label.indexOf('expire') !== -1) {
+                            this.hasExpiryToken = true;
+                            this.tokenExpiryDate = oauth.modified + Number(extra.value) * 1000;
+                        }
+                        return extra.value;
+                    });
+
+
+                    this.spaceOauthSettings = {
+                        accessToken: this.space.oauth.extras.filter(settings => settings.label === 'accessToken')[0].value,
+                        apiKey: this.space.oauth.settings.filter(settings => settings.keyName === 'apiKey')[0].value,
+                        apiSecret: this.space.oauth.settings.filter(settings => settings.keyName === 'apiSecret')[0].value,
+                        apiUrl: Paths.SPACE_API_URL[this.space.name]
+                    };
+
+                    if (this.tokenExpiryDate < Date.now()) {
+                        // todo: offer a manual way to do refresh token
+                        // todo: display warning when less than 30 minutes
+                        // todo: make sure it happens when we start working and loading posts, etc
+                        window.location.href = this.space.oauth.authorizationUrl;
+                    }
+                }
                 return this.space;
             });
+    }
+
+    public updateSpaceSettings(): any {
+        this.oauthService.updateSpaceSettings(this.space).subscribe(() => {
+            this.space.inEditMode = false;
+        });
     }
 
     public newDimensions(data): any {

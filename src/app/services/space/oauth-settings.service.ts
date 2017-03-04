@@ -19,14 +19,14 @@ export class OauthSettingsService {
   public requestAccessToken(space: Space, isOauth2 = false, oauth2): Observable<Space> {
     let queryData = '', urlSplit = [];
 
-    if (!isOauth2) {
+    if ( space.oauth.middlewareAuthUrl) {
       urlSplit = space.oauth.middlewareAuthUrl.split('?');
       queryData = JSON.parse('{"' + decodeURI(urlSplit[1].replace(/&/g, '\",\"').replace(/=/g, '\":\"')) + '"}');
     } else {
       urlSplit[0] = '';
     }
 
-    const bodyString = JSON.stringify({url: urlSplit[0], data: queryData, oauth2: oauth2}); // Stringify payload
+      const bodyString = JSON.stringify({url: urlSplit[0], data: queryData, oauth2: oauth2}); // Stringify payload
 
     const headers = new Headers({'Content-Type': 'application/json'}); // ... Set content type to JSON
     const options = new RequestOptions({headers: headers}); // Create a request option
@@ -45,7 +45,6 @@ export class OauthSettingsService {
             space.oauth.extras.push(new OauthExtras('accessToken', JSON.parse(res['_body'])));
           }
 
-          space.oauth.connected = !resExtras.hasOwnProperty('error');
 
           return space;
         })
@@ -80,14 +79,11 @@ export class OauthSettingsService {
     if (settingsRes.oauth) {
       const spaceOauth = settingsRes.oauth;
       const modified = settingsRes.modified;
-      const connected = settingsRes.connected;
-
       const extras = settingsRes.extras.filter(extra => extra.type === 'oauth');
       settingsRes = new SpaceOauthSettings(
           spaceOauth.map(settings => new OauthSettings(settings.label, settings.value, settings.keyName)),
           extras.map(settings => new OauthExtras(settings.label, settings.value)),
-          modified,
-          connected
+          modified
       );
 
 

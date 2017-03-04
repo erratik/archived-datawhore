@@ -20,6 +20,7 @@ const objectPath = require('object-path');
 
 export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
+    private profileFetchUrl = null;
     public space: Space = null;
     public profile: Profile = null;
     public profileSchema: any = null;
@@ -47,6 +48,9 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
             });
 
         spaceConfig$.subscribe(() => {
+
+            this.profileFetchUrl = Paths.PROFILE_FETCH_URL[this.space.name];
+            window.document.title = `${this.space.name} | view space`;
 
             if (this.profileSchema.propertyBucket) {
                 this.profile.createPropertyBucket(this.profileSchema.propertyBucket);
@@ -92,12 +96,17 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
     protected resetRawProfile(): any {
 
+        if (!this.profileFetchUrl) {
+            console.error(`there is no profile getter path for ${this.space.name}`);
+            return;
+        }
+
         this.isProfileReset = true;
         this.isFetchingSchema = true;
 
-        // strat with oauth2 values, for most /api/space/endpoint usages
-        const data = Object.assign(this.oauth2);
-        data['apiEndpointUrl'] = Paths.PROFILE_FETCH_URL[this.space.name];
+        // strat with spaceOauthSettings values, for most /api/space/endpoint usages
+        const data = Object.assign(this.spaceOauthSettings);
+        data['apiEndpointUrl'] = this.profileFetchUrl;
         data['action'] = 'schema.write';
         data['type'] = 'profile';
         data['space'] = this.space.name;

@@ -1,4 +1,5 @@
 let mongoose = require('mongoose');
+let Space = require('../models/spaceModel');
 
 const SettingSchema = {
     schema: {
@@ -32,97 +33,39 @@ const SettingSchema = {
             delete update._id;
             update.space = update.name;
             update.modified = Date.now();
-            update.connected = false;
+            update.connected = typeof update.connected !== 'undefined' ? false : update.connected;
 
             // stamp the oauth extras with a type
             if (update.oauth.extras) {
 
-                update.connected = update.oauth.extras.filter(extra => {
-                    if (extra.label.indexOf('token') >= 0) {
-                        return true;
-                    }
-                }).length;
-
                 update.extras = update.oauth.extras.map(settings => {
-                    if (settings.label.indexOf('token') !== -1) {
+
+                    if (settings.label === 'access_token') {
                         update.connected = true;
-                        if (settings.label === 'access_token') {
-                            settings.label = 'accessToken';
-                        }
+                        settings.label = 'accessToken';
                     }
+
                     settings.type = 'oauth';
                     return settings;
                 });
             }
 
-            update.oauth = update.oauth.settings;
-            console.log('update ->', update);
+            if (update.oauth.settings) {
+                update.oauth = update.oauth.settings;
+            } else {
+                delete update.oauth;
+            }
 
-            this.model('Setting').findOneAndUpdate(
-                {space: update.name},
-                {modified: Date.now(), oauth: update.oauth, extras: update.extras },
-                {upsert: true, returnNewDocument: true, setDefaultsOnInsert: true},
+            this.findOneAndUpdate(
+                query,
+                update,
+                {upsert: true, setDefaultsOnInsert: true},
                 function (err, updated) {
-                    console.log('modelUpdated ->', updated);
+                    // console.log('updated?', updated);
                     cb(updated);
                 });
 
         }
-    },
-
-    updateSettings: function (update, cb) {
-
-        const query = {space: update.name},
-            opts = {multi: false, upsert: true};
-
-        delete update._id;
-        update.space = update.name;
-        update.modified = Date.now();
-        update.connected = false;
-
-        // stamp the oauth extras with a type
-        if (update.oauth.extras) {
-
-            update.connected = update.oauth.extras.filter(extra => {
-                if (extra.label.indexOf('token') >= 0) {
-                         return true;
-                }
-            }).length;
-
-            update.extras = update.oauth.extras.map(settings => {
-                if (settings.label.indexOf('token') !== -1) {
-                    update.connected = true;
-                    if (settings.label === 'access_token') {
-                        settings.label = 'accessToken';
-                    }
-                }
-                settings.type = 'oauth';
-                return settings;
-            });
-        }
-
-        update.oauth = update.oauth.settings;
-        console.log('update ->', update);
-
-        this.model('Setting').findOneAndUpdate(
-            {space: update.name},
-            {modified: Date.now(), oauth: update.oauth, extras: update.extras },
-            {upsert: true, returnNewDocument: true, setDefaultsOnInsert: true},
-            function (err, updated) {
-                console.log('modelUpdated ->', updated);
-                cb(updated);
-            });
-        // this.model('Setting').update(query, update, opts, function (err, modelUpdated) {
-        //
-        //     if (modelUpdated) {
-        //         console.log('modelUpdated ->', modelUpdated);
-        //         cb(update);
-        //     } else if (err) {
-        //         cb(err);
-        //     }
-        //
-        // });
-
     }
 
 };

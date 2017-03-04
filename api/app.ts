@@ -1,8 +1,13 @@
 'use strict';
 
+
 let SwaggerExpress = require('swagger-express-mw');
 let express = require('express');
+let Grant = require('grant-express')
+let grant = new Grant(require('./config.json'))
+let logger = require('morgan')
 let app = require('express')();
+let session = require('express-session');
 let bodyParser = require('body-parser');
 let mongoose = require('mongoose');  // mongoose for mongodb
 let multer = require('multer');
@@ -10,9 +15,11 @@ let fs = require('fs');
 
 module.exports = app; // for testing
 
-let config = {
-    appRoot: __dirname // required config
-};
+app.use(logger('dev'));
+// REQUIRED:
+app.use(session({secret: 'very secret'}))
+// mount grant
+app.use(grant);
 
 // Add headers
 app.use(function (req, res, next) {

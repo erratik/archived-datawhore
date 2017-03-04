@@ -6,11 +6,15 @@ export class Paths {
         twitter: 'api.twitter.com',
         instagram: 'api.instagram.com',
         swarm: 'api.foursquare.com',
+        spotify: 'api.spotify.com',
+        facebook: 'graph.facebook.com',
         tumblr: 'api.tumblr.com'
     };
     public static readonly PROFILE_FETCH_URL = {
         twitter: '/1.1/users/show.json?screen_name=erratiktart&include_entities=false',
         instagram: '/v1/users/self/',
+        spotify: '/v1/me',
+        facebook: '/me',
         tumblr: '/v2/blog/erratik.tumblr.com/info',
         swarm: '/v2/users/self'
     };

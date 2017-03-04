@@ -1,7 +1,7 @@
 let mongoose = require('mongoose');
 
 let SpaceSchema = {
-    doc: {
+    schema: {
         name: String,
         modified: Number,
         avatar: String,
@@ -14,40 +14,21 @@ let SpaceSchema = {
         },
         getAll: function (cb) {
             return this.find({}, cb);
+        },
+        updateSpace: function (spaceName, update, cb) {
+
+            this.findOneAndUpdate(
+                {name: spaceName},
+                update,
+                {upsert: true, setDefaultsOnInsert: true},
+                function (err, updated) {
+                    console.log(updated);
+                    cb(updated);
+                });
         }
-    },
-    updateSpace: function (update, cb) {
-        /*
-         // todo: make updateSpace a self function, like schemaModel
-        // todo: use findOneAndUpdate so we can do everything at once!
-
-        this.findOneAndUpdate(
-            {space: spaceName},
-            {modified: Date.now(), schemas: [schema]},
-            {upsert: true, setDefaultsOnInsert: true},
-            function (err, updated) {
-                console.log();
-                cb(updated);
-            });
-        */
-        const query = {name: this.name},
-            opts = {multi: false, upsert: true};
-
-        update.modified = Date.now();
-
-        this.model('Config').update(query, update, opts, function (err, modelUpdated) {
-
-            if (modelUpdated) {
-                cb(update);
-            } else if (err) {
-                cb(err);
-            }
-
-        });
-
     }
 };
 
-let Space = require('./createModel')(mongoose, 'Spaces', SpaceSchema);
+let Space = require('./createModel')(mongoose, 'Space', SpaceSchema);
 
 module.exports = Space;

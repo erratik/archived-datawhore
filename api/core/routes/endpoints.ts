@@ -22,8 +22,8 @@ module.exports = {
         get: function (space, type, cb) {
 
             Schema.findSchema(space, type, (schema) => {
-                console.log(schema)
-                cb(schema)
+                console.log(schema);
+                cb(schema);
             });
 
         }

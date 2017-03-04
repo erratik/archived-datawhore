@@ -65,7 +65,7 @@ module.exports = function (app) {
         console.log('data', req.body.data);
         var data = req.body.data;
         var options;
-        // requests to apis that need oauth2 shit
+        // requests to apis that need spaceOauthSettings shit
         if (data.apiEndpointUrl) {
             switch (data.space) {
                 case 'twitter':
@@ -166,14 +166,8 @@ module.exports = function (app) {
                 res.json({ error_code: 1, err_desc: err });
                 return;
             }
-            var space = new Space({ name: req.params.space }); // instantiated Space
-            space.updateSpace({ icon: req.file.path, modified: Date.now() }, function () {
-                Space.findByName(req.params.space, function (error, _space) {
-                    // console.log('space -> ', space);
-                    // todo: return base64 string
-                    res.json(_space[0]);
-                });
-            });
+            // todo: return base64 string for the icon
+            Space.updateSpace(req.params.space, { icon: req.file.path, modified: Date.now() }, function (space) { return res.json(space); });
             // res.json(req.file);
         });
     });

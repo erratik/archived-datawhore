@@ -1,6 +1,7 @@
 <section class="hero is-dark">
     <div class="hero-body">
         <div class="container">
+            <div></div>
             <div class="heading">
                 <h2 class="is-flex">
                     <a (click)="uploadImage=!uploadImage">
@@ -11,7 +12,15 @@
                     {{space?.name}}
                 </h2>
             </div>
-            <small>Last modified: {{space?.modified | date:'medium'}}</small>
+            <div class="is-inline-flex">
+                <span class="icon is-small" *ngIf="space?.oauth">
+                    <i class="fa fa-{{(space.oauth.connected)? 'check' : 'exclamation'}}-circle is-{{(space.oauth.connected)? 'success' : 'danger'}}"></i>
+                </span>
+
+                <small>
+                    Last modified: {{space?.modified | date:'medium'}}
+                </small>
+            </div>
             <div *ngIf="uploadImage">
                 <input type="file" class="form-control" name="single" ng2FileSelect
                        [uploader]="uploader"/>
@@ -35,30 +44,14 @@
     <div class="container" *ngIf="space?.oauth">
         <div class="header">
             <h2 class="is-pulled-left heading">Space Oauth Settings</h2>
-        </div>
-        <div *ngIf="space?.inEditMode">
 
-            <ul *ngFor="let spaceProp of space?.oauth.settings">
-                <li class="control">
-                    <strong>{{spaceProp.label}}</strong>
-                    <input type="text" class="input" [(ngModel)]="spaceProp.value">
-                </li>
-            </ul>
-
-            <a class="button is-primary" href="{{space.oauth.authorizationUrl}}"
-               *ngIf="space.oauth && space.oauth.authorizationUrl">
-                <span *ngIf="!space.connected">Connect</span>
-                <span *ngIf="space.connected">Reconnect</span>
-            </a>
-            <a class="button is-success" (click)="updateSpaceSettings(space)">
-                <span>Save</span>
-            </a>
-            <a class="button" (click)="space.inEditMode = false">
-                <span>Cancel</span>
-            </a>
+            <span class="tag is-warning" *ngIf="hasExpiryToken">
+                <i class="fa fa-exclamation-triangle icon is-small"></i>
+                <span>Token expires on {{tokenExpiryDate | date:'medium'}}</span>
+            </span>
         </div>
-        <div *ngIf="!space?.inEditMode">
-            <details>
+        <div>
+            <details *ngIf="space?.oauth.settings.length && !space?.inEditMode">
                 <summary>Oauth Settings</summary>
                 <ul>
                     <li *ngFor="let spaceProp of space?.oauth.settings">
@@ -72,80 +65,119 @@
                     </li>
                 </ul>
             </details>
-            <details>
-                <summary>Acquired Oauth Settings</summary>
-                <ul *ngFor="let spaceProp of space?.oauth.extras">
-                    <li>
-                        <strong>{{spaceProp.label}}</strong>: {{spaceProp.value}}
+            <div *ngIf="space?.inEditMode">
+
+                <ul *ngFor="let spaceProp of space?.oauth.settings">
+                    <li class="control">
+                        <strong>{{spaceProp.label}}</strong>
+                        <input type="text" class="input" [(ngModel)]="spaceProp.value">
                     </li>
                 </ul>
-            </details>
-            <a class="button" (click)="toggleEditSpace(space)">Edit Oauth Settings</a>
-            <small *ngIf="hasExpiryToken">Token expires on {{tokenExpiryDate | date:'medium'}}</small>
-        </div>
-        <hr>
-        <div class="header">
-            <h2 class="is-pulled-left heading">Space Item: Profile</h2>
-        </div>
-        <div class="columns">
-            <div class="column is-half" *ngIf="profile">
 
-                <div class="header">
-                    <h3 class="is-pulled-left heading">Profile Structure & Example</h3>
+                <div *ngIf="space?.oauth.settings.length">
+                    <a class="button is-primary" href="{{space.oauth.authorizationUrl}}"
+                       *ngIf="space.oauth && space.oauth.authorizationUrl">
+                        <span *ngIf="!space.oauth.connected">Connect</span>
+                        <span *ngIf="space.oauth.connected">Reconnect</span>
+                    </a>
+                    <a class="button is-success" (click)="updateSpaceSettings()">
+                        <span>Save</span>
+                    </a>
                 </div>
-                <hr>
-                <div class="structure">
-                    <ul>
-                        <li *ngFor="let property of profile.properties">
-                            {{property.friendlyName}} ⇢ <cite>{{property.schemaPath}}</cite>
+
+                <a class="button" (click)="space.inEditMode = false">
+                    <span>Cancel</span>
+                </a>
+            </div>
+            <div *ngIf="space?.oauth.extras.length && !space?.inEditMode">
+                <details>
+                    <summary>Acquired Oauth Settings</summary>
+                    <ul *ngFor="let spaceProp of space?.oauth.extras">
+                        <li>
+                            <strong>{{spaceProp.label}}</strong>: {{spaceProp.value}}
                         </li>
                     </ul>
-                    <p *ngIf="!profile?.properties">
-                        No profile properties yet
+                </details>
+            </div>
+            <a class="button is-{{(space?.oauth.configured)? 'primary' : 'success'}} is-small"
+               (click)="toggleEditSpace(space)" *ngIf="!space?.inEditMode">
+                <span class="fa fa-{{(space?.oauth.configured)? 'edit' : 'plus-circle'}} icon is-small"></span>
+                <span>{{(space?.oauth.configured) ? 'Edit' : 'Add'}} Oauth Settings</span>
+            </a>
+            <pre>{{space | json}}</pre>
+            <pre>{{spaceOauthSettings | json}}</pre>
+
+        </div>
+        <hr>
+        <div *ngIf="spaceOauthSettings">
+            <div class="header">
+                <h2 class="is-pulled-left heading">Space Item: Profile</h2>
+            </div>
+            <div class="columns">
+                <div class="column is-half" *ngIf="profile">
+
+                    <div class="header">
+                        <h3 class="is-pulled-left heading">Profile Structure & Example</h3>
+                    </div>
+                    <hr>
+                    <div class="structure">
+                        <ul>
+                            <li *ngFor="let property of profile.properties">
+                                {{property.friendlyName}} ⇢ <cite>{{property.schemaPath}}</cite>
+                            </li>
+                        </ul>
+                        <p *ngIf="!profile?.properties">
+                            No profile properties yet
+                        </p>
+                    </div>
+
+                    <div class="example" *ngIf="profile?.properties">
+                        <datawhore-space-item [properties]="profile.properties" [type]="'profile'"
+                                              [space]="space.name"></datawhore-space-item>
+                    </div>
+                </div>
+                <div class="column is-half">
+                    <div class="header">
+                        <h3 class="is-pulled-left heading">Profile Schema</h3>
+                        <a class="button is-small is-warning" [class.is-loading]="isFetchingSchema"
+                           (click)="resetRawProfile()">
+                            <span class="icon is-small"><i class="fa fa-refresh"></i></span>
+                            <span>{{(profileFetchUrl) ? 'Reset' : 'Fetch'}} schema</span>
+                        </a>
+                    </div>
+                    <div *ngIf="profileFetchUrl">
+
+                        <div [class.is-loading]="isFetchingSchema">
+                            <!--<details>
+                                <summary>Space Profile (RAW)</summary>
+                                <pre>{{ profileSchema | json }}</pre>
+                            </details>-->
+
+                            <datawhore-profile-form class="column is-half"
+                                                    [model]="profileSchema?.propertyBucket"
+                                                    [dimType]="'profile'" [space]="space"
+                                                    (onNewDimensions)="newDimensions($event)"></datawhore-profile-form>
+                            <hr>
+                            <article class="message is-warning">
+                                <div class="message-body is-inline-flex">
+                                    <small>
+                                        Resetting the profile doesn't affect the structure, but will edit the items available in
+                                        it, and so the example space item.
+                                    </small>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                    <hr>
+
+                    <p *ngIf="!profileFetchUrl">
+                        No profile schema fetched yet.
                     </p>
                 </div>
 
-                <div class="example" *ngIf="profile?.properties">
-                    <datawhore-space-item [properties]="profile.properties" [type]="'profile'"
-                                          [space]="space.name"></datawhore-space-item>
-                </div>
-            </div>
-            <div class="column is-half">
-                <div class="header">
-                    <h3 class="is-pulled-left heading">Profile Schema</h3>
-                    <a class="button is-small is-warning" [class.is-loading]="isFetchingSchema"
-                       (click)="resetRawProfile()">
-                        <span class="icon is-small"><i class="fa fa-refresh"></i></span>
-                        <span>Reset schema</span>
-                    </a>
-                </div>
-                <hr>
-                <div [class.is-loading]="isFetchingSchema">
-                    <!--<details>
-                        <summary>Space Profile (RAW)</summary>
-                        <pre>{{ profileSchema | json }}</pre>
-                    </details>-->
-
-                    <datawhore-profile-form class="column is-half"
-                                            [model]="profileSchema?.propertyBucket"
-                                            [dimType]="'profile'" [space]="space"
-                                            (onNewDimensions)="newDimensions($event)"></datawhore-profile-form>
-                    <hr>
-                    <article class="message is-warning">
-                        <div class="message-body is-inline-flex">
-                            <small>
-                                Resetting the profile doesn't affect the structure, but will edit the items available in
-                                it, and so the example space item.</small>
-                        </div>
-                    </article>
-                </div>
 
             </div>
-
-
-            <hr>
         </div>
-        <div *ngIf="profileSchema">
-        </div>
+
     </div>
 </section>
