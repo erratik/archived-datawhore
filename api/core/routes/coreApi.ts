@@ -167,7 +167,7 @@ module.exports = function (app) {
 
         const data = {
             space: req.params.space,
-            type: req.query.type ? req.query.type : req.params.endpoint,
+            type: req.body.type ? req.body.type : req.params.endpoint,
             action: `${req.params.endpoint}.write`
         };
 

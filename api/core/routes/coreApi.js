@@ -136,7 +136,7 @@ module.exports = function (app) {
     app.put('/api/update/:endpoint/:space', function (req, res) {
         var data = {
             space: req.params.space,
-            type: req.query.type ? req.query.type : req.params.endpoint,
+            type: req.body.type ? req.body.type : req.params.endpoint,
             action: req.params.endpoint + ".write"
         };
         postEndpoint(data, req.body.data, function (resp) {

@@ -3,9 +3,7 @@
 
 let SwaggerExpress = require('swagger-express-mw');
 let express = require('express');
-let Grant = require('grant-express')
-let grant = new Grant(require('./config.json'))
-let logger = require('morgan')
+
 let app = require('express')();
 let session = require('express-session');
 let bodyParser = require('body-parser');
@@ -15,11 +13,9 @@ let fs = require('fs');
 
 module.exports = app; // for testing
 
-app.use(logger('dev'));
-// REQUIRED:
-app.use(session({secret: 'very secret'}))
-// mount grant
-app.use(grant);
+let config = {
+    appRoot: __dirname // required config
+};
 
 // Add headers
 app.use(function (req, res, next) {
