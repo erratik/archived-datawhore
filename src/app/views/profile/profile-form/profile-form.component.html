@@ -1,10 +1,8 @@
-<datawhore-dim-list [model]="model"></datawhore-dim-list>
-<a (click)="saveProfile()" class="button is-success is-small" *ngIf="haveDimsChanged()">Save</a>
 
 <div *ngIf="isProfileReset">
     <hr>
-    <label class="label is-primary">
-        <span class="icon"><i class="fa fa-exclamation-circle"></i></span>
+    <label class="label">
+        <span class="icon is-primary"><i class="fa fa-exclamation-circle"></i></span>
         Override object path to profile schema
     </label>
     <div class="control is-flex">
@@ -15,5 +13,7 @@
             Save
         </a>
     </div>
-    <hr>
 </div>
+<hr>
+<datawhore-dim-list [model]="model"></datawhore-dim-list>
+<a (click)="saveProfile()" class="button is-success is-small" *ngIf="haveDimsChanged()">Save</a>

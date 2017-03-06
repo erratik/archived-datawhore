@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {SpacesService} from '../../../services/spaces.service';
 import {ActivatedRoute} from '@angular/router';
 import {SpaceConfigComponent} from '../../../shared/component/space-config/space-config.component';
@@ -10,6 +10,7 @@ import {FileUploader} from 'ng2-file-upload';
 import {ProfileService} from '../../../services/profile/profile.service';
 import {Profile} from '../../../models/profile.model';
 import {SchemaValuePipe} from '../../../shared/pipes/schema-value.pipe';
+import {ProfileFormComponent} from '../../profile/profile-form/profile-form.component';
 const objectPath = require('object-path');
 
 @Component({
@@ -20,14 +21,15 @@ const objectPath = require('object-path');
 
 export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
-    private profileFetchUrl = null;
     public space: Space = null;
+    private profileFetchUrl = null;
     public profile: Profile = null;
     public profileSchema: any = null;
     public uploader: FileUploader;
     protected isFetchingSchema = false;
     protected isProfileReset = false;
     protected schemaObjectOverride: string = null;
+    @ViewChild(ProfileFormComponent) protected profileFormComponent;
     // @Output() onNewDims
 
     constructor(spacesService: SpacesService,
@@ -56,6 +58,7 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
                 this.profile.createPropertyBucket(this.profileSchema.propertyBucket);
             }
 
+
             this.uploader = new FileUploader({url: `${Paths.DATAWHORE_API_URL}/upload/${this.space.name}/space/icon`});
             this.uploader.onCompleteItem = (item, response, status) => {
                 if (status === 200) {
@@ -80,21 +83,11 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
         });
     }
 
-    protected saveRawProfile(schema): any {
-
-        schema = objectPath.get(this.profileSchema, `content.${schema}`);
-
-        const profileSchema$ = this.profileService.updateSchema(this.space.name, schema).do((profileSchema) => {
-            this.profileSchema = new DimensionSchema(profileSchema['type'], profileSchema['content'], profileSchema.modified);
-        });
-
-        profileSchema$.subscribe(() => {
-            this.isFetchingSchema = false;
-            this.isProfileReset = false;
-        });
-    }
-
     protected resetRawProfile(): any {
+
+        this.profileFormComponent.profileSchema = this.profileSchema;
+
+        // console.log(this.profileFormComponent);
 
         if (!this.profileFetchUrl) {
             console.error(`there is no profile getter path for ${this.space.name}`);
@@ -103,6 +96,9 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
         this.isProfileReset = true;
         this.isFetchingSchema = true;
+
+        this.profileFormComponent.isProfileReset = true;
+        this.profileFormComponent.isFetchingSchema = true;
 
         // strat with spaceOauthSettings values, for most /api/space/endpoint usages
         const data = Object.assign(this.spaceOauthSettings);
@@ -118,6 +114,7 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
         profileSchema$.subscribe(() => {
             this.profile.createPropertyBucket(this.profileSchema.propertyBucket);
             this.isFetchingSchema = false;
+            this.profileFormComponent.isFetchingSchema = false;
         });
 
     }

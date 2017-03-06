@@ -104,8 +104,6 @@
                 <span class="fa fa-{{(space?.oauth.configured)? 'edit' : 'plus-circle'}} icon is-small"></span>
                 <span>{{(space?.oauth.configured) ? 'Edit' : 'Add'}} Oauth Settings</span>
             </a>
-            <pre>{{space | json}}</pre>
-            <pre>{{spaceOauthSettings | json}}</pre>
 
         </div>
         <hr>
@@ -148,14 +146,9 @@
                     <div *ngIf="profileFetchUrl">
 
                         <div [class.is-loading]="isFetchingSchema">
-                            <!--<details>
-                                <summary>Space Profile (RAW)</summary>
-                                <pre>{{ profileSchema | json }}</pre>
-                            </details>-->
-
-                            <datawhore-profile-form class="column is-half"
-                                                    [model]="profileSchema?.propertyBucket"
+                            <datawhore-profile-form [model]="profileSchema?.propertyBucket"
                                                     [dimType]="'profile'" [space]="space"
+                                                    (onProfileSchema)="profileSchema = $event"
                                                     (onNewDimensions)="newDimensions($event)"></datawhore-profile-form>
                             <hr>
                             <article class="message is-warning">
