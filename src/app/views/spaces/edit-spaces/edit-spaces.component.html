@@ -2,26 +2,11 @@
 <section class="section">
     <div class="container">
         <div class="columns">
-            <div class="column is-half" *ngFor="let space of addingSpaces">
-                {{space.inEditMode}}
-                <div class="card">
-                    <header class="card-header">
-                        <div class="card-header-title is-inline-flex">
-                            <figure class="image is-32x32">
-                                <img src="http://bulma.io/images/placeholders/32x32.png">
-                            </figure>
-                            <h4>{{space.name}}</h4>
-                        </div>
-                        <span class="card-header-icon">
-                        <a class="delete" (click)="cancelSpaceAdd(space)"></a>
-                    </span>
-                    </header>
-                    <datawhore-add-space class="column is-half"></datawhore-add-space>
-                </div>
-            </div>
 
-            <div class="" *ngFor="let space of spaces">
-                <article class="media">
+            <div>
+                <datawhore-add-space (addedSpace)="onAddedSpace($event)"></datawhore-add-space>
+
+                <article class="media" *ngFor="let space of spaces">
                     <figure class="media-left">
                         <p class="image is-32x32">
                             <img src="{{(space.icon) ? space.icon : 'http://bulma.io/images/placeholders/32x32.png'}}">

@@ -1,7 +1,8 @@
-import {Component, OnInit, Input} from '@angular/core';
+import {Component, OnInit, Input, ViewChild, Output} from '@angular/core';
 import {SpacesService} from '../../../services/spaces.service';
 import {Space} from '../../../models/space.model';
 import 'rxjs/add/operator/map';
+import {AddSpaceComponent} from '../add-space/add-space.component';
 
 @Component({
     selector: 'datawhore-edit-spaces',
@@ -11,10 +12,11 @@ import 'rxjs/add/operator/map';
 })
 export class EditSpacesComponent implements OnInit {
 
-    public addingSpaces: Array<Space>;
+    public addingSpaces: Array<Space> = [];
     @Input() public isAddingSpaces = false;
     protected isLoadingSpaces = true;
-    protected spaces: Array<Space>;
+    protected spaces: Array<any>;
+    @ViewChild(AddSpaceComponent) protected addSpaceComponent;
 
     constructor(private spacesService: SpacesService) {
     }
@@ -25,14 +27,30 @@ export class EditSpacesComponent implements OnInit {
             .do((spaces) => this.spaces = spaces)
             .do(() => this.isLoadingSpaces = false);
 
-        getSpaces.subscribe();
+        getSpaces.subscribe(() => {
+            this.sortByKey(this.spaces, 'modified');
+        });
 
     }
 
-
-    protected cancelSpaceAdd(space: Space): void {
-        this.addingSpaces = this.addingSpaces.filter(spaces => spaces.modified !== space.modified);
+    public sortByKey(array, key, asc = true) {
+        array.sort(function (a, b) {
+            const x = a[key];
+            const y = b[key];
+            return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+        });
+        if (asc) {
+            array.reverse();
+        }
     }
 
+    protected deleteSpace(space: Space): void {
+        // this.spaces.unshift(space);
+    }
+
+
+    public onAddedSpace(space: Space): void {
+        this.spaces.unshift(space);
+    }
 
 }

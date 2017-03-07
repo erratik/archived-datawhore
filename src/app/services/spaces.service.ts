@@ -37,7 +37,7 @@ export class SpacesService {
 
     public updateSpace(space: Space): Observable<any> {
 
-        const url = `${this.apiServer}/space/update/${space.name}`;
+        const url = `${this.apiServer}/update/space/${space.name}`;
         const bodyString = JSON.stringify({
             space: space.name,
             data: space

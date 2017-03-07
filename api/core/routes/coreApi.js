@@ -40,16 +40,6 @@ module.exports = function (app) {
             res.json(data);
         });
     });
-    app.put('/api/space/update/:space', function (req, res) {
-        var space = new Space({ name: req.params.space }); // instantiated Space
-        req.body.data.modified = Date.now();
-        console.log(req.body);
-        space.updateSpace(req.body.data, function () {
-            Space.findByName(req.params.space, function (error, _space) {
-                res.json(_space[0]);
-            });
-        });
-    });
     // todo: this should be deprecated to merge with the lower endpoint
     app.put('/api/space/update/settings/:space', function (req, res) {
         var setting = new Setting(req.body); // instantiated Space
@@ -167,7 +157,7 @@ module.exports = function (app) {
                 return;
             }
             // todo: return base64 string for the icon
-            Space.updateSpace(req.params.space, { icon: req.file.path, modified: Date.now() }, function (space) { return res.json(space); });
+            Space.updateSpaceSchema(req.params.space, { icon: req.file.path, modified: Date.now() }, function (space) { return res.json(space); });
             // res.json(req.file);
         });
     });

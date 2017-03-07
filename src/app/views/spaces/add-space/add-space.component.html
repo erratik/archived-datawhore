@@ -1,0 +1,10 @@
+
+<button class="button is-primary" (click)="newSpace()" *ngIf="!spaces.length">
+    Add Space
+</button>
+<div class="control has-addons" *ngFor="let space of spaces">
+    <input type="text" [(ngModel)]="space.name" class="input is-expanded" placeholder="Find a repository">
+    <a class="button is-success" (click)="addSpace(space)" *ngIf="space.name">Add Space</a>
+    <a class="button is-danger" (click)="spaces.splice($index, 1)">Cancel</a>
+</div>
+<hr>

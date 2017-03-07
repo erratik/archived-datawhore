@@ -1,4 +1,5 @@
 var Schema = require('../models/schemaModel');
+var Space = require('../models/spaceModel');
 var Profile = require('../models/profileModel');
 module.exports = {
     schema: {
@@ -26,6 +27,18 @@ module.exports = {
         write: function (space, content, type, cb) {
             if (type === void 0) { type = null; }
             Profile.writeProfile(space, content, function (updatedProfile) {
+                // console.log(updatedProfile);
+                cb(content);
+            });
+        },
+        get: function (space, type, cb) {
+            Profile.findProfile(space, function (profile) { return cb(profile); });
+        }
+    },
+    space: {
+        write: function (space, content, type, cb) {
+            if (type === void 0) { type = null; }
+            Space.updateSpace(space, content, function (updatedProfile) {
                 // console.log(updatedProfile);
                 cb(content);
             });

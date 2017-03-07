@@ -119,10 +119,9 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
     }
 
-    public updateSpace(keyName, value, fromType): void {
+    public updateSpaceSchema(keyName, value, fromType): void {
         this.space[keyName] = this.schemaValuePipe.transform(value, fromType, this.profileSchema);
         const saveSpace$ = this.spacesService.updateSpace(this.space).subscribe();
-        // | schemaValue: 'profile': schema
     }
 
     public toggleEditSpace(): void {

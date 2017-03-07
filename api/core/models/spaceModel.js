@@ -15,8 +15,9 @@ var SpaceSchema = {
             return this.find({}, cb);
         },
         updateSpace: function (spaceName, update, cb) {
-            this.findOneAndUpdate({ name: spaceName }, update, { upsert: true, setDefaultsOnInsert: true }, function (err, updated) {
-                console.log(updated);
+            update.modified = Date.now();
+            this.findOneAndUpdate({ name: spaceName }, update, { upsert: true, returnNewDocument: true }, function (err, updated) {
+                // console.log(updated);
                 cb(updated);
             });
         }

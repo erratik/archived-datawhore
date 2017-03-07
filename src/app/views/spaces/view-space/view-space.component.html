@@ -31,7 +31,7 @@
             <div>
                 <a href="">+ add avatar</a>
                 <span class="tag" *ngFor="let property of profile?.properties"
-                      (click)="updateSpace('avatar', property.schemaPath, 'profile')">
+                      (click)="updateSpaceSchema('avatar', property.schemaPath, 'profile')">
                     {{property.friendlyName}}
                 </span>
                 <!--{{profile?.properties | json}}-->

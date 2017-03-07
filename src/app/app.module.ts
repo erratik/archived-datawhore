@@ -18,7 +18,6 @@ import {ContainerComponent} from './wrapper/container/container.component';
 import {FooterComponent} from './wrapper/footer/footer.component';
 
 import {SettingsViewComponent} from './views/settings/settings.component';
-import {AddSpaceComponent} from './views/spaces/edit-spaces/add-space/add-space.component';
 import {EditSpacesComponent} from './views/spaces/edit-spaces/edit-spaces.component';
 
 import {ValuesPipePipe} from './shared/pipes/values-pipe.pipe';
@@ -30,6 +29,8 @@ import {DimensionFormComponent} from './shared/component/dimensions/dimensions-f
 import {SpaceItemComponent} from './shared/component/space-item/space-item.component';
 import {SchemaValuePipe} from './shared/pipes/schema-value.pipe';
 import {ProfileFormComponent} from './views/profile/profile-form/profile-form.component';
+import { OrderByPipe } from './shared/pipes/order-by.pipe';
+import { AddSpaceComponent } from './views/spaces/add-space/add-space.component';
 
 const appRoutes: Routes = [
     {
@@ -70,8 +71,6 @@ const appRoutes: Routes = [
         FooterComponent,
         SettingsViewComponent,
         FileSelectDirective,
-        AddSpaceComponent,
-        AddSpaceComponent,
         EditSpacesComponent,
         ValuesPipePipe,
         ConnectCallbackComponent,
@@ -81,7 +80,9 @@ const appRoutes: Routes = [
         DimensionFormComponent,
         SpaceItemComponent,
         SchemaValuePipe,
-        ProfileFormComponent
+        ProfileFormComponent,
+        OrderByPipe,
+        AddSpaceComponent
     ],
     providers: [SpacesService, OauthSettingsService, SpaceItemService, ProfileService, SchemaValuePipe],
     bootstrap: [AppComponent]
