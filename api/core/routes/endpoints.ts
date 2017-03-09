@@ -57,12 +57,11 @@ module.exports = {
         }*/
     },
     settings: {
-        // write: function (space, content, type = null, cb) {
-        //     Space.updateSpace(space, content, (updatedProfile) => {
-        //         // console.log(updatedProfile);
-        //         cb(content);
-        //     });
-        // },
+        write: function (space, content, type = null, cb) {
+
+            Setting.updateSettings(content, (updatedSettings) => cb(content));
+
+        },
         get: function (space, type, cb) {
 
             Setting.findSettings(space, (settings) => cb(settings));

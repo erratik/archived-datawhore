@@ -48,21 +48,6 @@ module.exports = function (app) {
         //     });
         // });
 
-    // SPACES: SETTINGS (MOSTLY OAUTH, FOR NOW)
-
-    app.put('/api/space/update/settings/:space', function (req, res) {
-        const setting = new Setting(req.body); // instantiated Space
-
-        Setting.updateSettings(req.body, function () {
-            Setting.findSettings(req.params.space, function (err, space) {
-                // console.log('space -> ', space);
-                res.json(space);
-            });
-        });
-
-    });
-
-
     // SPACES: ENDPOINTS TO GET DATA FROM DATAWHORE API
     app.get('/api/get/:endpoint/:space', (req, res) => {
 

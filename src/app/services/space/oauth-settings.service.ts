@@ -58,14 +58,12 @@ export class OauthSettingsService {
 
     public updateSpaceSettings(space: Space): Observable<any> {
 
-        const bodyString = JSON.stringify(space);
+        const bodyString = JSON.stringify({data: space});
         const headers = new Headers({'Content-Type': 'application/json'});
         const options = new RequestOptions({headers: headers});
 
-        return this.http.put(`${this.apiServer}/space/update/settings/${space['name']}`, bodyString, options)
-            .map((res: Response) => {
-                return this.toSpaceSettings(res);
-            })
+        return this.http.put(`${this.apiServer}/update/settings/${space['name']}`, bodyString, options)
+            .map((res: Response) => this.toSpaceSettings(res))
             .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
     }
 

@@ -46,12 +46,13 @@ module.exports = {
         }
     },
     settings: {
-        // write: function (space, content, type = null, cb) {
-        //     Space.updateSpace(space, content, (updatedProfile) => {
-        //         // console.log(updatedProfile);
-        //         cb(content);
-        //     });
-        // },
+        write: function (space, content, type, cb) {
+            if (type === void 0) { type = null; }
+            Setting.updateSettings(content, function (updatedSettings) {
+                console.log('updated settings ->', updatedSettings);
+                cb(content);
+            });
+        },
         get: function (space, type, cb) {
             Setting.findSettings(space, function (settings) { return cb(settings); });
         }
