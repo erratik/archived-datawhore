@@ -51,7 +51,7 @@
             </span>
         </div>
         <div>
-            <details *ngIf="space?.oauth.settings.length && !space?.inEditMode">
+            <details *ngIf="space?.oauth?.settings?.length && !space?.inEditMode">
                 <summary>Oauth Settings</summary>
                 <ul>
                     <li *ngFor="let spaceProp of space?.oauth.settings">
@@ -89,7 +89,7 @@
                     <span>Cancel</span>
                 </a>
             </div>
-            <div *ngIf="space?.oauth.extras.length && !space?.inEditMode">
+            <div *ngIf="space?.oauth?.extras?.length && !space?.inEditMode">
                 <details>
                     <summary>Acquired Oauth Settings</summary>
                     <ul *ngFor="let spaceProp of space?.oauth.extras">

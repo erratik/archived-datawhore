@@ -8,7 +8,8 @@ export class Paths {
         swarm: 'api.foursquare.com',
         spotify: 'api.spotify.com',
         facebook: 'graph.facebook.com',
-        tumblr: 'api.tumblr.com'
+        tumblr: 'api.tumblr.com',
+        moves: 'api.moves-app.com/api/1.1'
     };
     public static readonly PROFILE_FETCH_URL = {
         twitter: '/1.1/users/show.json?screen_name=erratiktart&include_entities=false',
@@ -16,6 +17,7 @@ export class Paths {
         spotify: '/v1/me',
         facebook: '/me',
         tumblr: '/v2/blog/erratik.tumblr.com/info',
-        swarm: '/v2/users/self'
+        swarm: '/v2/users/self',
+        moves: '/user/profile'
     };
 }

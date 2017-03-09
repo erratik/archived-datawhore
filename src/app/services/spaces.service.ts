@@ -19,6 +19,11 @@ export class SpacesService {
             return res.json();
         }).catch(this.handleError);
     }
+    public deleteSpace(spaceName: string): Observable<Space> {
+        return this.http.delete(`${this.apiServer}/space/${spaceName}`).map((res: Response) => {
+            return res.json();
+        }).catch(this.handleError);
+    }
 
     public getAllSpaces(): Observable<Space[]> {
         return this.http.get(`${this.apiServer}/spaces`).map((res: Response) => {

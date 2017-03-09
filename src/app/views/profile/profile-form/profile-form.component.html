@@ -9,7 +9,7 @@
         <input #override class="input" type="text" placeholder="Enter object path (a.b.c)"
                [(ngModel)]="schemaObjectOverride">
         <a class="button is-success" *ngIf="override.value"
-           (click)="saveRawProfile(schemaObjectOverride)">
+           (click)="saveRawProfile(override.value)">
             Save
         </a>
     </div>

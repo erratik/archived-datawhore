@@ -29,18 +29,18 @@ module.exports = function (app) {
             res.json(data);
         });
     });
-    app.get('/api/space/:space', function (req, res) {
+    app
+        .get('/api/space/:space', function (req, res) {
         Space.findByName(req.params.space, function (err, data) {
             res.json(data[0]);
         });
     });
+    // .delete('/api/space/:space', function (req, res) {
+    //     Space.getAll(function (err, data) {
+    //         res.json(data);
+    //     });
+    // });
     // SPACES: SETTINGS (MOSTLY OAUTH, FOR NOW)
-    app.get('/api/space/settings/:space', function (req, res) {
-        Setting.findSettings(req.params.space, function (err, data) {
-            res.json(data);
-        });
-    });
-    // todo: this should be deprecated to merge with the lower endpoint
     app.put('/api/space/update/settings/:space', function (req, res) {
         var setting = new Setting(req.body); // instantiated Space
         Setting.updateSettings(req.body, function () {
@@ -48,6 +48,29 @@ module.exports = function (app) {
                 // console.log('space -> ', space);
                 res.json(space);
             });
+        });
+    });
+    // SPACES: ENDPOINTS TO GET DATA FROM DATAWHORE API
+    app.get('/api/get/:endpoint/:space', function (req, res) {
+        var data = {
+            space: req.params.space,
+            type: req.query.type ? req.query.type : req.params.endpoint,
+            action: req.params.endpoint + ".get"
+        };
+        getEndpoint(data, function (resp) {
+            console.log("[endpoints." + data.action + " response]", resp);
+            res.json(resp);
+        });
+    });
+    app.put('/api/update/:endpoint/:space', function (req, res) {
+        var data = {
+            space: req.params.space,
+            type: req.body.type ? req.body.type : req.params.endpoint,
+            action: req.params.endpoint + ".write"
+        };
+        postEndpoint(data, req.body.data, function (resp) {
+            console.log("[endpoints." + data.action + " response]", resp);
+            res.json(resp);
         });
     });
     // SPACES: ENDPOINTS TO GET DATA FROM SPACES (TWITTER, INSTAGRAM, ETC)
@@ -89,6 +112,8 @@ module.exports = function (app) {
                             'Content-Type': 'application/x-www-form-urlencoded'
                         }
                     };
+                    console.log('api endpoints, by access_token query');
+                    console.log(options);
                     request(options, function (error, response, body) {
                         if (error) {
                             res.send(error);
@@ -99,40 +124,6 @@ module.exports = function (app) {
                     });
             }
         }
-        else {
-            // fallbacks when there are not specific routes set for the action
-            if (data.action.includes('.write')) {
-                console.log('[ALERT: THIS NEED TO BE SHITCANNED]');
-                postEndpoint(req.body.data, req.body.data.content, function (resp) { return res.json(resp); });
-            }
-            else {
-                console.log('[ALERT: THIS NEED TO BE SHITCANNED]');
-                getEndpoint(req.body.data, function (resp) { return res.json(resp); });
-            }
-        }
-    });
-    // SPACES: ENDPOINTS TO GET DATA FROM DATAWHORE API
-    app.get('/api/get/:endpoint/:space', function (req, res) {
-        var data = {
-            space: req.params.space,
-            type: req.query.type ? req.query.type : req.params.endpoint,
-            action: req.params.endpoint + ".get"
-        };
-        getEndpoint(data, function (resp) {
-            console.log("[endpoints." + data.action + " response]", resp);
-            res.json(resp);
-        });
-    });
-    app.put('/api/update/:endpoint/:space', function (req, res) {
-        var data = {
-            space: req.params.space,
-            type: req.body.type ? req.body.type : req.params.endpoint,
-            action: req.params.endpoint + ".write"
-        };
-        postEndpoint(data, req.body.data, function (resp) {
-            console.log("[endpoints." + data.action + " response]", resp);
-            res.json(resp);
-        });
     });
     // UPLOADS
     // todo: see if i can change this to a put?

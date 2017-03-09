@@ -1,8 +1,8 @@
-import {Component, OnInit, Input, ViewChild, Output} from '@angular/core';
+import {Component, OnInit, Input, ViewChild} from '@angular/core';
 import {SpacesService} from '../../../services/spaces.service';
 import {Space} from '../../../models/space.model';
 import 'rxjs/add/operator/map';
-import {AddSpaceComponent} from '../add-space/add-space.component';
+import {SpaceConfigComponent} from '../../../shared/component/space-config/space-config.component';
 
 @Component({
     selector: 'datawhore-edit-spaces',
@@ -10,24 +10,22 @@ import {AddSpaceComponent} from '../add-space/add-space.component';
     styleUrls: ['edit-spaces.component.less'],
     providers: [SpacesService]
 })
+
 export class EditSpacesComponent implements OnInit {
 
-    public addingSpaces: Array<Space> = [];
-    @Input() public isAddingSpaces = false;
     protected isLoadingSpaces = true;
     protected spaces: Array<any>;
-    @ViewChild(AddSpaceComponent) protected addSpaceComponent;
+    @ViewChild(SpaceConfigComponent) protected spaceConfigComponent;
 
-    constructor(private spacesService: SpacesService) {
-    }
+    constructor(private spacesService: SpacesService) {}
 
     ngOnInit() {
 
-        const getSpaces = this.spacesService.getAllSpaces()
-            .do((spaces) => this.spaces = spaces)
+        const getSpaces$ = this.spacesService.getAllSpaces()
+            .switchMap((spaces) => this.spaces = spaces)
             .do(() => this.isLoadingSpaces = false);
 
-        getSpaces.subscribe(() => {
+        getSpaces$.subscribe(() => {
             this.sortByKey(this.spaces, 'modified');
         });
 
@@ -45,7 +43,10 @@ export class EditSpacesComponent implements OnInit {
     }
 
     protected deleteSpace(space: Space): void {
-        // this.spaces.unshift(space);
+
+        this.spacesService.deleteSpace(space.name).subscribe(() => {
+            // this.spaces.unshift(space.name);
+        });
     }
 
 

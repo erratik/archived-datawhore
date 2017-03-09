@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, Output, EventEmitter} from '@angular/core';
 import {Space} from '../../../models/space.model';
 import {ActivatedRoute} from '@angular/router';
 import {SpacesService} from '../../../services/spaces.service';
@@ -10,7 +10,7 @@ import {ProfileService} from '../../../services/profile/profile.service';
 import {Profile} from '../../../models/profile.model';
 
 @Component({
-    selector: 'datawhore-space',
+    selector: 'datawhore-space-config',
     templateUrl: 'space-config.component.html',
     styleUrls: ['space-config.component.less']
 })
@@ -22,6 +22,7 @@ export class SpaceConfigComponent {
     public tokenExpiryDate: number;
     public spaceOauthSettings = null;
     public retrieveSpace$: Observable<SpaceOauthSettings> = new Observable<SpaceOauthSettings>();
+    @Output() public gotOauthSettings: EventEmitter<SpaceOauthSettings> = new EventEmitter<SpaceOauthSettings>();
 
     public toggleEditSpace(): void {
         this.space.inEditMode = !this.space.inEditMode;
@@ -50,8 +51,12 @@ export class SpaceConfigComponent {
                     false,
                     this.space.icon
                 );
+                if (this.space.oauth) {
+// debugger;
+                    this.space.oauth.populateMatches(['authorizationUrl', 'middlewareAuthUrl']);
+                }
 
-                this.space.oauth.populateMatches(['authorizationUrl', 'middlewareAuthUrl']);
+                this.gotOauthSettings.emit(this.space.oauth);
 
                 // console.log(this.space.oauth.extras.filter(settings => settings.label === 'accessToken'))
                 if (this.space.oauth.connected) {
@@ -93,6 +98,10 @@ export class SpaceConfigComponent {
     public newDimensions(data): any {
         console.log(data[0]);
         this[data[1]].properties = data[0];
+    }
+
+    public getSpace(): void {
+        this.retrieveSpace$.subscribe();
     }
 
 }

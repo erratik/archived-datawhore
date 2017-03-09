@@ -10,14 +10,11 @@ var SettingSchema = {
     },
     self: {
         findSettings: function (spaceName, cb) {
-            var _this = this;
-            this.find({ space: spaceName }, function (err, retrievedSpace) {
-                var space = retrievedSpace[0];
-                if (!space) {
-                    var query = { space: spaceName }, update = { modified: Date.now() }, opts = { multi: false, upsert: true };
-                    _this.update(query, update, opts);
+            this.find({ space: spaceName }, function (err, docs) {
+                if (!docs.length) {
+                    docs = [{ space: spaceName, modified: Date.now() }];
                 }
-                cb(err, space);
+                cb(docs[0]);
             });
         },
         updateSettings: function (update, cb) {

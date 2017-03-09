@@ -5,7 +5,7 @@ import {Paths} from '../classes/paths.class';
 export class SpaceOauthSettings {
     constructor(public settings: Array<OauthSettings> = null,
                 public extras: Array<OauthExtras> = null,
-                public modified: number = null,
+                public modified: number,
                 public connected = false,
                 public configured = true,
                 public authorizationUrl?: string,

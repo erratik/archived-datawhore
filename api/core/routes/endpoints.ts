@@ -1,4 +1,5 @@
 let Schema = require('../models/schemaModel');
+let Setting = require('../models/settingModel');
 let Space = require('../models/spaceModel');
 let Profile = require('../models/profileModel');
 
@@ -49,9 +50,22 @@ module.exports = {
                 cb(content);
             });
         },
-        get: function (space, type, cb) {
+        /*get: function (space, type, cb) {
 
             Profile.findProfile(space, (profile) => cb(profile));
+
+        }*/
+    },
+    settings: {
+        // write: function (space, content, type = null, cb) {
+        //     Space.updateSpace(space, content, (updatedProfile) => {
+        //         // console.log(updatedProfile);
+        //         cb(content);
+        //     });
+        // },
+        get: function (space, type, cb) {
+
+            Setting.findSettings(space, (settings) => cb(settings));
 
         }
     }
