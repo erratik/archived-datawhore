@@ -48,10 +48,7 @@ module.exports = {
     settings: {
         write: function (space, content, type, cb) {
             if (type === void 0) { type = null; }
-            Setting.updateSettings(content, function (updatedSettings) {
-                console.log('updated settings ->', updatedSettings);
-                cb(content);
-            });
+            Setting.updateSettings(content, function (updatedSettings) { return cb(content); });
         },
         get: function (space, type, cb) {
             Setting.findSettings(space, function (settings) { return cb(settings); });

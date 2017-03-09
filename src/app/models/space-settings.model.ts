@@ -12,17 +12,18 @@ export class SpaceOauthSettings {
                 public middlewareAuthUrl?: string,
                 public redirectUrl?: string) {
 
+        this.populateMatches();
         this.connected = this.extras.length > 0 && this.extras.filter(extra => extra.label === 'accessToken').length > 0;
         if (!this.settings.length) {
             this.toDefaults();
         }
     }
 
-    public castValues(haystack, needle, replace): string {
+    private castValues(haystack, needle, replace): string {
         return haystack.replace(needle, replace);
     }
 
-    public toDefaults(space: any = false): void {
+    private toDefaults(space: any = false): void {
         this.settings = [];
         this.configured = false;
 
@@ -41,11 +42,9 @@ export class SpaceOauthSettings {
 
     }
 
-    public populateMatches(keys: Array<string>) {
+    private populateMatches(): void {
+        this.settings.map((params, index) => {
 
-        this.settings.map(params => {
-
-            if (keys.indexOf(params.keyName) !== -1) {
                 let settingsValue = params.value;
                 if (settingsValue) {
 
@@ -57,10 +56,10 @@ export class SpaceOauthSettings {
                             settingsValue = this.castValues(settingsValue, foundKey[1], matches[0].value);
                         }
                     }
-                    const oauthKey = keys[keys.indexOf(params.keyName)];
-                    this[oauthKey] = settingsValue;
+
+                    this.settings[index].value = settingsValue;
                 }
-            }
+
         });
     }
 
@@ -79,6 +78,7 @@ export class OauthExtras extends PropObj {
     }
 }
 
+/*
 
 interface DefaultSpaceSettings {
     settings: Array<OauthSettings>;
@@ -89,3 +89,4 @@ interface DefaultSpaceSettings {
     middlewareAuthUrl?: string;
     redirectUrl?: string;
 }
+*/

@@ -51,10 +51,6 @@ export class SpaceConfigComponent {
                     false,
                     this.space.icon
                 );
-                if (this.space.oauth) {
-// debugger;
-                    this.space.oauth.populateMatches(['authorizationUrl', 'middlewareAuthUrl']);
-                }
 
                 this.gotOauthSettings.emit(this.space.oauth);
 

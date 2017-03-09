@@ -79,9 +79,6 @@ export class ConnectCallbackComponent implements OnInit {
                     )
                 );
 
-                // need the middleware url to request token
-                this.space.oauth.populateMatches(['authorizationUrl', 'middlewareAuthUrl']);
-
                 // remove the code because fuck that noise
                 // todo: check against defaults from SpaceOauthSettings
                 this.space.oauth.settings = oauth.settings.filter(settings => {
