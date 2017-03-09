@@ -31,6 +31,7 @@ import {SchemaValuePipe} from './shared/pipes/schema-value.pipe';
 import {ProfileFormComponent} from './views/profile/profile-form/profile-form.component';
 import { OrderByPipe } from './shared/pipes/order-by.pipe';
 import { AddSpaceComponent } from './views/spaces/add-space/add-space.component';
+import { PopulateMatchesPipe } from './shared/pipes/populate-matches.pipe';
 
 const appRoutes: Routes = [
     {
@@ -82,7 +83,8 @@ const appRoutes: Routes = [
         SchemaValuePipe,
         ProfileFormComponent,
         OrderByPipe,
-        AddSpaceComponent
+        AddSpaceComponent,
+        PopulateMatchesPipe
     ],
     providers: [SpacesService, OauthSettingsService, SpaceItemService, ProfileService, SchemaValuePipe],
     bootstrap: [AppComponent]

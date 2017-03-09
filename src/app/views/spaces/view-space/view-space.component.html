@@ -65,6 +65,7 @@
                     </li>
                 </ul>
             </details>
+
             <div *ngIf="space?.inEditMode">
 
                 <ul *ngFor="let spaceProp of space?.oauth.settings">
@@ -75,7 +76,7 @@
                 </ul>
 
                 <div *ngIf="space?.oauth.settings.length">
-                    <a class="button is-primary" href="{{space.oauth.authorizationUrl}}"
+                    <a class="button is-primary" href="{{space.oauth.settings | populateMatches: 'authorizationUrl'}}"
                        *ngIf="space.oauth && space.oauth.authorizationUrl">
                         <span *ngIf="!space.oauth.connected">Connect</span>
                         <span *ngIf="space.oauth.connected">Reconnect</span>
@@ -107,6 +108,7 @@
 
         </div>
         <hr>
+
         <div *ngIf="spaceOauthSettings">
             <div class="header">
                 <h2 class="is-pulled-left heading">Space Item: Profile</h2>

@@ -52,11 +52,15 @@ export class SpaceConfigComponent {
                     this.space.icon
                 );
 
-                this.gotOauthSettings.emit(this.space.oauth);
+                this.spaceOauthSettings = {
+                    apiKey: this.space.oauth.settings.filter(settings => settings.keyName === 'apiKey')[0].value,
+                    apiSecret: this.space.oauth.settings.filter(settings => settings.keyName === 'apiSecret')[0].value,
+                    apiUrl: Paths.SPACE_API_URL[this.space.name]
+                };
 
                 // console.log(this.space.oauth.extras.filter(settings => settings.label === 'accessToken'))
                 if (this.space.oauth.connected) {
-
+                    this.spaceOauthSettings.accessToken = this.space.oauth.extras.filter(settings => settings.label === 'accessToken')[0].value;
                     // check if we have refresh token data and when it expires
                     this.space.oauth.extras.filter(extra => {
                         if (extra.label.indexOf('expire') !== -1) {
@@ -67,13 +71,6 @@ export class SpaceConfigComponent {
                     });
 
 
-                    this.spaceOauthSettings = {
-                        accessToken: this.space.oauth.extras.filter(settings => settings.label === 'accessToken')[0].value,
-                        apiKey: this.space.oauth.settings.filter(settings => settings.keyName === 'apiKey')[0].value,
-                        apiSecret: this.space.oauth.settings.filter(settings => settings.keyName === 'apiSecret')[0].value,
-                        apiUrl: Paths.SPACE_API_URL[this.space.name]
-                    };
-
                     if (this.tokenExpiryDate < Date.now()) {
                         // todo: offer a manual way to do refresh token
                         // todo: display warning when less than 30 minutes
@@ -81,12 +78,15 @@ export class SpaceConfigComponent {
                         window.location.href = this.space.oauth.authorizationUrl;
                     }
                 }
+
+                this.gotOauthSettings.emit(this.space.oauth);
                 return this.space;
             });
     }
 
     public updateSpaceSettings(): any {
-        this.oauthService.updateSpaceSettings(this.space).subscribe(() => {
+        this.oauthService.updateSpaceSettings(this.space).subscribe((settings) => {
+            this.gotOauthSettings.emit(settings);
             this.space.inEditMode = false;
         });
     }

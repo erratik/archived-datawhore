@@ -12,7 +12,6 @@ export class SpaceOauthSettings {
                 public middlewareAuthUrl?: string,
                 public redirectUrl?: string) {
 
-        this.populateMatches();
         this.connected = this.extras.length > 0 && this.extras.filter(extra => extra.label === 'accessToken').length > 0;
         if (!this.settings.length) {
             this.toDefaults();
