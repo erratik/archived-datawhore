@@ -23,11 +23,7 @@ export class AddSpaceComponent implements OnInit {
     }
 
     protected addSpace(addingSpace: Space): void {
-
-        this.spacesService.updateSpace(addingSpace).subscribe((space) => {
-            console.log(space);
-            this.addedSpace.emit(space);
-        });
+        this.spacesService.updateSpace(addingSpace).subscribe((space) => this.addedSpace.emit(space));
     }
 
 

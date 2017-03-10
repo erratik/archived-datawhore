@@ -16,6 +16,7 @@ export class SpaceOauthSettings {
         if (!this.settings.length) {
             this.toDefaults();
         }
+        this.populateMatches();
     }
 
     private castValues(haystack, needle, replace): string {
@@ -42,7 +43,7 @@ export class SpaceOauthSettings {
     }
 
     private populateMatches(): void {
-        this.settings.map((params, index) => {
+        this.settings.map(params => {
 
                 let settingsValue = params.value;
                 if (settingsValue) {
@@ -56,7 +57,7 @@ export class SpaceOauthSettings {
                         }
                     }
 
-                    this.settings[index].value = settingsValue;
+                    this[params.keyName] = settingsValue;
                 }
 
         });

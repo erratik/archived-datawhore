@@ -20,6 +20,9 @@ const SettingSchema = {
                 }
             );
         },
+        removeSettings: function (name, cb) {
+            this.remove({space: name}, cb);
+        },
         updateSettings: function (update, cb) {
 
             const query = {space: update.name},

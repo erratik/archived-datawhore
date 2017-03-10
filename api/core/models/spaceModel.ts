@@ -1,4 +1,6 @@
 let mongoose = require('mongoose');
+let Setting = require('../models/settingModel');
+let Profile = require('../models/profileModel');
 
 let SpaceSchema = {
     schema: {
@@ -14,6 +16,13 @@ let SpaceSchema = {
         },
         getAll: function (cb) {
             return this.find({}, cb);
+        },
+        removeSpace: function (name, cb) {
+            // console.log(name)
+            Setting.removeSettings(name, function() {});
+            Profile.removeProfile(name, function() {});
+
+            this.remove({name: name}, cb);
         },
         updateSpace: function (spaceName, update, cb) {
             update.modified = Date.now();

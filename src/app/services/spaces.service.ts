@@ -4,6 +4,7 @@ import {Http, Response, Headers, RequestOptions} from '@angular/http';
 import 'rxjs/add/operator/map';
 import {Observable} from 'rxjs';
 import {Paths} from '../classes/paths.class';
+import {Router} from '@angular/router';
 
 @Injectable()
 export class SpacesService {
@@ -11,7 +12,7 @@ export class SpacesService {
     // private instance variable to hold base url
     private apiServer = Paths.DATAWHORE_API_URL;
 
-    constructor(private http: Http) {
+    constructor(private http: Http, private router: Router) {
     }
 
     public getSpace(spaceName: string): Observable<Space> {
@@ -19,9 +20,12 @@ export class SpacesService {
             return res.json();
         }).catch(this.handleError);
     }
-    public deleteSpace(spaceName: string): Observable<Space> {
+
+    public removeSpace(spaceName: string): any {
         return this.http.delete(`${this.apiServer}/space/${spaceName}`).map((res: Response) => {
-            return res.json();
+           if (res.status === 200) {
+               this.router.navigate([`/spaces`]);
+           }
         }).catch(this.handleError);
     }
 

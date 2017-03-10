@@ -41,12 +41,13 @@ module.exports = function (app) {
             Space.findByName(req.params.space, function (err, data) {
                 res.json(data[0]);
             });
+        })
+        .delete('/api/space/:space', function (req, res) {
+            Space.removeSpace(req.params.space, function () {
+                res.status(200).send(`${req.params.space} was deleted`);
+            });
+
         });
-        // .delete('/api/space/:space', function (req, res) {
-        //     Space.getAll(function (err, data) {
-        //         res.json(data);
-        //     });
-        // });
 
     // SPACES: ENDPOINTS TO GET DATA FROM DATAWHORE API
     app.get('/api/get/:endpoint/:space', (req, res) => {

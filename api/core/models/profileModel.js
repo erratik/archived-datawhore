@@ -24,6 +24,9 @@ var ProfileSchema = {
             this.findOneAndUpdate({ space: spaceName }, update, { upsert: true, returnNewDocument: true }, function (err, updated) {
                 cb(updated);
             });
+        },
+        removeProfile: function (name, cb) {
+            this.remove({ space: name }, cb);
         }
     }
 };

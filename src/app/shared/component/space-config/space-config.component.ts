@@ -1,6 +1,6 @@
 import {Component, Output, EventEmitter} from '@angular/core';
 import {Space} from '../../../models/space.model';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {SpacesService} from '../../../services/spaces.service';
 import {SpaceOauthSettings, OauthSettings, OauthExtras} from '../../../models/space-settings.model';
 import {Paths} from '../../../classes/paths.class';
@@ -31,7 +31,8 @@ export class SpaceConfigComponent {
     constructor(public spacesService: SpacesService,
                 public oauthService: OauthSettingsService,
                 public profileService?: ProfileService,
-                private activatedRoute?: ActivatedRoute) {
+                private activatedRoute?: ActivatedRoute,
+                public router?: Router) {
 
         this.retrieveSpace$ = this.activatedRoute.params.do(params => {
                 return params;
@@ -86,10 +87,11 @@ export class SpaceConfigComponent {
 
     public updateSpaceSettings(): any {
         this.oauthService.updateSpaceSettings(this.space).subscribe((settings) => {
-            this.gotOauthSettings.emit(settings);
+            this.space.oauth = settings;
             this.space.inEditMode = false;
         });
     }
+
 
     public newDimensions(data): any {
         console.log(data[0]);

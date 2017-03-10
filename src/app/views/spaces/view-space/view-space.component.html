@@ -51,11 +51,12 @@
             </span>
         </div>
         <div>
-            <details *ngIf="space?.oauth?.settings?.length && !space?.inEditMode">
-                <summary>Oauth Settings</summary>
+            <div *ngIf="space?.oauth?.settings?.length && !space?.inEditMode">
                 <ul>
                     <li *ngFor="let spaceProp of space?.oauth.settings">
-                        <div *ngIf="spaceProp.value">
+                        <div *ngIf="spaceProp.value" class="is-inline-flex">
+
+                            <span (click)="removeSpace(space)" class="fa fa-times icon is-danger is-small"></span>
                             <strong>{{spaceProp.label}}</strong>: {{spaceProp.value}}
                         </div>
                         <div *ngIf="!spaceProp.value">
@@ -64,17 +65,17 @@
                         </div>
                     </li>
                 </ul>
-            </details>
-
+            </div>
             <div *ngIf="space?.inEditMode">
 
-                <ul *ngFor="let spaceProp of space?.oauth.settings">
-                    <li class="control">
+                <div *ngFor="let spaceProp of space?.oauth.settings" class="control is-horizontal">
+                    <div class="control-label">
                         <strong>{{spaceProp.label}}</strong>
+                    </div>
+                    <div class="control">
                         <input type="text" class="input" [(ngModel)]="spaceProp.value">
-                    </li>
-                </ul>
-
+                    </div>
+                </div>
                 <div *ngIf="space?.oauth.settings.length">
                     <a class="button is-primary" href="{{space.oauth.settings | populateMatches: 'authorizationUrl'}}"
                        *ngIf="space.oauth && space.oauth.authorizationUrl">
@@ -84,11 +85,11 @@
                     <a class="button is-success" (click)="updateSpaceSettings()">
                         <span>Save</span>
                     </a>
+                    <a class="button" (click)="space.inEditMode = false">
+                        <span>Cancel</span>
+                    </a>
                 </div>
 
-                <a class="button" (click)="space.inEditMode = false">
-                    <span>Cancel</span>
-                </a>
             </div>
             <div *ngIf="space?.oauth?.extras?.length && !space?.inEditMode">
                 <details>
@@ -108,6 +109,11 @@
 
         </div>
         <hr>
+        <a class="button is-danger"
+           (click)="removeSpace(space)">
+            <span class="fa fa-trash icon"></span>
+            <span>Remove Space</span>
+        </a>
 
         <div *ngIf="spaceOauthSettings">
             <div class="header">

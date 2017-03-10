@@ -32,7 +32,10 @@ const ProfileSchema = {
                 function (err, updated) {
                     cb(updated);
                 });
-        }
+        },
+        removeProfile: function (name, cb) {
+            this.remove({space: name}, cb);
+        },
     }
 
 };

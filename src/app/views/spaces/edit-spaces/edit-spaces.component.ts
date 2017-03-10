@@ -1,8 +1,8 @@
-import {Component, OnInit, Input, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {SpacesService} from '../../../services/spaces.service';
 import {Space} from '../../../models/space.model';
 import 'rxjs/add/operator/map';
-import {SpaceConfigComponent} from '../../../shared/component/space-config/space-config.component';
+import {Router} from '@angular/router';
 
 @Component({
     selector: 'datawhore-edit-spaces',
@@ -15,9 +15,8 @@ export class EditSpacesComponent implements OnInit {
 
     protected isLoadingSpaces = true;
     protected spaces: Array<any>;
-    @ViewChild(SpaceConfigComponent) protected spaceConfigComponent;
 
-    constructor(private spacesService: SpacesService) {}
+    constructor(private spacesService: SpacesService, private router: Router) {}
 
     ngOnInit() {
 
@@ -42,16 +41,9 @@ export class EditSpacesComponent implements OnInit {
         }
     }
 
-    protected deleteSpace(space: Space): void {
-
-        this.spacesService.deleteSpace(space.name).subscribe(() => {
-            // this.spaces.unshift(space.name);
-        });
-    }
-
-
     public onAddedSpace(space: Space): void {
-        this.spaces.unshift(space);
+        // this.spaces.unshift(space);
+        this.router.navigate([`/space/${space.name}`]);
     }
 
 }

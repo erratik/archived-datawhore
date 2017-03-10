@@ -17,6 +17,9 @@ var SettingSchema = {
                 cb(docs[0]);
             });
         },
+        removeSettings: function (name, cb) {
+            this.remove({ space: name }, cb);
+        },
         updateSettings: function (update, cb) {
             var query = { space: update.name }, opts = { multi: false, upsert: true };
             delete update._id;

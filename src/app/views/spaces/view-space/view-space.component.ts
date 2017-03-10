@@ -30,7 +30,6 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
     protected isProfileReset = false;
     protected schemaObjectOverride: string = null;
     @ViewChild(ProfileFormComponent) protected profileFormComponent;
-    // @Output() onNewDims
 
     constructor(spacesService: SpacesService,
                 oauthService: OauthSettingsService,
@@ -121,11 +120,17 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
     public updateSpaceSchema(keyName, value, fromType): void {
         this.space[keyName] = this.schemaValuePipe.transform(value, fromType, this.profileSchema);
-        const saveSpace$ = this.spacesService.updateSpace(this.space).subscribe();
+        this.spacesService.updateSpace(this.space).subscribe();
     }
+
+    public removeSpace(): void {
+        this.spacesService.removeSpace(this.space.name).subscribe();
+    }
+
 
     public toggleEditSpace(): void {
         this.space.inEditMode = !this.space.inEditMode;
     }
+
 
 }
