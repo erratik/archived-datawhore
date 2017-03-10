@@ -1,9 +1,8 @@
-
 <section class="section">
     <div class="container">
         <div class="columns">
 
-            <div>
+            <div class="column">
                 <datawhore-add-space (addedSpace)="onAddedSpace($event)"></datawhore-add-space>
 
                 <article class="media" *ngFor="let space of spaces">
@@ -14,13 +13,28 @@
                     </figure>
                     <div class="media-content">
                         <div class="content">
-                            <p>
-                                <strong>{{space.name}}</strong> <small *ngIf="space.username">@{{space.username}}</small>
-                                <br>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ornare magna eros, eu pellentesque tortor vestibulum ut. Maecenas non massa sem. Etiam finibus odio quis feugiat facilisis.
-                            </p>
+                            <div>
+                                <figure class="image is-24x24 is-circle" *ngIf="space.avatar">
+                                    <img src="{{space.avatar}}">
+                                </figure>
+                                <var *ngIf="!space.username">{{space.name}}</var>
+                                <small *ngIf="space.username">@{{space.username}}</small>
+                            </div>
+                            <p>{{space.description}}</p>
 
-                            <small>Last modified: {{space.modified | date:'medium'}}</small>
+                            <!--<div class="tag is-{{(space.oauth?.connected)? 'success' : 'danger'}}">
+                                <span class="icon is-small" *ngIf="space?.oauth">
+                                    <i class="fa fa-{{(space.oauth?.connected)? 'check' : 'exclamation'}}-circle"></i>
+                                </span>
+                                <span>{{(space.oauth?.connected)? 'Connected' : 'Not connected'}}</span>
+                            </div>-->
+                            <div class="is-flex">
+                                <span class="icon is-small" *ngIf="space?.oauth">
+                                    <i class="fa fa-{{(space.oauth.connected)? 'check' : 'exclamation'}}-circle is-{{(space.oauth.connected)? 'success' : 'danger'}}"></i>
+                                </span>
+                                <small>Last modified: {{space.modified | date:'medium'}}</small>
+                            </div>
+                            <!--<pre>{{space|json}}</pre>-->
                         </div>
                     </div>
                     <div class="media-right">

@@ -55,6 +55,13 @@ figure {
   overflow: hidden;
 }
 
+.is-dark {
+  hr {
+    border-bottom: 1px solid #444;
+    border-top: 1px solid #222;
+  }
+}
+
 .section {
   padding: 3rem 1.5rem 0;
 }
@@ -108,6 +115,9 @@ table {
     font-size: 90%;
     td {
       padding: 0.25rem 0.5rem 0.25rem 0;
+      &:last-child {
+        word-break: break-all;
+      }
     }
   }
 }

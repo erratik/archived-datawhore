@@ -3,6 +3,7 @@ import {SpacesService} from '../../../services/spaces.service';
 import {Space} from '../../../models/space.model';
 import 'rxjs/add/operator/map';
 import {Router} from '@angular/router';
+import {OauthSettingsService} from '../../../services/space/oauth-settings.service';
 
 @Component({
     selector: 'datawhore-edit-spaces',
@@ -16,12 +17,22 @@ export class EditSpacesComponent implements OnInit {
     protected isLoadingSpaces = true;
     protected spaces: Array<any>;
 
-    constructor(private spacesService: SpacesService, private router: Router) {}
+    constructor(private spacesService: SpacesService,
+                private oauthService: OauthSettingsService,
+                private router: Router) {
+    }
 
     ngOnInit() {
 
         const getSpaces$ = this.spacesService.getAllSpaces()
-            .switchMap((spaces) => this.spaces = spaces)
+            .switchMap((spaces) => {
+                spaces.forEach(space => {
+                    this.oauthService.getOauthSettings(space.name).subscribe(settings => {
+                        space.oauth = settings;
+                    });
+                });
+                return this.spaces =  spaces;
+            })
             .do(() => this.isLoadingSpaces = false);
 
         getSpaces$.subscribe(() => {
@@ -42,8 +53,8 @@ export class EditSpacesComponent implements OnInit {
     }
 
     public onAddedSpace(space: Space): void {
-        // this.spaces.unshift(space);
         this.router.navigate([`/space/${space.name}`]);
+        // this.spaces.unshift(space);
     }
 
 }

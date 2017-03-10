@@ -37,7 +37,12 @@ export class SpacesService {
                 return new Space(
                     space.name,
                     space.modified,
-                    null, false, space.icon
+                    null,
+                    false,
+                    space.icon,
+                    space.username,
+                    space.description,
+                    space.avatar
                 );
 
             });
