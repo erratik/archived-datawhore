@@ -29,6 +29,7 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
     protected isFetchingSchema = false;
     protected isProfileReset = false;
     protected schemaObjectOverride: string = null;
+    protected activeTab: string = 'space';
     @ViewChild(ProfileFormComponent) protected profileFormComponent;
 
     constructor(spacesService: SpacesService,
@@ -130,6 +131,10 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
     public toggleEditSpace(): void {
         this.space.inEditMode = !this.space.inEditMode;
+    }
+
+    public setActiveTab(tabName: string): void {
+        this.activeTab = tabName;
     }
 
 

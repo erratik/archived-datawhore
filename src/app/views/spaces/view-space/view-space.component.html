@@ -41,81 +41,87 @@
     </div>
 </section>
 <section class="hero-body">
-    <div class="container" *ngIf="space?.oauth">
-        <div class="header">
-            <h2 class="is-pulled-left heading">Space Oauth Settings</h2>
+    <div class="container" *ngIf="space?.oauth" [ngSwitch]="activeTab">
+        <div class="tabs">
+            <ul>
+                <li (click)="setActiveTab('space')" [class.is-active]="activeTab === 'space'"><a>Space</a></li>
+                <li (click)="setActiveTab('profile')" [class.is-active]="activeTab === 'profile'"><a>Profile</a></li>
+            </ul>
+        </div>
+        <div class="tab space" *ngSwitchDefault>
 
-            <span class="tag is-warning" *ngIf="hasExpiryToken">
+            <div class="header">
+                <h2 class="is-pulled-left heading">Space Oauth Settings</h2>
+
+                <span class="tag is-warning" *ngIf="hasExpiryToken">
                 <i class="fa fa-exclamation-triangle icon is-small"></i>
                 <span>Token expires on {{tokenExpiryDate | date:'medium'}}</span>
             </span>
-        </div>
-        <div>
-            <div *ngIf="space?.oauth?.settings?.length && !space?.inEditMode">
-                <ul>
-                    <li *ngFor="let spaceProp of space?.oauth.settings">
-                        <div *ngIf="spaceProp.value" class="is-inline-flex">
-
-                            <span (click)="removeSpace(space)" class="fa fa-times icon is-danger is-small"></span>
-                            <strong>{{spaceProp.label}}</strong>: {{spaceProp.value}}
-                        </div>
-                        <div *ngIf="!spaceProp.value">
-                            <strong>{{spaceProp.label}}</strong> (<em>{{spaceProp.keyName}}</em>) has not been
-                            set yet
-                        </div>
-                    </li>
-                </ul>
             </div>
-            <div *ngIf="space?.inEditMode">
-
-                <div *ngFor="let spaceProp of space?.oauth.settings" class="control is-horizontal">
-                    <div class="control-label">
-                        <strong>{{spaceProp.label}}</strong>
-                    </div>
-                    <div class="control">
-                        <input type="text" class="input" [(ngModel)]="spaceProp.value">
-                    </div>
-                </div>
-                <div *ngIf="space?.oauth.settings.length">
-                    <a class="button is-primary" href="{{space.oauth.settings | populateMatches: 'authorizationUrl'}}"
-                       *ngIf="space.oauth && space.oauth.authorizationUrl">
-                        <span *ngIf="!space.oauth.connected">Connect</span>
-                        <span *ngIf="space.oauth.connected">Reconnect</span>
-                    </a>
-                    <a class="button is-success" (click)="updateSpaceSettings()">
-                        <span>Save</span>
-                    </a>
-                    <a class="button" (click)="space.inEditMode = false">
-                        <span>Cancel</span>
-                    </a>
-                </div>
-
-            </div>
-            <div *ngIf="space?.oauth?.extras?.length && !space?.inEditMode">
-                <details>
-                    <summary>Acquired Oauth Settings</summary>
-                    <ul *ngFor="let spaceProp of space?.oauth.extras">
-                        <li>
-                            <strong>{{spaceProp.label}}</strong>: {{spaceProp.value}}
+            <div>
+                <div *ngIf="space?.oauth?.settings?.length && !space?.inEditMode">
+                    <ul>
+                        <li *ngFor="let spaceProp of space?.oauth.settings">
+                            <div *ngIf="spaceProp.value" class="is-inline-flex">
+                                <!--<span (click)="removeSpace(space)" class="fa fa-times icon is-danger is-small"></span>-->
+                                <strong>{{spaceProp.label}}</strong>: {{spaceProp.value}}
+                            </div>
+                            <div *ngIf="!spaceProp.value">
+                                <strong>{{spaceProp.label}}</strong> (<em>{{spaceProp.keyName}}</em>) has not been
+                                set yet
+                            </div>
                         </li>
                     </ul>
-                </details>
+                </div>
+                <div *ngIf="space?.inEditMode">
+
+                    <div *ngFor="let spaceProp of space?.oauth.settings" class="control is-horizontal">
+                        <div class="control-label">
+                            <strong>{{spaceProp.label}}</strong>
+                        </div>
+                        <div class="control">
+                            <input type="text" class="input" [(ngModel)]="spaceProp.value">
+                        </div>
+                    </div>
+                    <div *ngIf="space?.oauth.settings.length">
+                        <a class="button is-primary" href="{{space.oauth.settings | populateMatches: 'authorizationUrl'}}"
+                           *ngIf="space.oauth && space.oauth.authorizationUrl">
+                            <span *ngIf="!space.oauth.connected">Connect</span>
+                            <span *ngIf="space.oauth.connected">Reconnect</span>
+                        </a>
+                        <a class="button is-success" (click)="updateSpaceSettings()">
+                            <span>Save</span>
+                        </a>
+                        <a class="button" (click)="space.inEditMode = false">
+                            <span>Cancel</span>
+                        </a>
+                    </div>
+
+                </div>
+                <div *ngIf="space?.oauth?.extras?.length && !space?.inEditMode">
+                    <details>
+                        <summary>Acquired Oauth Settings</summary>
+                        <ul *ngFor="let spaceProp of space?.oauth.extras">
+                            <li>
+                                <strong>{{spaceProp.label}}</strong>: {{spaceProp.value}}
+                            </li>
+                        </ul>
+                    </details>
+                </div>
+                <a class="button is-{{(space?.oauth.configured)? 'primary' : 'success'}} is-small"
+                   (click)="toggleEditSpace(space)" *ngIf="!space?.inEditMode">
+                    <span class="fa fa-{{(space?.oauth.configured)? 'edit' : 'plus-circle'}} icon is-small"></span>
+                    <span>{{(space?.oauth.configured) ? 'Edit' : 'Add'}} Oauth Settings</span>
+                </a>
+                <a class="button is-danger is-small"
+                   (click)="removeSpace(space)">
+                    <span class="fa fa-trash icon is-small"></span>
+                    <span>Remove Space</span>
+                </a>
+
             </div>
-            <a class="button is-{{(space?.oauth.configured)? 'primary' : 'success'}} is-small"
-               (click)="toggleEditSpace(space)" *ngIf="!space?.inEditMode">
-                <span class="fa fa-{{(space?.oauth.configured)? 'edit' : 'plus-circle'}} icon is-small"></span>
-                <span>{{(space?.oauth.configured) ? 'Edit' : 'Add'}} Oauth Settings</span>
-            </a>
-
         </div>
-        <hr>
-        <a class="button is-danger"
-           (click)="removeSpace(space)">
-            <span class="fa fa-trash icon"></span>
-            <span>Remove Space</span>
-        </a>
-
-        <div *ngIf="spaceOauthSettings">
+        <div class="tab profile" *ngSwitchCase="'profile'">
             <div class="header">
                 <h2 class="is-pulled-left heading">Space Item: Profile</h2>
             </div>
@@ -179,6 +185,7 @@
 
             </div>
         </div>
+
 
     </div>
 </section>
