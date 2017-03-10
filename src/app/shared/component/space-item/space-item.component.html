@@ -1,7 +1,10 @@
 
-<ul>
-  <li *ngFor="let property of properties">
-    ({{property.friendlyName}})
-    {{property.schemaPath | schemaValue: 'profile': schema}}
-  </li>
-</ul>
+<table class="is-small">
+    <tr *ngFor="let property of properties">
+        <td><a class="fa icon is-small is-grey fa-{{isItemLinked(property) ? 'link is-success' : 'unlink'}}"
+               *ngIf="property.linkableToSpace"
+               (click)="linkItemToSpace(property)"></a></td>
+        <td>{{property.friendlyName}}</td>
+        <td>{{property.schemaPath | schemaValue: 'profile': schema}}</td>
+    </tr>
+</table>

@@ -46,7 +46,7 @@ module.exports = {
     space: {
         write: function (space, content, type = null, cb) {
             Space.updateSpace(space, content, (updatedProfile) => {
-                // console.log(updatedProfile);
+                // todo: make sure to return what's updated, not what's intended for updated
                 cb(content);
             });
         },

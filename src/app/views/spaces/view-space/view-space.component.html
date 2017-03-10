@@ -12,15 +12,25 @@
                     {{space?.name}}
                 </h2>
             </div>
-            <div class="is-inline-flex">
-                <span class="icon is-small" *ngIf="space?.oauth">
-                    <i class="fa fa-{{(space.oauth.connected)? 'check' : 'exclamation'}}-circle is-{{(space.oauth.connected)? 'success' : 'danger'}}"></i>
-                </span>
+            <div class="is-flex" *ngIf="space?.username">
 
-                <small>
-                    Last modified: {{space?.modified | date:'medium'}}
-                </small>
+                <figure class="image is-24x24 is-circle" *ngIf="space?.username">
+                    <img src="{{space.avatar}}">
+                </figure>
+
+                <span>@{{space.username}}</span>
+
+                <div class="is-inline-flex space-last-modified">
+                    <span class="icon is-small" *ngIf="space?.oauth">
+                        <i class="fa fa-{{(space.oauth.connected)? 'check' : 'exclamation'}}-circle is-{{(space.oauth.connected)? 'success' : 'danger'}}"></i>
+                    </span>
+
+                    <small>
+                        Last modified: {{space?.modified | date:'medium'}}
+                    </small>
+                </div>
             </div>
+            <p *ngIf="space?.description">{{space.description}}</p>
             <div *ngIf="uploadImage">
                 <input type="file" class="form-control" name="single" ng2FileSelect
                        [uploader]="uploader"/>
@@ -28,15 +38,7 @@
                     <span class="fa fa-cloud-upload"></span>
                 </a>
             </div>
-            <div>
-                <a href="">+ add avatar</a>
-                <span class="tag" *ngFor="let property of profile?.properties"
-                      (click)="updateSpaceSchema('avatar', property.schemaPath, 'profile')">
-                    {{property.friendlyName}}
-                </span>
-                <!--{{profile?.properties | json}}-->
-                <a href="">+ add username</a>
-            </div>
+
         </div>
     </div>
 </section>
@@ -48,7 +50,72 @@
                 <li (click)="setActiveTab('profile')" [class.is-active]="activeTab === 'profile'"><a>Profile</a></li>
             </ul>
         </div>
-        <div class="tab space" *ngSwitchDefault>
+        <div class="tab profile" *ngSwitchDefault>
+            <div class="header">
+                <h2 class="is-pulled-left heading">Space Item: Profile</h2>
+            </div>
+            <div class="columns">
+                <div class="column is-half" *ngIf="profile">
+
+                    <div class="header">
+                        <h3 class="is-pulled-left heading">Profile Structure & Example</h3>
+                    </div>
+                    <hr>
+                    <div class="structure">
+                        <ul>
+                            <li *ngFor="let property of profile.properties">
+                                {{property.friendlyName}} ⇢ <cite>{{property.schemaPath}}</cite>
+                            </li>
+                        </ul>
+                        <p *ngIf="!profile?.properties">
+                            No profile properties yet
+                        </p>
+                    </div>
+
+                    <div class="example" *ngIf="profile?.properties">
+                        <datawhore-space-item [properties]="profile.properties" [type]="'profile'"
+                                              [space]="space" (linkingToSpace)="updateSpace()"></datawhore-space-item>
+                    </div>
+                </div>
+                <div class="column is-half">
+                    <div class="header">
+                        <h3 class="is-pulled-left heading">Profile Schema</h3>
+                        <a class="button is-small is-warning" [class.is-loading]="isFetchingSchema"
+                           (click)="resetRawProfile()">
+                            <span class="icon is-small"><i class="fa fa-refresh"></i></span>
+                            <span>{{(profileFetchUrl) ? 'Reset' : 'Fetch'}} schema</span>
+                        </a>
+                    </div>
+                    <div *ngIf="profileFetchUrl">
+
+                        <div [class.is-loading]="isFetchingSchema">
+                            <datawhore-profile-form [model]="profileSchema?.propertyBucket"
+                                                    [dimType]="'profile'" [space]="space"
+                                                    (onProfileSchema)="profileSchema = $event"
+                                                    (onNewDimensions)="newDimensions($event)"></datawhore-profile-form>
+                            <hr>
+                            <article class="message is-warning">
+                                <div class="message-body is-inline-flex">
+                                    <small>
+                                        Resetting the profile doesn't affect the structure, but will edit the items
+                                        available in
+                                        it, and so the example space item.
+                                    </small>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                    <hr>
+
+                    <p *ngIf="!profileFetchUrl">
+                        No profile schema fetched yet.
+                    </p>
+                </div>
+
+
+            </div>
+        </div>
+        <div class="tab space" *ngSwitchCase="'space'">
 
             <div class="header">
                 <h2 class="is-pulled-left heading">Space Oauth Settings</h2>
@@ -84,7 +151,8 @@
                         </div>
                     </div>
                     <div *ngIf="space?.oauth.settings.length">
-                        <a class="button is-primary" href="{{space.oauth.settings | populateMatches: 'authorizationUrl'}}"
+                        <a class="button is-primary"
+                           href="{{space.oauth.settings | populateMatches: 'authorizationUrl'}}"
                            *ngIf="space.oauth && space.oauth.authorizationUrl">
                             <span *ngIf="!space.oauth.connected">Connect</span>
                             <span *ngIf="space.oauth.connected">Reconnect</span>
@@ -118,70 +186,6 @@
                     <span class="fa fa-trash icon is-small"></span>
                     <span>Remove Space</span>
                 </a>
-
-            </div>
-        </div>
-        <div class="tab profile" *ngSwitchCase="'profile'">
-            <div class="header">
-                <h2 class="is-pulled-left heading">Space Item: Profile</h2>
-            </div>
-            <div class="columns">
-                <div class="column is-half" *ngIf="profile">
-
-                    <div class="header">
-                        <h3 class="is-pulled-left heading">Profile Structure & Example</h3>
-                    </div>
-                    <hr>
-                    <div class="structure">
-                        <ul>
-                            <li *ngFor="let property of profile.properties">
-                                {{property.friendlyName}} ⇢ <cite>{{property.schemaPath}}</cite>
-                            </li>
-                        </ul>
-                        <p *ngIf="!profile?.properties">
-                            No profile properties yet
-                        </p>
-                    </div>
-
-                    <div class="example" *ngIf="profile?.properties">
-                        <datawhore-space-item [properties]="profile.properties" [type]="'profile'"
-                                              [space]="space.name"></datawhore-space-item>
-                    </div>
-                </div>
-                <div class="column is-half">
-                    <div class="header">
-                        <h3 class="is-pulled-left heading">Profile Schema</h3>
-                        <a class="button is-small is-warning" [class.is-loading]="isFetchingSchema"
-                           (click)="resetRawProfile()">
-                            <span class="icon is-small"><i class="fa fa-refresh"></i></span>
-                            <span>{{(profileFetchUrl) ? 'Reset' : 'Fetch'}} schema</span>
-                        </a>
-                    </div>
-                    <div *ngIf="profileFetchUrl">
-
-                        <div [class.is-loading]="isFetchingSchema">
-                            <datawhore-profile-form [model]="profileSchema?.propertyBucket"
-                                                    [dimType]="'profile'" [space]="space"
-                                                    (onProfileSchema)="profileSchema = $event"
-                                                    (onNewDimensions)="newDimensions($event)"></datawhore-profile-form>
-                            <hr>
-                            <article class="message is-warning">
-                                <div class="message-body is-inline-flex">
-                                    <small>
-                                        Resetting the profile doesn't affect the structure, but will edit the items available in
-                                        it, and so the example space item.
-                                    </small>
-                                </div>
-                            </article>
-                        </div>
-                    </div>
-                    <hr>
-
-                    <p *ngIf="!profileFetchUrl">
-                        No profile schema fetched yet.
-                    </p>
-                </div>
-
 
             </div>
         </div>

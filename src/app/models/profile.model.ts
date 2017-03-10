@@ -1,6 +1,7 @@
 export class Dimension {
     constructor(public friendlyName: string,
-                public schemaPath: string) {
+                public schemaPath: string,
+                public linkableToSpace = false) {
     }
 }
 

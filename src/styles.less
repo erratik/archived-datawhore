@@ -1,4 +1,5 @@
 @import "assets/styles/less/bulma-vars";
+
 html, body, main {
   height: 100%;
   word-wrap: break-word;
@@ -13,17 +14,45 @@ button, summary {
   outline: none;
 }
 
-.is-danger { color: @danger; }
-.is-warning { color: @warning; }
-.is-success { color: @success; }
-.is-primary { color: @primary; }
-.is-info { color: @info; }
+figure {
+  + * {
+    margin-left: 10px;
+  }
+}
+
+.is-grey {
+  color: @grey;
+}
+
+.is-danger {
+  color: @danger;
+}
+
+.is-warning {
+  color: @warning;
+}
+
+.is-success {
+  color: @success;
+}
+
+.is-primary {
+  color: @primary;
+}
+
+.is-info {
+  color: @info;
+}
 
 .icon + *, i + * {
   margin-left: 5px;
   .button & {
     margin-left: inherit;
   }
+}
+.is-circle {
+  border-radius: 100%;
+  overflow: hidden;
 }
 
 .section {
@@ -37,6 +66,7 @@ button, summary {
 .is-inline-flex {
   align-items: center;
 }
+
 .is-flex-vertical {
   display: flex;
   flex-direction: column;
@@ -71,4 +101,13 @@ button, summary {
 .header {
   display: flex;
   justify-content: space-between;
+}
+
+table {
+  &.is-small {
+    font-size: 90%;
+    td {
+      padding: 0.25rem 0.5rem 0.25rem 0;
+    }
+  }
 }

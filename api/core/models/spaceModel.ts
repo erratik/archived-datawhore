@@ -7,6 +7,7 @@ let SpaceSchema = {
         name: String,
         modified: Number,
         avatar: String,
+        description: String,
         username: String,
         icon: String
     },

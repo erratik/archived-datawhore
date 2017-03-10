@@ -1,13 +1,14 @@
-import {Component, Output, EventEmitter} from '@angular/core';
+import {Component, Output, EventEmitter, ViewChild} from '@angular/core';
 import {Space} from '../../../models/space.model';
 import {ActivatedRoute, Router} from '@angular/router';
 import {SpacesService} from '../../../services/spaces.service';
-import {SpaceOauthSettings, OauthSettings, OauthExtras} from '../../../models/space-settings.model';
+import {SpaceOauthSettings} from '../../../models/space-settings.model';
 import {Paths} from '../../../classes/paths.class';
 import {Observable} from 'rxjs';
 import {OauthSettingsService} from '../../../services/space/oauth-settings.service';
 import {ProfileService} from '../../../services/profile/profile.service';
 import {Profile} from '../../../models/profile.model';
+import {SpaceItemComponent} from '../space-item/space-item.component';
 
 @Component({
     selector: 'datawhore-space-config',
@@ -23,6 +24,8 @@ export class SpaceConfigComponent {
     public spaceOauthSettings = null;
     public retrieveSpace$: Observable<SpaceOauthSettings> = new Observable<SpaceOauthSettings>();
     @Output() public gotOauthSettings: EventEmitter<SpaceOauthSettings> = new EventEmitter<SpaceOauthSettings>();
+    @ViewChild(SpaceItemComponent) public spaceItemComponent;
+
 
     public toggleEditSpace(): void {
         this.space.inEditMode = !this.space.inEditMode;
@@ -50,7 +53,10 @@ export class SpaceConfigComponent {
                     this.space.modified,
                     oauth,
                     false,
-                    this.space.icon
+                    this.space.icon,
+                    this.space.username,
+                    this.space.description,
+                    this.space.avatar
                 );
 
                 this.spaceOauthSettings = {
@@ -88,6 +94,7 @@ export class SpaceConfigComponent {
     public updateSpaceSettings(): any {
         this.oauthService.updateSpaceSettings(this.space).subscribe((settings) => {
             this.space.oauth = settings;
+            this.spaceItemComponent.findSpaceLinkables();
             this.space.inEditMode = false;
         });
     }
@@ -96,10 +103,6 @@ export class SpaceConfigComponent {
     public newDimensions(data): any {
         console.log(data[0]);
         this[data[1]].properties = data[0];
-    }
-
-    public getSpace(): void {
-        this.retrieveSpace$.subscribe();
     }
 
 }

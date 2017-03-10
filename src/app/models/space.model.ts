@@ -6,6 +6,8 @@ export class Space {
                 public oauth: SpaceOauthSettings = null,
                 public inEditMode = false,
                 public icon?: string,
+                public username?: string,
+                public description?: string,
                 public avatar?: string) {
     }
 

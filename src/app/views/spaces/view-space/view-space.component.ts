@@ -29,7 +29,7 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
     protected isFetchingSchema = false;
     protected isProfileReset = false;
     protected schemaObjectOverride: string = null;
-    protected activeTab: string = 'space';
+    protected activeTab = 'profile';
     @ViewChild(ProfileFormComponent) protected profileFormComponent;
 
     constructor(spacesService: SpacesService,
@@ -119,15 +119,13 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
     }
 
-    public updateSpaceSchema(keyName, value, fromType): void {
-        this.space[keyName] = this.schemaValuePipe.transform(value, fromType, this.profileSchema);
+    public updateSpace(): void {
         this.spacesService.updateSpace(this.space).subscribe();
     }
 
     public removeSpace(): void {
         this.spacesService.removeSpace(this.space.name).subscribe();
     }
-
 
     public toggleEditSpace(): void {
         this.space.inEditMode = !this.space.inEditMode;
