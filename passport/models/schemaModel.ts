@@ -13,7 +13,6 @@ const SchemaSchema = {
     },
     self: {
         findSchema: function (spaceName: string, schemaType: string, cb) {
-            // console.log(`finding ${spaceName} ${schemaType} schema`);
 
             this.find({space: spaceName},
                 function (err, docs) {
@@ -30,6 +29,7 @@ const SchemaSchema = {
                         docs.push(schema);
 
                     }
+
                     cb(docs[0].schemas.filter(schema => schema.type === schemaType)[0]);
                 }
             );
@@ -38,16 +38,17 @@ const SchemaSchema = {
             const that = this;
             this.findOneAndUpdate(
                 {space: spaceName},
-                {modified: Date.now(), schemas: [schema]},
-                {upsert: true, setDefaultsOnInsert: true},
+                {modified: Date.now()},
+                {upsert: true, returnNewDocument: true},
                 function (err, updated) {
-                    that.findOne({space: spaceName, 'schemas.type': schema.type}, {'schemas.$': 1},
-                        function (_err, docs) {
-                            if (docs) {
-                                cb(docs.schemas[0]);
-                            }
-                        }
-                    );
+                    console.log(updated);
+                    // that.findOne({space: spaceName, 'schemas.type': schema.type}, {'schemas.$': 1},
+                    //     function (_err, docs) {
+                    //         if (docs) {
+                    //             cb(docs.schemas[0]);
+                    //         }
+                    //     }
+                    // );
                 });
         }
     }

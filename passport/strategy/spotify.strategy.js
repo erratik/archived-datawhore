@@ -26,7 +26,7 @@ module.exports = function (app) {
     });
 
     app.get('/auth/spotify', passport.authenticate(space, {
-        scope: ['user-read-email', 'user-read-private'],
+        scope: ['user-read-email', 'user-read-private', 'user-read-recently-played'],
         showDialog: true
     }));
     app.get('/auth/spotify/callback', passport.authenticate(space, {

@@ -52,7 +52,7 @@ router
     };
     getEndpoint(data, function (resp) {
         // console.log(`[endpoints.${data.action} response]`, resp);
-        res.json(resp);
+        res.status(200).send(resp);
     });
 })
     .put('/update/:endpoint/:space', function (req, res) {

@@ -12,7 +12,6 @@ var SchemaSchema = {
     },
     self: {
         findSchema: function (spaceName, schemaType, cb) {
-            // console.log(`finding ${spaceName} ${schemaType} schema`);
             this.find({ space: spaceName }, function (err, docs) {
                 if (!docs.length) {
                     var schema = new Schema({
@@ -29,12 +28,15 @@ var SchemaSchema = {
         },
         writeSchema: function (spaceName, schema, cb) {
             var that = this;
-            this.findOneAndUpdate({ space: spaceName }, { modified: Date.now(), schemas: [schema] }, { upsert: true, setDefaultsOnInsert: true }, function (err, updated) {
-                that.findOne({ space: spaceName, 'schemas.type': schema.type }, { 'schemas.$': 1 }, function (_err, docs) {
-                    if (docs) {
-                        cb(docs.schemas[0]);
-                    }
-                });
+            this.findOneAndUpdate({ space: spaceName }, { modified: Date.now() }, { upsert: true, returnNewDocument: true }, function (err, updated) {
+                console.log(updated);
+                // that.findOne({space: spaceName, 'schemas.type': schema.type}, {'schemas.$': 1},
+                //     function (_err, docs) {
+                //         if (docs) {
+                //             cb(docs.schemas[0]);
+                //         }
+                //     }
+                // );
             });
         }
     }
