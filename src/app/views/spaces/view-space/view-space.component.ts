@@ -9,9 +9,8 @@ import {OauthSettingsService} from '../../../services/space/oauth-settings.servi
 import {FileUploader} from 'ng2-file-upload';
 import {ProfileService} from '../../../services/profile/profile.service';
 import {Profile} from '../../../models/profile.model';
-import {SchemaValuePipe} from '../../../shared/pipes/schema-value.pipe';
 import {ProfileFormComponent} from '../../profile/profile-form/profile-form.component';
-const objectPath = require('object-path');
+import {Drop} from '../../../models/drop.model';
 
 @Component({
     selector: 'datawhore-view-space',
@@ -22,21 +21,22 @@ const objectPath = require('object-path');
 export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
     public space: Space = null;
-    private profileFetchUrl = null;
+    private dropFetchUrl = null;
     public profile: Profile = null;
+    public drops: Array<Drop> = [];
     public profileSchema: any = null;
+    public dropSchemas: Array<any> = [];
     public uploader: FileUploader;
     protected isFetchingSchema = false;
     protected isProfileReset = false;
     protected schemaObjectOverride: string = null;
-    protected activeTab = 'profile';
+    protected activeTab = 'drops';
     @ViewChild(ProfileFormComponent) protected profileFormComponent;
 
     constructor(spacesService: SpacesService,
                 oauthService: OauthSettingsService,
                 profileService: ProfileService,
-                activatedRoute: ActivatedRoute,
-                private schemaValuePipe: SchemaValuePipe) {
+                activatedRoute: ActivatedRoute) {
         super(spacesService, oauthService, profileService, activatedRoute);
     }
 
@@ -51,7 +51,8 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
         spaceConfig$.subscribe(() => {
 
-            this.profileFetchUrl = Paths.PROFILE_FETCH_URL[this.space.name];
+            this.dropFetchUrl = Paths.DROP_FETCH_URL[this.space.name];
+
             window.document.title = `${this.space.name} | view space`;
 
             if (this.profileSchema.propertyBucket) {
@@ -83,6 +84,43 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
         });
     }
 
+
+    protected fetchDropSchema(): any {
+
+        // this.profileFormComponent.profileSchema = this.profileSchema;
+
+        // console.log(this.profileFormComponent);
+
+        if (!this.dropFetchUrl) {
+            console.error(`there is no profile getter path for ${this.space.name}`);
+            return;
+        }
+        //
+        // this.isProfileReset = true;
+        // this.isFetchingSchema = true;
+        //
+        // this.profileFormComponent.isProfileReset = true;
+        // this.profileFormComponent.isFetchingSchema = true;
+
+        // strat with spaceOauthSettings values, for most /api/space/endpoint usages
+        const data = Object.assign(this.spaceOauthSettings);
+        data['apiEndpointUrl'] = this.dropFetchUrl;
+        data['action'] = 'schema.write';
+        data['type'] = 'drop.post';
+        data['space'] = this.space.name;
+
+        const profileSchema$ = this.spacesService.spaceEndpoint(this.space, data).do((schema) => {
+            // debugger;
+            this.dropSchemas.push(new DimensionSchema(schema['type'], schema['content'], schema.modified));
+        });
+
+        profileSchema$.subscribe(() => {
+            // this.drops.map();
+            // this.isFetchingSchema = false;
+            // this.profileFormComponent.isFetchingSchema = false;
+        });
+
+    }
     protected updateSpace(space: Space): void {
         this.spacesService.updateSpace(space).subscribe();
     }

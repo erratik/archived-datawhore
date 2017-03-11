@@ -1,5 +1,6 @@
 let mongoose = require('mongoose');
 
+const colors = require('colors');
 let childSchema = new mongoose.Schema({
     type: String,
     modified: Number,
@@ -35,21 +36,41 @@ const SchemaSchema = {
             );
         },
         writeSchema: function (spaceName: string, schema: any, cb) {
+
+            const query = {space: spaceName, 'schemas.type': schema.type};
             const that = this;
-            this.findOneAndUpdate(
-                {space: spaceName},
-                {modified: Date.now()},
-                {upsert: true, returnNewDocument: true},
-                function (err, updated) {
-                    console.log(updated);
-                    // that.findOne({space: spaceName, 'schemas.type': schema.type}, {'schemas.$': 1},
-                    //     function (_err, docs) {
-                    //         if (docs) {
-                    //             cb(docs.schemas[0]);
-                    //         }
-                    //     }
-                    // );
-                });
+            const addSchema = (callback) => {
+                that.findOneAndUpdate(
+                    {space: spaceName},
+                    {modified: Date.now(), $push: {schemas: schema}},
+                    {upsert: true, returnNewDocument: true},
+                    function (err, updated) {
+                        // console.log('... and updated', schema);
+                        callback(schema);
+                    });
+            };
+
+            this.findOne(query, {'schemas.$': 1},
+                function (_err, docs) {
+
+                    if (docs) {
+                        that.update(
+                            query,
+                            {$pull: {schemas: {type: schema.type}}},
+                            {multi: true}, function (error, _updated) {
+                                // console.log('pulled', _updated);
+                                if (_updated.ok) {
+                                    addSchema(cb);
+                                }
+                            }
+                        );
+                    } else {
+                        // console.log(`no ${schema.type} schema found, creating`);
+                        addSchema(cb);
+                    }
+
+                }
+            );
         }
     }
 

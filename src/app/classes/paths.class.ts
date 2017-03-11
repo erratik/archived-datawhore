@@ -12,6 +12,6 @@ export class Paths {
         moves: 'api.moves-app.com/api/1.1'
     };
     public static readonly DROP_FETCH_URL = {
-        spotify: '/v1/me/player/recently-played'
+        spotify: '/v1/me/player/recently-played?limit=1'
     };
 }
