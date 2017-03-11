@@ -11,6 +11,7 @@ import {SpacesService} from './services/spaces.service';
 import {OauthSettingsService} from './services/space/oauth-settings.service';
 import {ProfileService} from './services/profile/profile.service';
 import {SpaceItemService} from './shared/services/space-item/space-item.service';
+import {DropService} from './services/drop/drop.service';
 
 import {AppComponent} from './app.component';
 import {HeaderComponent} from './wrapper/header/header.component';
@@ -28,9 +29,10 @@ import {DimensionFormComponent} from './shared/component/dimensions/dimensions-f
 import {SpaceItemComponent} from './shared/component/space-item/space-item.component';
 import {SchemaValuePipe} from './shared/pipes/schema-value.pipe';
 import {ProfileFormComponent} from './views/profile/profile-form/profile-form.component';
-import { OrderByPipe } from './shared/pipes/order-by.pipe';
-import { AddSpaceComponent } from './views/spaces/add-space/add-space.component';
-import { PopulateMatchesPipe } from './shared/pipes/populate-matches.pipe';
+import {OrderByPipe} from './shared/pipes/order-by.pipe';
+import {AddSpaceComponent} from './views/spaces/add-space/add-space.component';
+import {PopulateMatchesPipe} from './shared/pipes/populate-matches.pipe';
+import {DropFormComponent} from './views/drops/drop-form/drop-form.component';
 
 const appRoutes: Routes = [
     {
@@ -79,9 +81,17 @@ const appRoutes: Routes = [
         ProfileFormComponent,
         OrderByPipe,
         AddSpaceComponent,
-        PopulateMatchesPipe
+        PopulateMatchesPipe,
+        DropFormComponent
     ],
-    providers: [SpacesService, OauthSettingsService, SpaceItemService, ProfileService, SchemaValuePipe],
+    providers: [
+        SpacesService,
+        OauthSettingsService,
+        SpaceItemService,
+        ProfileService,
+        DropService,
+        SchemaValuePipe
+    ],
     bootstrap: [AppComponent]
 })
 export class AppModule {

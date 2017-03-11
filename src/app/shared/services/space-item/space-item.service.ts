@@ -29,8 +29,8 @@ export class SpaceItemService {
         }).catch(this.handleError);
     }
 
-    public fetchSchema(space: string): Observable<any> {
-        return this.http.get(`${this.apiServer}/get/schema/${space}?type=${this.type}`).map((res: Response) => {
+    public fetchSchema(space: string, type = this.type): Observable<any> {
+        return this.http.get(`${this.apiServer}/get/schema/${space}?type=${type}`).map((res: Response) => {
             return res.json();
         }).catch(this.handleError);
     }

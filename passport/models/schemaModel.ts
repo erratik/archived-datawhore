@@ -31,7 +31,11 @@ const SchemaSchema = {
 
                     }
 
-                    cb(docs[0].schemas.filter(schema => schema.type === schemaType)[0]);
+                    if (schemaType !== 'drop') {
+                        cb(docs[0].schemas.filter(schema => schema.type === schemaType)[0]);
+                    } else {
+                        cb(docs[0].schemas.filter(schema => schema.type.includes('drop')));
+                    }
                 }
             );
         },
@@ -40,6 +44,7 @@ const SchemaSchema = {
             const query = {space: spaceName, 'schemas.type': schema.type};
             const that = this;
             const addSchema = (callback) => {
+                schema.modified = Date.now();
                 that.findOneAndUpdate(
                     {space: spaceName},
                     {modified: Date.now(), $push: {schemas: schema}},

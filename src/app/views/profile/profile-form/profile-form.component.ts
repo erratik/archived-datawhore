@@ -15,7 +15,7 @@ export class ProfileFormComponent extends DimensionFormComponent implements OnIn
 
     public isProfileReset = false;
     @Input() public profileSchema;
-    public isFetchingSchema;
+    @Input() public isFetchingSchema;
     @Output() onProfileSchema = new EventEmitter<any>();
 
     constructor(profileService: ProfileService) {

@@ -18,10 +18,15 @@ let objectPath = require('object-path');
 
 // my own endpoints, read/write in mongo docs
 let getEndpoint = (data, cb) => {
-    // console.log(`[getEndpoint] ${data.action} -> `, data);
-    return objectPath.get(endpoints, data.action)(data.space, data.type, function (resp) {
-        cb(resp);
-    });
+    console.log(`[getEndpoint] ${data.action} -> `, data);
+    const endpointAction = objectPath.get(endpoints, data.action);
+    if (typeof endpointAction === 'function') {
+        return endpointAction(data.space, data.type, function (resp) {
+            cb(resp);
+        });
+    } else {
+        cb({message: 'no endpoints set for ' + data.action})
+    }
 };
 
 let postEndpoint = (data, content, cb) => {

@@ -9,6 +9,8 @@ import {OauthSettingsService} from '../../../services/space/oauth-settings.servi
 import {ProfileService} from '../../../services/profile/profile.service';
 import {Profile} from '../../../models/profile.model';
 import {SpaceItemComponent} from '../space-item/space-item.component';
+import {DropService} from '../../../services/drop/drop.service';
+import {SpaceItemService} from '../../services/space-item/space-item.service';
 
 @Component({
     selector: 'datawhore-space-config',
@@ -25,11 +27,12 @@ export class SpaceConfigComponent {
     public retrieveSpace$: Observable<SpaceOauthSettings> = new Observable<SpaceOauthSettings>();
     @Output() public gotOauthSettings: EventEmitter<SpaceOauthSettings> = new EventEmitter<SpaceOauthSettings>();
     @ViewChild(SpaceItemComponent) public spaceItemComponent;
-    
 
     constructor(public spacesService: SpacesService,
                 public oauthService: OauthSettingsService,
+                public spaceItemService?: SpaceItemService,
                 public profileService?: ProfileService,
+                public dropService?: DropService,
                 private activatedRoute?: ActivatedRoute,
                 public router?: Router) {
 

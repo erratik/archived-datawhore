@@ -24,13 +24,19 @@ var SchemaSchema = {
                     });
                     docs.push(schema);
                 }
-                cb(docs[0].schemas.filter(function (schema) { return schema.type === schemaType; })[0]);
+                if (schemaType !== 'drop') {
+                    cb(docs[0].schemas.filter(function (schema) { return schema.type === schemaType; })[0]);
+                }
+                else {
+                    cb(docs[0].schemas.filter(function (schema) { return schema.type.includes('drop'); }));
+                }
             });
         },
         writeSchema: function (spaceName, schema, cb) {
             var query = { space: spaceName, 'schemas.type': schema.type };
             var that = this;
             var addSchema = function (callback) {
+                schema.modified = Date.now();
                 that.findOneAndUpdate({ space: spaceName }, { modified: Date.now(), $push: { schemas: schema } }, { upsert: true, returnNewDocument: true }, function (err, updated) {
                     // console.log('... and updated', schema);
                     callback(schema);

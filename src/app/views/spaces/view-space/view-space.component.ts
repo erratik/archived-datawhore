@@ -11,6 +11,8 @@ import {ProfileService} from '../../../services/profile/profile.service';
 import {Profile} from '../../../models/profile.model';
 import {ProfileFormComponent} from '../../profile/profile-form/profile-form.component';
 import {Drop} from '../../../models/drop.model';
+import {DropService} from '../../../services/drop/drop.service';
+import {SpaceItemService} from '../../../shared/services/space-item/space-item.service';
 
 @Component({
     selector: 'datawhore-view-space',
@@ -35,14 +37,17 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
     constructor(spacesService: SpacesService,
                 oauthService: OauthSettingsService,
+                spaceItemService: SpaceItemService,
                 profileService: ProfileService,
+                dropService: DropService,
                 activatedRoute: ActivatedRoute) {
-        super(spacesService, oauthService, profileService, activatedRoute);
+        super(spacesService, oauthService, spaceItemService, profileService, dropService, activatedRoute);
     }
 
     ngOnInit() {
 
         const spaceConfig$ = this.retrieveSpace$
+            .switchMap(() => this.getDrops())
             .switchMap(() => this.getProfile())
             .mergeMap(() => this.getRawProfile())
             .do((profileSchema) => {
@@ -55,6 +60,7 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
             window.document.title = `${this.space.name} | view space`;
 
+            // to know what's already selected and renamed
             if (this.profileSchema.propertyBucket) {
                 this.profile.createPropertyBucket(this.profileSchema.propertyBucket);
             }
@@ -78,6 +84,12 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
         });
     }
 
+    private getDrops(): any {
+        return this.spaceItemService.fetchSchema(this.space.name, 'drop').do((drops) => {
+            this.dropSchemas = drops.map(dropSchema => new DimensionSchema(dropSchema['type'], dropSchema['content'], dropSchema.modified));
+        });
+    }
+
     private getRawProfile(): any {
         return this.profileService.fetchSchema(this.space.name).do((profileSchema) => {
             this.profileSchema = new DimensionSchema(profileSchema['type'], profileSchema['content'], profileSchema.modified);
@@ -87,38 +99,30 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
     protected fetchDropSchema(): any {
 
-        // this.profileFormComponent.profileSchema = this.profileSchema;
-
-        // console.log(this.profileFormComponent);
 
         if (!this.dropFetchUrl) {
             console.error(`there is no profile getter path for ${this.space.name}`);
             return;
         }
-        //
-        // this.isProfileReset = true;
-        // this.isFetchingSchema = true;
-        //
-        // this.profileFormComponent.isProfileReset = true;
-        // this.profileFormComponent.isFetchingSchema = true;
 
-        // strat with spaceOauthSettings values, for most /api/space/endpoint usages
+        this.isFetchingSchema = true;
+
+        // start with spaceOauthSettings values, for most /api/space/endpoint usages
         const data = Object.assign(this.spaceOauthSettings);
         data['apiEndpointUrl'] = this.dropFetchUrl;
         data['action'] = 'schema.write';
         data['type'] = 'drop.post';
         data['space'] = this.space.name;
 
-        const profileSchema$ = this.spacesService.spaceEndpoint(this.space, data).do((schema) => {
-            // debugger;
-            this.dropSchemas.push(new DimensionSchema(schema['type'], schema['content'], schema.modified));
+        const profileSchema$ = this.spacesService.spaceEndpoint(this.space, data).do((resetDropSchema) => {
+            this.dropSchemas.map(schemas => {
+                if (schemas.type === data.type) {
+                    return new DimensionSchema(resetDropSchema['type'], resetDropSchema['content'], resetDropSchema.modified);
+                }
+            });
         });
 
-        profileSchema$.subscribe(() => {
-            // this.drops.map();
-            // this.isFetchingSchema = false;
-            // this.profileFormComponent.isFetchingSchema = false;
-        });
+        profileSchema$.subscribe(() => this.isFetchingSchema = false);
 
     }
     protected updateSpace(space: Space): void {
