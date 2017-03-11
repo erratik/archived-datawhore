@@ -51,7 +51,7 @@ router
         action: req.params.endpoint + ".get"
     };
     getEndpoint(data, function (resp) {
-        console.log("[endpoints." + data.action + " response]", resp);
+        // console.log(`[endpoints.${data.action} response]`, resp);
         res.json(resp);
     });
 })
@@ -62,7 +62,7 @@ router
         action: req.params.endpoint + ".write"
     };
     postEndpoint(data, req.body.data, function (resp) {
-        console.log("[endpoints." + data.action + " response]", resp);
+        // console.log(`[endpoints.${data.action} response]`, resp);
         res.json(resp);
     });
 });
@@ -74,14 +74,16 @@ router.post('/endpoint/space', function (req, res) {
     // requests to apis that need spaceOauthSettings shit
     if (data.apiEndpointUrl) {
         switch (data.space) {
+            case 'tumblr':
             case 'twitter':
                 options = {
                     hostname: data.apiUrl,
                     path: data.apiEndpointUrl,
                     headers: {
-                        Authorization: getEchoAuth("https://" + data.apiUrl + data.apiEndpointUrl, data.token, data.secret, data.apiKey, data.apiSecret)
+                        Authorization: getEchoAuth(data)
                     }
                 };
+                console.log(options);
                 https.get(options, function (result) {
                     var buffer = '';
                     result.setEncoding('utf8');
@@ -148,14 +150,14 @@ router.post('/upload/:space/:folder/:filename', function (req, res) {
         // res.json(req.file);
     });
 });
-function getEchoAuth(url, token, secret, apiKey, apiSecret) {
+function getEchoAuth(data) {
     // helper to construct echo/oauth headers from URL
-    var oauth = new OAuth.OAuth('https://api.twitter.com/oauth/request_token', 'https://api.twitter.com/oauth/access_token', apiKey, // test app token
-    apiSecret, // test app secret
+    var oauth = new OAuth.OAuth("https://" + data.apiUrl + "/oauth/request_token", "https://" + data.apiUrl + "/oauth/access_token", data.apiKey, // test app token
+    data.apiSecret, // test app secret
     '1.0', null, 'HMAC-SHA1');
-    var orderedParams = oauth._prepareParameters(token, // test user token
-    secret, // test user secret
-    'GET', url);
+    var orderedParams = oauth._prepareParameters(data.token, // test user token
+    data.secret, // test user secret
+    'GET', "https://" + data.apiUrl + data.apiEndpointUrl);
     return oauth._buildAuthorizationHeaders(orderedParams);
 }
 module.exports = router;

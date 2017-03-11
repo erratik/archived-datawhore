@@ -11,7 +11,6 @@ var ProfileSchema = {
     },
     self: {
         findProfile: function (spaceName, cb) {
-            var that = this;
             this.find({ space: spaceName }, function (err, docs) {
                 if (!docs.length) {
                     docs = [{ space: spaceName, modified: Date.now() }];

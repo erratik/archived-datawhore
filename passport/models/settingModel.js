@@ -44,7 +44,7 @@ var SettingSchema = {
                 delete update.oauth;
             }
             this.findOneAndUpdate(query, update, { upsert: true, returnNewDocument: true }, function (err, updated) {
-                console.log('updated?', updated);
+                // console.log('updated?', updated);
                 cb(updated);
             });
         }

@@ -77,16 +77,12 @@
                 <div class="column is-half">
                     <div class="header">
                         <h3 class="is-pulled-left heading">Profile Schema</h3>
-                        <a class="button is-small is-warning" [class.is-loading]="isFetchingSchema"
-                           (click)="resetRawProfile()">
-                            <span class="icon is-small"><i class="fa fa-refresh"></i></span>
-                            <span>{{(profileFetchUrl) ? 'Reset' : 'Fetch'}} schema</span>
-                        </a>
                     </div>
                     <div *ngIf="profileFetchUrl">
 
                         <div [class.is-loading]="isFetchingSchema">
                             <datawhore-profile-form [model]="profileSchema?.propertyBucket"
+                                                    [profileSchema]="profileSchema"
                                                     [dimType]="'profile'" [space]="space"
                                                     (onProfileSchema)="profileSchema = $event"
                                                     (onNewDimensions)="newDimensions($event)"></datawhore-profile-form>

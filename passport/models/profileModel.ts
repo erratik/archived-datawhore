@@ -13,7 +13,7 @@ const ProfileSchema = {
     },
     self: {
         findProfile: function (spaceName: string, cb) {
-            const that = this;
+
             this.find({space: spaceName},
                 function (err, docs) {
                     if (!docs.length) {

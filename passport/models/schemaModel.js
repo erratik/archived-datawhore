@@ -12,7 +12,7 @@ var SchemaSchema = {
     },
     self: {
         findSchema: function (spaceName, schemaType, cb) {
-            console.log("finding " + spaceName + " " + schemaType + " schema");
+            // console.log(`finding ${spaceName} ${schemaType} schema`);
             this.find({ space: spaceName }, function (err, docs) {
                 if (!docs.length) {
                     var schema = new Schema({

@@ -83,42 +83,6 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
         });
     }
 
-    protected resetRawProfile(): any {
-
-        this.profileFormComponent.profileSchema = this.profileSchema;
-
-        // console.log(this.profileFormComponent);
-
-        if (!this.profileFetchUrl) {
-            console.error(`there is no profile getter path for ${this.space.name}`);
-            return;
-        }
-
-        this.isProfileReset = true;
-        this.isFetchingSchema = true;
-
-        this.profileFormComponent.isProfileReset = true;
-        this.profileFormComponent.isFetchingSchema = true;
-
-        // strat with spaceOauthSettings values, for most /api/space/endpoint usages
-        const data = Object.assign(this.spaceOauthSettings);
-        data['apiEndpointUrl'] = this.profileFetchUrl;
-        data['action'] = 'schema.write';
-        data['type'] = 'profile';
-        data['space'] = this.space.name;
-
-        const profileSchema$ = this.spacesService.spaceEndpoint(this.space, data).do((profileSchema) => {
-            this.profileSchema = new DimensionSchema(profileSchema['type'], profileSchema['content'], profileSchema.modified);
-        });
-
-        profileSchema$.subscribe(() => {
-            this.profile.createPropertyBucket(this.profileSchema.propertyBucket);
-            this.isFetchingSchema = false;
-            this.profileFormComponent.isFetchingSchema = false;
-        });
-
-    }
-
     public updateSpace(): void {
         this.spacesService.updateSpace(this.space).subscribe();
     }

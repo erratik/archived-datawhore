@@ -5,7 +5,7 @@ var Profile = require('../models/profileModel');
 module.exports = {
     schema: {
         write: function (space, content, type, cb) {
-            console.log(content);
+            // console.log(content)
             // then we have other type of schema, using request(), instead of https(),
             // so... not twitter, so far...
             content = (typeof content === 'string') ? JSON.parse(content) : content;
@@ -14,13 +14,13 @@ module.exports = {
                 content: typeof content.data !== 'undefined' ? content.data : content
             };
             Schema.writeSchema(space, schema, function (updatedSchema) {
-                console.log('[schema.write callback]', updatedSchema);
+                // console.log('[schema.write callback]', updatedSchema);
                 cb(updatedSchema);
             });
         },
         get: function (space, type, cb) {
             Schema.findSchema(space, type, function (schema) {
-                console.log(schema);
+                // console.log(schema);
                 cb(schema);
             });
         }

@@ -45,7 +45,7 @@ export class SpaceItemComponent implements OnInit {
 
     protected isItemLinked(property): boolean {
         if (objectPath.get(this.schema, property.schemaPath)) {
-            console.log(objectPath.get(this.schema, property.schemaPath), this.space[property.friendlyName])
+            // console.log(objectPath.get(this.schema, property.schemaPath), this.space[property.friendlyName])
         }
         return this.space[property.friendlyName] === objectPath.get(this.schema, property.schemaPath);
     }

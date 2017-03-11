@@ -13,7 +13,7 @@ const SchemaSchema = {
     },
     self: {
         findSchema: function (spaceName: string, schemaType: string, cb) {
-            console.log(`finding ${spaceName} ${schemaType} schema`);
+            // console.log(`finding ${spaceName} ${schemaType} schema`);
 
             this.find({space: spaceName},
                 function (err, docs) {

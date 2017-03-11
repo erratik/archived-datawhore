@@ -1,4 +1,4 @@
-import {Component, OnInit, Output, EventEmitter} from '@angular/core';
+import {Component, OnInit, Output, EventEmitter, Input} from '@angular/core';
 import {DimensionFormComponent} from '../../../shared/component/dimensions/dimensions-form/dimensions-form.component';
 import {ProfileService} from '../../../services/profile/profile.service';
 import {DimensionSchema} from '../../../models/dimension-schema.model';
@@ -14,7 +14,7 @@ const objectPath = require('object-path');
 export class ProfileFormComponent extends DimensionFormComponent implements OnInit {
 
     public isProfileReset = false;
-    public profileSchema;
+    @Input() public profileSchema;
     public isFetchingSchema;
     @Output() onProfileSchema = new EventEmitter<any>();
 
@@ -34,7 +34,8 @@ export class ProfileFormComponent extends DimensionFormComponent implements OnIn
 
         schema = objectPath.get(this.profileSchema, `content.${schema}`);
         // schema = this.profileSchema.content;
-        debugger;
+        // console.log(this.model)
+        // debugger;
         const profileSchema$ = this.profileService.updateSchema(this.space.name, schema).do((profileSchema) => {
             this.onProfileSchema.emit(new DimensionSchema(profileSchema['type'], profileSchema['content'], profileSchema.modified));
         });

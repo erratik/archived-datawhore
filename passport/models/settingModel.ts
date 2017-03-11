@@ -59,7 +59,7 @@ const SettingSchema = {
                 update,
                 {upsert: true, returnNewDocument: true},
                 function (err, updated) {
-                    console.log('updated?', updated);
+                    // console.log('updated?', updated);
                     cb(updated);
                 });
 
