@@ -83,8 +83,8 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
         });
     }
 
-    public updateSpace(): void {
-        this.spacesService.updateSpace(this.space).subscribe();
+    protected updateSpace(space: Space): void {
+        this.spacesService.updateSpace(space).subscribe();
     }
 
     public removeSpace(): void {

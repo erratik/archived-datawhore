@@ -71,7 +71,8 @@
 
                     <div class="example" *ngIf="profile?.properties">
                         <datawhore-space-item [properties]="profile.properties" [type]="'profile'"
-                                              [space]="space" (linkingTospace)="updatespace()"></datawhore-space-item>
+                                              [space]="space"
+                                              (linkingToSpace)="updateSpace($event)"></datawhore-space-item>
                     </div>
                 </div>
                 <div class="column is-half">
@@ -173,7 +174,7 @@
                     <span>{{(space?.oauth.configured) ? 'Edit' : 'Add'}} Oauth Settings</span>
                 </a>
                 <a class="button is-danger"
-                   (click)="removespace(space)">
+                   (click)="removeSpace(space)">
                     <span class="fa fa-trash icon"></span>
                     <span>Remove space</span>
                 </a>
