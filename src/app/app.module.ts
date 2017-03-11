@@ -11,7 +11,7 @@ import {SpacesService} from './services/spaces.service';
 import {OauthSettingsService} from './services/space/oauth-settings.service';
 import {ProfileService} from './services/profile/profile.service';
 import {SpaceItemService} from './shared/services/space-item/space-item.service';
-import {DropService} from './services/drop/drop.service';
+import {RainService} from './services/rain/rain.service';
 
 import {AppComponent} from './app.component';
 import {HeaderComponent} from './wrapper/header/header.component';
@@ -32,7 +32,7 @@ import {ProfileFormComponent} from './views/profile/profile-form/profile-form.co
 import {OrderByPipe} from './shared/pipes/order-by.pipe';
 import {AddSpaceComponent} from './views/spaces/add-space/add-space.component';
 import {PopulateMatchesPipe} from './shared/pipes/populate-matches.pipe';
-import {DropFormComponent} from './views/drops/drop-form/drop-form.component';
+import {RainFormComponent} from './views/rain/rain-form/rain-form.component';
 
 const appRoutes: Routes = [
     {
@@ -82,14 +82,14 @@ const appRoutes: Routes = [
         OrderByPipe,
         AddSpaceComponent,
         PopulateMatchesPipe,
-        DropFormComponent
+        RainFormComponent
     ],
     providers: [
         SpacesService,
         OauthSettingsService,
         SpaceItemService,
         ProfileService,
-        DropService,
+        RainService,
         SchemaValuePipe
     ],
     bootstrap: [AppComponent]

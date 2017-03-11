@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {SpacesService} from '../../../services/spaces.service';
 import {ActivatedRoute} from '@angular/router';
 import {SpaceConfigComponent} from '../../../shared/component/space-config/space-config.component';
@@ -9,9 +9,7 @@ import {OauthSettingsService} from '../../../services/space/oauth-settings.servi
 import {FileUploader} from 'ng2-file-upload';
 import {ProfileService} from '../../../services/profile/profile.service';
 import {Profile} from '../../../models/profile.model';
-import {ProfileFormComponent} from '../../profile/profile-form/profile-form.component';
-import {Drop} from '../../../models/drop.model';
-import {DropService} from '../../../services/drop/drop.service';
+import {Rain} from '../../../models/rain.model';
 import {SpaceItemService} from '../../../shared/services/space-item/space-item.service';
 
 @Component({
@@ -23,31 +21,28 @@ import {SpaceItemService} from '../../../shared/services/space-item/space-item.s
 export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
     public space: Space = null;
-    private dropFetchUrl = null;
+    public rain: Array<Rain> = [];
+    public rainSchemas: Array<any> = [];
     public profile: Profile = null;
-    public drops: Array<Drop> = [];
     public profileSchema: any = null;
-    public dropSchemas: Array<any> = [];
     public uploader: FileUploader;
     protected isFetchingSchema = false;
-    protected isProfileReset = false;
     protected schemaObjectOverride: string = null;
-    protected activeTab = 'drops';
-    @ViewChild(ProfileFormComponent) protected profileFormComponent;
+    protected activeTab = 'rain';
+    private rainFetchUrl = null;
 
     constructor(spacesService: SpacesService,
                 oauthService: OauthSettingsService,
                 spaceItemService: SpaceItemService,
                 profileService: ProfileService,
-                dropService: DropService,
                 activatedRoute: ActivatedRoute) {
-        super(spacesService, oauthService, spaceItemService, profileService, dropService, activatedRoute);
+        super(spacesService, oauthService, spaceItemService, profileService, activatedRoute);
     }
 
     ngOnInit() {
 
         const spaceConfig$ = this.retrieveSpace$
-            .switchMap(() => this.getDrops())
+            .switchMap(() => this.getRawRain())
             .switchMap(() => this.getProfile())
             .mergeMap(() => this.getRawProfile())
             .do((profileSchema) => {
@@ -56,7 +51,7 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
         spaceConfig$.subscribe(() => {
 
-            this.dropFetchUrl = Paths.DROP_FETCH_URL[this.space.name];
+            this.rainFetchUrl = Paths.DROP_FETCH_URL[this.space.name];
 
             window.document.title = `${this.space.name} | view space`;
 
@@ -84,9 +79,10 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
         });
     }
 
-    private getDrops(): any {
-        return this.spaceItemService.fetchSchema(this.space.name, 'drop').do((drops) => {
-            this.dropSchemas = drops.map(dropSchema => new DimensionSchema(dropSchema['type'], dropSchema['content'], dropSchema.modified));
+    private getRawRain(): any {
+        return this.spaceItemService.fetchSchema(this.space.name, 'rain').do((rain) => {
+            // this.rainSchemas = rain.map(rainSchema => new DimensionSchema(rainSchema['type'], rainSchema['content'], rainSchema.modified));
+            this.rainSchemas.push(new DimensionSchema(rain.type, rain.content, rain.modified));
         });
     }
 
@@ -96,11 +92,9 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
         });
     }
 
+    protected resetRain(): any {
 
-    protected fetchDropSchema(): any {
-
-
-        if (!this.dropFetchUrl) {
+        if (!this.rainFetchUrl) {
             console.error(`there is no profile getter path for ${this.space.name}`);
             return;
         }
@@ -109,24 +103,37 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
         // start with spaceOauthSettings values, for most /api/space/endpoint usages
         const data = Object.assign(this.spaceOauthSettings);
-        data['apiEndpointUrl'] = this.dropFetchUrl;
+        data['apiEndpointUrl'] = this.rainFetchUrl;
         data['action'] = 'schema.write';
-        data['type'] = 'drop.post';
+        data['type'] = 'rain';
         data['space'] = this.space.name;
 
-        const profileSchema$ = this.spacesService.spaceEndpoint(this.space, data).do((resetDropSchema) => {
-            this.dropSchemas.map(schemas => {
+        const profileSchema$ = this.spacesService.spaceEndpoint(this.space, data).do((resetRainSchema) => {
+            this.rainSchemas = this.rainSchemas.map(schemas => {
                 if (schemas.type === data.type) {
-                    return new DimensionSchema(resetDropSchema['type'], resetDropSchema['content'], resetDropSchema.modified);
+                    return new DimensionSchema(resetRainSchema['type'], resetRainSchema['content'], resetRainSchema.modified);
                 }
             });
+
         });
 
         profileSchema$.subscribe(() => this.isFetchingSchema = false);
 
     }
+
     protected updateSpace(space: Space): void {
         this.spacesService.updateSpace(space).subscribe();
+    }
+
+    protected updateRainSchema(schema): any {
+
+        console.log(schema);
+        this.rainSchemas = this.rainSchemas.map(s => {
+            if (s.type === schema.type) {
+                return new DimensionSchema(schema['type'], schema['content'], schema.modified);
+            }
+        });
+
     }
 
     public removeSpace(): void {

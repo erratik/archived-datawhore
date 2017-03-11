@@ -4,8 +4,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 } )
 export class OrderByPipe implements PipeTransform {
     transform( array: any, orderField: string, orderType: boolean ): Array<string> {
-        console.log();
-        debugger;
+
         array.sort( ( a: any, b: any ) => {
             let ae = a[ orderField ];
             let be = b[ orderField ];

@@ -22,7 +22,7 @@ var getEndpoint = function (data, cb) {
         });
     }
     else {
-        cb({ message: 'no endpoints set for ' + data.action });
+        cb('no endpoints set for ' + data.action);
     }
 };
 var postEndpoint = function (data, content, cb) {

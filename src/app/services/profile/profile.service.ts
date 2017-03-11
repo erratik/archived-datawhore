@@ -19,7 +19,7 @@ export class ProfileService extends SpaceItemService {
             .catch(this.handleError);
     }
 
-    public updateProfile(space: string, profile: any): Observable<any> {
+    public update(space: string, profile: any): Observable<any> {
         const bodyString = JSON.stringify({
             data: profile
         });

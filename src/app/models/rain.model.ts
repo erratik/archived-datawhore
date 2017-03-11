@@ -5,10 +5,10 @@ export class Dimension {
     }
 }
 
-export class Drop {
+export class Rain {
     constructor(public space: string,
                 public properties: Array<Dimension>,
-                public dropType: string = null,
+                public rainType: string = null,
                 public modified?: number) {
         if (this.properties) {
             this.properties = this.assignProperties();

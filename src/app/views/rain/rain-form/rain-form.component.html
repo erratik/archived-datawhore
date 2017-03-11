@@ -1,0 +1,18 @@
+<datawhore-dim-list [model]="model"></datawhore-dim-list>
+<div *ngIf="haveDimsChanged()">
+    <hr>
+    <label class="label">
+        <span class="icon is-primary"><i class="fa fa-exclamation-circle"></i></span>
+        Override object path to rain schema
+    </label>
+    <div class="control is-flex">
+        <input #overrideRain class="input" type="text" placeholder="Enter object path (a.b.c)"
+               [(ngModel)]="schemaObjectOverride">
+        <a class="button is-success" *ngIf="overrideRain.value"
+           (click)="saveRawRain(overrideRain.value)">
+            Save
+        </a>
+    </div>
+</div>
+<hr>
+<a (click)="saveRain()" class="button is-success" *ngIf="haveDimsChanged() || !schemaObjectOverride">Save</a>

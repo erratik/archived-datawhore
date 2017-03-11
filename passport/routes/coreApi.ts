@@ -25,7 +25,7 @@ let getEndpoint = (data, cb) => {
             cb(resp);
         });
     } else {
-        cb({message: 'no endpoints set for ' + data.action})
+        cb('no endpoints set for ' + data.action)
     }
 };
 

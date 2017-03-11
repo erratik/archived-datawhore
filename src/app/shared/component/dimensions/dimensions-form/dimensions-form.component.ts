@@ -1,8 +1,8 @@
-import {Component, OnInit, Input, EventEmitter, Output} from '@angular/core';
-import {SpacesService} from '../../../../services/spaces.service';
+import {Component, Input, EventEmitter, Output} from '@angular/core';
 import {Space} from '../../../../models/space.model';
 import {Dimension} from '../../../../models/profile.model';
 import {ProfileService} from '../../../../services/profile/profile.service';
+import {RainService} from '../../../../services/rain/rain.service';
 
 @Component({
     selector: 'datawhore-dim-form',
@@ -18,8 +18,8 @@ export class DimensionFormComponent {
     @Input() public dimType: string;
     @Output() public onNewDimensions = new EventEmitter<any>();
 
-    constructor(public profileService: ProfileService) {
-    }
+    constructor(public profileService: ProfileService,
+                public rainService: RainService) {}
 
     public haveDimsChanged(): boolean {
         return JSON.stringify(this.model) !== this.initialModel;
@@ -29,7 +29,7 @@ export class DimensionFormComponent {
 
         this.dims = [];
 
-        const dimensions$ = this[`${this.dimType}Service`].updateProfile(this.space.name, this.prepareDimensions()).do((dims) => {
+        const dimensions$ = this[`${this.dimType}Service`].update(this.space.name, this.prepareDimensions()).do((dims) => {
             this.dims = dims.map(dim => new Dimension(dim.friendlyName, dim.schemaPath));
             this.onNewDimensions.emit([this.dims, this.dimType]);
 

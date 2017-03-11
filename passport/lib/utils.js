@@ -8,7 +8,7 @@ module.exports = {
 
 
         endpoints.schema.write(settings.space, profile, 'profile', function(schema) {
-            // console.log('connect profile saving', schema);
+            console.log('connect profile saving', profile);
             settings.extras  = Object.keys(extras).map(key => {
                 return {
                     'type': 'oauth',
@@ -17,7 +17,7 @@ module.exports = {
                 };
             });
 
-            // console.log('saving passport', settings);
+            console.log('saving passport', settings);
             Setting.updateSettings(settings, function (settings) {
                     done(null, settings);
                 }

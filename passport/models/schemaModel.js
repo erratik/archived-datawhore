@@ -24,11 +24,11 @@ var SchemaSchema = {
                     });
                     docs.push(schema);
                 }
-                if (schemaType !== 'drop') {
+                if (schemaType !== 'rain') {
                     cb(docs[0].schemas.filter(function (schema) { return schema.type === schemaType; })[0]);
                 }
                 else {
-                    cb(docs[0].schemas.filter(function (schema) { return schema.type.includes('drop'); }));
+                    cb(docs[0].schemas.filter(function (schema) { return schema.type.includes('rain'); }));
                 }
             });
         },

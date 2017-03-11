@@ -44,7 +44,7 @@
         <div class="tabs">
             <ul>
                 <li (click)="setActiveTab('profile')" [class.is-active]="activeTab === 'profile'"><a>Profile</a></li>
-                <li (click)="setActiveTab('drops')" [class.is-active]="activeTab === 'drops'"><a>Drops</a></li>
+                <li (click)="setActiveTab('rain')" [class.is-active]="activeTab === 'rain'"><a>Rain</a></li>
                 <li (click)="setActiveTab('space')" [class.is-active]="activeTab === 'space'"><a>Space</a></li>
             </ul>
         </div>
@@ -83,8 +83,7 @@
                     <div *ngIf="profileSchema?.propertyBucket">
 
                         <div [class.is-loading]="isFetchingSchema">
-                            <datawhore-profile-form [model]="profileSchema?.propertyBucket"
-                                                    [profileSchema]="profileSchema"
+                            <datawhore-profile-form [model]="profileSchema"
                                                     [dimType]="'profile'" [space]="space"
                                                     (onProfileSchema)="profileSchema = $event"
                                                     (onNewDimensions)="newDimensions($event)"></datawhore-profile-form>
@@ -109,19 +108,52 @@
 
             </div>
         </div>
-        <div class="tab space" *ngSwitchCase="'drops'">
+        <div class="tab space" *ngSwitchCase="'rain'">
 
             <div class="header">
-                <h2 class="is-pulled-left heading">Drop Settings</h2>
-            </div>
-            <div class="configure-drop">
+                <h2 class="is-pulled-left heading">Rain Configuration</h2>
                 <a class="button is-small is-warning" [class.is-loading]="isFetchingSchema"
-                   (click)="fetchDropSchema('post')">
+                   (click)="resetRain('post')">
                     <span class="icon is-small"><i class="fa fa-refresh"></i></span>
                     <span>Fetch schema</span>
                 </a>
-                <pre>{{dropSchemas | json}}</pre>
             </div>
+            <article class="media columns" *ngFor="let rainSchema of rainSchemas">
+                <div class="column is-half" *ngIf="profile">
+                    <div class=" configure-rain">
+                        <datawhore-rain-form
+                                [model]="rainSchema"
+                                [dimType]="'rain'" [space]="space"
+                                (onRainSchema)="updateRainSchema($event)"
+                                (onNewDimensions)="newDimensions($event)">
+
+                        </datawhore-rain-form>
+                    </div>
+                </div>
+                <div class="column is-half" *ngIf="rain.length">
+
+                    <div class="header">
+                        <h3 class="is-pulled-left heading">Profile Structure & Example</h3>
+                    </div>
+                    <hr>
+                    <div class="structure">
+                        <ul>
+                            <li *ngFor="let property of profile.properties">
+                                {{property.friendlyName}} ⇢ <cite>{{property.schemaPath}}</cite>
+                            </li>
+                        </ul>
+                        <p *ngIf="!profile?.properties">
+                            No profile properties yet
+                        </p>
+                    </div>
+
+                    <div class="example" *ngIf="profile?.properties">
+                        <datawhore-space-item [properties]="profile.properties" [type]="'profile'"
+                                              [space]="space"
+                                              (linkingToSpace)="updateSpace($event)"></datawhore-space-item>
+                    </div>
+                </div>
+            </article>
         </div>
         <div class="tab space" *ngSwitchCase="'space'">
 

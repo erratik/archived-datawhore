@@ -2,8 +2,7 @@ import {Component, OnInit, Output, EventEmitter, Input} from '@angular/core';
 import {DimensionFormComponent} from '../../../shared/component/dimensions/dimensions-form/dimensions-form.component';
 import {ProfileService} from '../../../services/profile/profile.service';
 import {DimensionSchema} from '../../../models/dimension-schema.model';
-import {Observable} from 'rxjs';
-import {SpaceOauthSettings} from '../../../models/space-settings.model';
+import {RainService} from '../../../services/rain/rain.service';
 const objectPath = require('object-path');
 
 @Component({
@@ -14,12 +13,12 @@ const objectPath = require('object-path');
 export class ProfileFormComponent extends DimensionFormComponent implements OnInit {
 
     public isProfileReset = false;
-    @Input() public profileSchema;
     @Input() public isFetchingSchema;
     @Output() onProfileSchema = new EventEmitter<any>();
 
-    constructor(profileService: ProfileService) {
-        super(profileService);
+    constructor(profileService: ProfileService,
+                rainService: RainService) {
+        super(profileService, rainService);
     }
 
     ngOnInit() {
@@ -32,10 +31,7 @@ export class ProfileFormComponent extends DimensionFormComponent implements OnIn
 
     protected saveRawProfile(schema): any {
 
-        schema = objectPath.get(this.profileSchema, `content.${schema}`);
-        // schema = this.profileSchema.content;
-        // console.log(this.model)
-        // debugger;
+        schema = objectPath.get(this.model, `content.${schema}`);
         const profileSchema$ = this.profileService.updateSchema(this.space.name, schema).do((profileSchema) => {
             this.onProfileSchema.emit(new DimensionSchema(profileSchema['type'], profileSchema['content'], profileSchema.modified));
         });
