@@ -150,7 +150,7 @@
                             <span *ngIf="!space.oauth.connected">Connect</span>
                             <span *ngIf="space.oauth.connected">Reconnect</span>
                         </a>
-                        <a class="button is-success" (click)="updatespaceSettings()">
+                        <a class="button is-success" (click)="updateSpaceSettings()">
                             <span>Save</span>
                         </a>
                         <a class="button" (click)="space.inEditMode = false">
@@ -172,7 +172,7 @@
                     </details>
                 </div>
                 <a class="button is-{{(space?.oauth.configured)? 'primary' : 'success'}}"
-                   (click)="toggleEditspace(space)" *ngIf="!space?.inEditMode">
+                   (click)="toggleEditSpace(space)" *ngIf="!space?.inEditMode">
                     <span class="fa fa-{{(space?.oauth.configured)? 'edit' : 'plus-circle'}} icon"></span>
                     <span>{{(space?.oauth.configured) ? 'Edit' : 'Add'}} Oauth Settings</span>
                 </a>

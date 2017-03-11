@@ -6,6 +6,7 @@
 
 # dependencies
 /node_modules
+/**/node_modules
 
 # IDEs and editors
 /.idea
@@ -40,8 +41,4 @@ testem.log
 Thumbs.db
 
 /src2
-/node_modules
-/api/node_modules
-/api/oauth-sign
-/api/config.json
 /src/assets/uploads/.tmp

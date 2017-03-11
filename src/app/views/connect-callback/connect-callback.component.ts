@@ -96,14 +96,16 @@ export class ConnectCallbackComponent implements OnInit {
                     };
                 }
 
+                return this.space;
+
             })
-            .switchMap(() => this.oauthService.requestAccessToken(this.space, this.skipTokenRequest, this.oauth2))
+            // .switchMap(() => this.oauthService.requestAccessToken(this.space, this.skipTokenRequest, this.oauth2))
             .do((spaceWithCredentials) => {
                 console.log(spaceWithCredentials);
                 // save space with api credentials
-                this.oauthService.updateSpaceSettings(spaceWithCredentials).subscribe(() => {
+                this.oauthService.updateSpaceSettings(this.space).subscribe(() => {
                     this.isRequestingAccessToken = false;
-                    this.router.navigate([`/space/${this.space.name}`]);
+                    // this.router.navigate([`/space/${this.space.name}`]);
                 });
 
             });

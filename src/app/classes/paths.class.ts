@@ -15,8 +15,8 @@ export class Paths {
         twitter: '/1.1/users/show.json?screen_name=erratiktart&include_entities=false',
         instagram: '/v1/users/self/',
         spotify: '/v1/me',
-        facebook: '/me',
-        tumblr: '/v2/blog/erratik.tumblr.com/info',
+        facebook: '/me?fields=about,cover,id,updated_time,picture,friends',
+        tumblr: '/v2/user/info',
         swarm: '/v2/users/self',
         moves: '/user/profile'
     };

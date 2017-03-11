@@ -25,11 +25,7 @@ export class SpaceConfigComponent {
     public retrieveSpace$: Observable<SpaceOauthSettings> = new Observable<SpaceOauthSettings>();
     @Output() public gotOauthSettings: EventEmitter<SpaceOauthSettings> = new EventEmitter<SpaceOauthSettings>();
     @ViewChild(SpaceItemComponent) public spaceItemComponent;
-
-
-    public toggleEditSpace(): void {
-        this.space.inEditMode = !this.space.inEditMode;
-    }
+    
 
     constructor(public spacesService: SpacesService,
                 public oauthService: OauthSettingsService,
@@ -68,6 +64,9 @@ export class SpaceConfigComponent {
                 // console.log(this.space.oauth.extras.filter(settings => settings.label === 'accessToken'))
                 if (this.space.oauth.connected) {
                     this.spaceOauthSettings.accessToken = this.space.oauth.extras.filter(settings => settings.label === 'accessToken')[0].value;
+                    if (this.space.oauth.extras.filter(settings => settings.label === 'tokenSecret').length) {
+                        this.spaceOauthSettings.tokenSecret = this.space.oauth.extras.filter(settings => settings.label === 'tokenSecret')[0].value;
+                    }
                     // check if we have refresh token data and when it expires
                     this.space.oauth.extras.filter(extra => {
                         if (extra.label.indexOf('expire') !== -1) {
@@ -94,7 +93,7 @@ export class SpaceConfigComponent {
     public updateSpaceSettings(): any {
         this.oauthService.updateSpaceSettings(this.space).subscribe((settings) => {
             this.space.oauth = settings;
-            this.spaceItemComponent.findSpaceLinkables();
+            this.spaceItemComponent.findSpaceLinks();
             this.space.inEditMode = false;
         });
     }

@@ -6,7 +6,7 @@ let Profile = require('../models/profileModel');
 module.exports = {
     schema: {
         write: function (space, content, type, cb) {
-
+            console.log(content)
             // then we have other type of schema, using request(), instead of https(),
             // so... not twitter, so far...
             content = (typeof content === 'string') ? JSON.parse(content) : content;

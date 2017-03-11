@@ -40,6 +40,9 @@ const appRoutes: Routes = [
         pathMatch: 'full'
     },
     {
+        path: 'login', component: EditSpacesComponent
+    },
+    {
         path: 'spaces', component: EditSpacesComponent
     },
     {
