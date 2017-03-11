@@ -21,7 +21,6 @@ import {SettingsViewComponent} from './views/settings/settings.component';
 import {EditSpacesComponent} from './views/spaces/edit-spaces/edit-spaces.component';
 
 import {ValuesPipePipe} from './shared/pipes/values-pipe.pipe';
-import {ConnectCallbackComponent} from './views/connect-callback/connect-callback.component';
 import {SpaceViewComponent} from './views/spaces/view-space/view-space.component';
 import {SpaceConfigComponent} from './shared/component/space-config/space-config.component';
 import {DimensionListComponent} from './shared/component/dimensions/dimensions-list/dimensions-list.component';
@@ -49,12 +48,6 @@ const appRoutes: Routes = [
         path: 'space/:space', component: SpaceViewComponent
     },
     {
-        path: 'oauth/connect/:space/', component: ConnectCallbackComponent
-    },
-    {
-        path: 'connect/:space/callback', component: ConnectCallbackComponent
-    },
-    {
         path: 'settings', component: SettingsViewComponent
     },
 ];
@@ -77,7 +70,6 @@ const appRoutes: Routes = [
         FileSelectDirective,
         EditSpacesComponent,
         ValuesPipePipe,
-        ConnectCallbackComponent,
         SpaceViewComponent,
         SpaceConfigComponent,
         DimensionListComponent,
