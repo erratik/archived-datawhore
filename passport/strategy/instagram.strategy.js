@@ -24,7 +24,9 @@ module.exports = function (app) {
 
     });
 
-    app.get('/auth/instagram', passport.authenticate(space));
+    app.get('/auth/instagram', passport.authenticate(space, {
+        scope: ['basic', 'public_content', 'likes', 'comments', 'follower_list', 'relationships']
+    }));
     app.get('/auth/instagram/callback', passport.authenticate(space, {
         successRedirect: `http://datawhore.erratik.ca:4200/space/${space}`,
         failureRedirect: 'http://datawhore.erratik.ca:4200'

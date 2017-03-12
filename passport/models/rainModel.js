@@ -11,9 +11,8 @@ var RainSchema = {
         dimensions: [dimensionSchema]
     },
     self: {
-        findByRain: function (space, cb) {
+        findBySpace: function (space, cb) {
             return this.find({ space: space }, function (err, rain) {
-                console.log(rain);
                 cb(rain);
             });
         },

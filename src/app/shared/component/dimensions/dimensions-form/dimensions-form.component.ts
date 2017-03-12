@@ -44,6 +44,9 @@ export class DimensionFormComponent {
             dimensions.forEach(dim => {
                 if (dim) {
                     if (dim.grouped) {
+                        if (dim.content.enabled) {
+                            this.dims.push(dim.content);
+                        }
                         groupEnabled(dim.content.value);
                     } else if (dim.content.enabled) {
                         this.dims.push(dim.content);

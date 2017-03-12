@@ -48,7 +48,7 @@ export class OauthSettingsService {
             settingsRes.modified
         );
 
-        console.log(settingsRes);
+        // console.log(settingsRes);
         return settingsRes;
     }
 
