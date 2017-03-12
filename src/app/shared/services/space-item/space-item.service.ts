@@ -13,10 +13,9 @@ export class SpaceItemService {
     constructor(public http: Http) {
     }
 
-    public fetchSchema(space: string, type = this.type): Observable<any> {
-        return this.http.get(`${this.apiServer}/get/schema/${space}?type=${type}`).map((res: Response) => {
-            return res.json();
-        }).catch(this.handleError);
+    public fetchSchema(space: string, schemaType = this.type): Observable<any> {
+        return this.http.get(`${this.apiServer}/get/schema/${space}?type=${schemaType}`).map((res: Response) => res.json())
+            .catch(this.handleError);
     }
 
     public updateSchema(space: string, schema: any, type = this.type): Observable<any> {

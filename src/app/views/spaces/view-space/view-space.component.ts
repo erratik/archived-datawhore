@@ -9,8 +9,9 @@ import {OauthSettingsService} from '../../../services/space/oauth-settings.servi
 import {FileUploader} from 'ng2-file-upload';
 import {ProfileService} from '../../../services/profile/profile.service';
 import {Profile} from '../../../models/profile.model';
-import {Rain} from '../../../models/rain.model';
+import {Rain, Dimension} from '../../../models/rain.model';
 import {SpaceItemService} from '../../../shared/services/space-item/space-item.service';
+import {RainService} from '../../../services/rain/rain.service';
 
 @Component({
     selector: 'datawhore-view-space',
@@ -35,13 +36,14 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
                 oauthService: OauthSettingsService,
                 spaceItemService: SpaceItemService,
                 profileService: ProfileService,
+                rainService: RainService,
                 activatedRoute: ActivatedRoute) {
-        super(spacesService, oauthService, spaceItemService, profileService, activatedRoute);
+        super(spacesService, oauthService, spaceItemService, profileService, rainService, activatedRoute);
     }
 
     ngOnInit() {
-
         const spaceConfig$ = this.retrieveSpace$
+            .switchMap(() => this.getRain())
             .switchMap(() => this.getRawRain())
             .switchMap(() => this.getProfile())
             .mergeMap(() => this.getRawProfile())
@@ -58,6 +60,7 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
             // to know what's already selected and renamed
             if (this.profileSchema.propertyBucket) {
                 this.profile.createPropertyBucket(this.profileSchema.propertyBucket);
+                this.rain.forEach((r, i) => r.createPropertyBucket(this.rainSchemas[i].propertyBucket));
             }
 
 
@@ -79,10 +82,20 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
         });
     }
 
+    private getRain(): any {
+        return this.rainService.getRain(this.space.name).do((rain) => {
+            this.rain = rain.map(r => new Rain(
+                    this.space.name,
+                    r.dimensions.map(dims => new Dimension(dims.friendlyName, dims.schemaPath)),
+                    'drop',
+                    r.modified
+            ));
+        });
+    }
+
     private getRawRain(): any {
         return this.spaceItemService.fetchSchema(this.space.name, 'rain').do((rain) => {
-            // this.rainSchemas = rain.map(rainSchema => new DimensionSchema(rainSchema['type'], rainSchema['content'], rainSchema.modified));
-            this.rainSchemas.push(new DimensionSchema(rain.type, rain.content, rain.modified));
+            this.rainSchemas = rain.map(rainSchema => new DimensionSchema(rainSchema['type'], rainSchema['content'], rainSchema.modified));
         });
     }
 

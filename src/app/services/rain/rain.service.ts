@@ -12,6 +12,12 @@ export class RainService extends SpaceItemService {
     super(http);
   }
 
+  public getRain(space: string): Observable<any> {
+    return this.http.get(`${this.apiServer}/get/rain/${space}`)
+        .map((res: Response) => res.json())
+        .catch(this.handleError);
+  }
+
   public update(space: string, rain: any): Observable<any> {
     const bodyString = JSON.stringify({
       data: rain

@@ -10,6 +10,7 @@ import {ProfileService} from '../../../services/profile/profile.service';
 import {Profile} from '../../../models/profile.model';
 import {SpaceItemComponent} from '../space-item/space-item.component';
 import {SpaceItemService} from '../../services/space-item/space-item.service';
+import {RainService} from '../../../services/rain/rain.service';
 
 @Component({
     selector: 'datawhore-space-config',
@@ -31,6 +32,7 @@ export class SpaceConfigComponent {
                 public oauthService: OauthSettingsService,
                 public spaceItemService?: SpaceItemService,
                 public profileService?: ProfileService,
+                public rainService?: RainService,
                 private activatedRoute?: ActivatedRoute,
                 public router?: Router) {
 

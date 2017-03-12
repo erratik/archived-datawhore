@@ -3,6 +3,7 @@ import {Dimension} from '../../../models/profile.model';
 import {ProfileService} from '../../../services/profile/profile.service';
 import {Space} from '../../../models/space.model';
 import {SpacesService} from '../../../services/spaces.service';
+import {RainService} from '../../../services/rain/rain.service';
 const objectPath = require('object-path');
 
 @Component({
@@ -20,12 +21,17 @@ export class SpaceItemComponent implements OnInit {
 
 
     constructor(private profileService: ProfileService,
+                private rainService: RainService,
                 private spacesService: SpacesService) {
     }
 
     ngOnInit() {
-        const itemSchema$ = this[`${this.type}Service`].fetchSchema(this.space.name).do((rawSchema) => this.schema = rawSchema);
+        const itemSchema$ = this[`${this.type}Service`].fetchSchema(this.space.name).do((rawSchema) => {
+            // debugger;
+            this.schema = rawSchema.length ? rawSchema[0] : rawSchema;
+        });
         itemSchema$.subscribe(() => {
+            // debugger;
             this.findSpaceLinks();
         });
     }

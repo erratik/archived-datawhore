@@ -26,7 +26,7 @@ export class ProfileFormComponent extends DimensionFormComponent implements OnIn
     }
 
     protected saveProfile(): void {
-        this.saveDimensions();
+        this.saveDimensions(this.model.propertyBucket);
     }
 
     protected saveRawProfile(schema): any {

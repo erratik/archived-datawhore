@@ -37,7 +37,6 @@ export class Rain {
 
             });
         }
-        // debugger;
 
         return propertyBucket;
     }

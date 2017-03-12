@@ -1,7 +1,8 @@
-let Schema = require('../models/schemaModel');
-let Setting = require('../models/settingModel');
-let Space = require('../models/spaceModel');
-let Profile = require('../models/profileModel');
+const Schema = require('../models/schemaModel');
+const Setting = require('../models/settingModel');
+const Space = require('../models/spaceModel');
+const Profile = require('../models/profileModel');
+const Rain = require('../models/rainModel');
 
 module.exports = {
     schema: {
@@ -56,16 +57,23 @@ module.exports = {
 
         }*/
     },
+    rain: {
+        write: function (space, content, type = null, cb) {
+            Rain.updateRain(space, content, (updatedRain) => {
+                console.log(updatedRain);
+                cb(content);
+            });
+        },
+        get: function (space, type = null, cb) {
+            Rain.findBySpace(space, (rain) => cb(rain));
+        }
+    },
     settings: {
         write: function (space, content, type = null, cb) {
-
             Setting.updateSettings(content, (updatedSettings) => cb(content));
-
         },
         get: function (space, type, cb) {
-
             Setting.findSettings(space, (settings) => cb(settings));
-
         }
     }
 };

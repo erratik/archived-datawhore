@@ -5,6 +5,6 @@
                *ngIf="property.linkableToSpace"
                (click)="linkItemToSpace(property)"></a></td>
         <td>{{property.friendlyName}}</td>
-        <td>{{property.schemaPath | schemaValue: 'profile': schema}}</td>
+        <td>{{property.schemaPath | schemaValue:schema}}</td>
     </tr>
 </table>
