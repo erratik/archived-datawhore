@@ -7,11 +7,13 @@ var mkdirp = require('mkdirp');
 var request = require('request');
 var https = require('https');
 var OAuth = require('oauth');
+var refresh = require('passport-oauth2-refresh');
 var Space = require('../models/spaceModel');
 var Setting = require('../models/settingModel');
 var Schema = require('../models/schemaModel');
 var endpoints = require('./endpoints');
 var objectPath = require('object-path');
+var Utils = require('../lib/utils');
 // my own endpoints, read/write in mongo docs
 var getEndpoint = function (data, cb) {
     console.log("[getEndpoint] " + data.action + " -> ", data);
@@ -26,7 +28,7 @@ var getEndpoint = function (data, cb) {
     }
 };
 var postEndpoint = function (data, content, cb) {
-    // console.log(`[postEndpoint] ${data.action} -> `, data);
+    console.log("[postEndpoint] " + data.action + " -> ", data);
     var endpointAction = objectPath.get(endpoints, data.action);
     return endpointAction(data.space, content, data.type, function (resp) {
         cb(resp);
@@ -77,16 +79,16 @@ router.post('/endpoint/space', function (req, res) {
     console.log('data', req.body.data);
     var data = req.body.data;
     var options;
-    // requests to apis that need spaceOauthSettings shit
     if (data.apiEndpointUrl) {
         switch (data.space) {
+            // OAuth Authorization requests
             case 'tumblr':
             case 'twitter':
                 options = {
                     hostname: data.apiUrl,
                     path: data.apiEndpointUrl,
                     headers: {
-                        Authorization: getEchoAuth(data)
+                        Authorization: makeOAuthHeaders(data)
                     }
                 };
                 console.log(options);
@@ -102,12 +104,12 @@ router.post('/endpoint/space', function (req, res) {
                         endpointAction(data.space, response, data.type, function (updatedResponse) {
                             res.json(updatedResponse);
                         });
+                        // postEndpoint(req.body.data, response, (resp) => res.json(resp));
                     });
                 });
                 break;
+            // Access Token requests
             default:
-                console.log('api endpoints, by access_token query');
-                // console.log(options);
                 if (!data.apiEndpointUrl.includes('?')) {
                     data.apiEndpointUrl += '?erratik=datawhore';
                 }
@@ -118,14 +120,45 @@ router.post('/endpoint/space', function (req, res) {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     }
                 };
-                request(options, function (error, response, body) {
+                // let fakeError = 401;
+                var requestDataWithToken_1 = function () { return request(options, function (error, response, body) {
                     if (error) {
                         res.send(error);
                     }
-                    if (data.action.includes('.write')) {
-                        postEndpoint(req.body.data, body, function (resp) { return res.json(resp); });
+                    if (typeof body !== 'undefined') {
+                        var err = JSON.parse(body).error || {};
+                        // err.status = fakeError === 200 ? 200 : 401;
+                        console.log('requestData running ...', err.status);
+                        if (err.status === 401) {
+                            console.log('refreshing tokens');
+                            Setting.findSettings(data.space, function (settings) {
+                                refresh.requestNewAccessToken(data.space, data.refreshToken, function (_e, accessToken, refreshToken) {
+                                    // `refreshToken` may or may not exist, depending on the strategy you are using.
+                                    refreshToken = refreshToken ? refreshToken : data.refreshToken;
+                                    var keys = { accessToken: accessToken, refreshToken: refreshToken };
+                                    settings.extras = Object.keys(keys).map(function (key) {
+                                        return {
+                                            'type': 'oauth',
+                                            'value': keys[key],
+                                            'label': key
+                                        };
+                                    });
+                                    console.log(settings.extras);
+                                    Setting.updateSettings(settings, function () {
+                                        data.accessToken = accessToken;
+                                        console.log('saved new token: ' + accessToken);
+                                        // fakeError = 200;
+                                        requestDataWithToken_1();
+                                    });
+                                });
+                            });
+                        }
+                        else {
+                            postEndpoint(req.body.data, body, function (resp) { return res.json(resp); });
+                        }
                     }
-                });
+                }); };
+                requestDataWithToken_1();
         }
     }
 });
@@ -156,7 +189,7 @@ router.post('/upload/:space/:folder/:filename', function (req, res) {
         // res.json(req.file);
     });
 });
-function getEchoAuth(data) {
+function makeOAuthHeaders(data) {
     // helper to construct echo/oauth headers from URL
     var oauth = new OAuth.OAuth("https://" + data.apiUrl + "/oauth/request_token", "https://" + data.apiUrl + "/oauth/access_token", data.apiKey, // test app token
     data.apiSecret, // test app secret

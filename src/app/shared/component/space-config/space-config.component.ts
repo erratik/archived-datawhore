@@ -70,6 +70,9 @@ export class SpaceConfigComponent {
                     if (this.space.oauth.extras.filter(settings => settings.label === 'tokenSecret').length) {
                         this.spaceOauthSettings.tokenSecret = this.space.oauth.extras.filter(settings => settings.label === 'tokenSecret')[0].value;
                     }
+                    if (this.space.oauth.extras.filter(settings => settings.label === 'refreshToken').length) {
+                        this.spaceOauthSettings.refreshToken = this.space.oauth.extras.filter(settings => settings.label === 'refreshToken')[0].value;
+                    }
                     // check if we have refresh token data and when it expires
                     this.space.oauth.extras.filter(extra => {
                         if (extra.label.indexOf('expire') !== -1) {

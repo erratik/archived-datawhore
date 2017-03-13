@@ -2,19 +2,22 @@ const express = require('express');
 const passport = require('passport');
 const router = express.Router();
 
-let multer = require('multer');
-let fs = require('fs');
-let mkdirp = require('mkdirp');
-let request = require('request');
-let https = require('https');
-let OAuth = require('oauth');
+const multer = require('multer');
+const fs = require('fs');
+const mkdirp = require('mkdirp');
+const request = require('request');
+const https = require('https');
+const OAuth = require('oauth');
+const refresh = require('passport-oauth2-refresh');
 
-let Space = require('../models/spaceModel');
-let Setting = require('../models/settingModel');
-let Schema = require('../models/schemaModel');
+const Space = require('../models/spaceModel');
+const Setting = require('../models/settingModel');
+const Schema = require('../models/schemaModel');
 
-let endpoints = require('./endpoints');
-let objectPath = require('object-path');
+const endpoints = require('./endpoints');
+const objectPath = require('object-path');
+const Utils = require('../lib/utils');
+
 
 // my own endpoints, read/write in mongo docs
 let getEndpoint = (data, cb) => {
@@ -30,7 +33,7 @@ let getEndpoint = (data, cb) => {
 };
 
 let postEndpoint = (data, content, cb) => {
-    // console.log(`[postEndpoint] ${data.action} -> `, data);
+    console.log(`[postEndpoint] ${data.action} -> `, data);
     const endpointAction = objectPath.get(endpoints, data.action);
     return endpointAction(data.space, content, data.type, function (resp) {
         cb(resp);
@@ -65,7 +68,7 @@ router
         };
 
         getEndpoint(data, (resp) => {
-           // console.log(`[endpoints.${data.action} response]`, resp);
+            // console.log(`[endpoints.${data.action} response]`, resp);
             res.status(200).send(resp);
         })
     })
@@ -91,20 +94,19 @@ router.post('/endpoint/space', function (req, res) {
     const data = req.body.data;
 
     let options;
-    // requests to apis that need spaceOauthSettings shit
     if (data.apiEndpointUrl) {
         switch (data.space) {
 
+            // OAuth Authorization requests
             case 'tumblr':
             case 'twitter':
                 options = {
                     hostname: data.apiUrl,
                     path: data.apiEndpointUrl,
                     headers: {
-                        Authorization: getEchoAuth(data)
+                        Authorization: makeOAuthHeaders(data)
                     }
                 };
-
                 console.log(options);
 
                 https.get(options, function (result) {
@@ -120,14 +122,14 @@ router.post('/endpoint/space', function (req, res) {
                         endpointAction(data.space, response, data.type, function (updatedResponse) {
                             res.json(updatedResponse);
                         });
+
+                        // postEndpoint(req.body.data, response, (resp) => res.json(resp));
                     });
                 });
-
                 break;
-            default:
 
-                console.log('api endpoints, by access_token query');
-                // console.log(options);
+            // Access Token requests
+            default:
 
                 if (!data.apiEndpointUrl.includes('?')) {
                     data.apiEndpointUrl += '?erratik=datawhore'
@@ -141,18 +143,53 @@ router.post('/endpoint/space', function (req, res) {
                     }
                 };
 
-                request(options, function (error, response, body) {
+                // let fakeError = 401;
+                const requestDataWithToken = () => request(options, function (error, response, body) {
                     if (error) {
                         res.send(error);
                     }
 
-                    if (data.action.includes('.write')) {
-                        postEndpoint(req.body.data, body, (resp) => res.json(resp));
+                    if (typeof body !== 'undefined') {
+                        const err = JSON.parse(body).error || {};
+                        // err.status = fakeError === 200 ? 200 : 401;
+                        console.log('requestData running ...', err.status);
+                        if (err.status === 401) {
+
+                            console.log('refreshing tokens');
+                            Setting.findSettings(data.space, (settings) => {
+                                refresh.requestNewAccessToken(data.space, data.refreshToken, (_e, accessToken, refreshToken) => {
+                                    // `refreshToken` may or may not exist, depending on the strategy you are using.
+
+                                    refreshToken = refreshToken ? refreshToken : data.refreshToken;
+                                    const keys = {accessToken: accessToken, refreshToken: refreshToken};
+                                    settings.extras  = Object.keys(keys).map(key => {
+                                        return {
+                                            'type': 'oauth',
+                                            'value': keys[key],
+                                            'label': key
+                                        };
+                                    });
+                                    console.log(settings.extras);
+
+                                    Setting.updateSettings(settings, () => {
+                                            data.accessToken = accessToken;
+                                            console.log('saved new token: ' + accessToken);
+                                            // fakeError = 200;
+                                            requestDataWithToken();
+                                        }
+                                    );
+
+                                });
+                            });
+
+                        } else {
+                            postEndpoint(req.body.data, body, (resp) => res.json(resp));
+                        }
+                        // res.status(err.status).json({message: err.message});
                     }
-
                 });
-            // }
 
+                requestDataWithToken();
         }
 
     }
@@ -197,7 +234,7 @@ router.post('/upload/:space/:folder/:filename', function (req, res) {
     });
 });
 
-function getEchoAuth(data) {
+function makeOAuthHeaders(data) {
     // helper to construct echo/oauth headers from URL
     const oauth = new OAuth.OAuth(`https://${data.apiUrl}/oauth/request_token`,
         `https://${data.apiUrl}/oauth/access_token`,
