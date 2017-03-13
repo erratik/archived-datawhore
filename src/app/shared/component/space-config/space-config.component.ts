@@ -46,7 +46,6 @@ export class SpaceConfigComponent {
             })
             .do(oauth => {
 
-
                 this.space = new Space(
                     this.space.name,
                     this.space.modified,
@@ -64,7 +63,9 @@ export class SpaceConfigComponent {
                     apiUrl: Paths.SPACE_API_URL[this.space.name]
                 };
 
-                // console.log(this.space.oauth.extras.filter(settings => settings.label === 'accessToken'))
+                // todo : this is disgusting, make it look nice!
+                // this could easily be turned into a function
+                // this.space.oauth.extras.filter(settings => settings.label === 'accessToken')
                 if (this.space.oauth.connected) {
                     this.spaceOauthSettings.accessToken = this.space.oauth.extras.filter(settings => settings.label === 'accessToken')[0].value;
                     if (this.space.oauth.extras.filter(settings => settings.label === 'tokenSecret').length) {
@@ -85,8 +86,8 @@ export class SpaceConfigComponent {
 
                     if (this.tokenExpiryDate < Date.now()) {
                         // todo: offer a manual way to do refresh token
-                        // todo: display warning when less than 30 minutes
-                        // todo: make sure it happens when we start working and loading posts, etc
+                        // display warning when less than 30 minutes
+                        // make sure it happens when we start working and loading posts, etc
                         window.location.href = this.space.oauth.authorizationUrl;
                     }
                 }
@@ -103,7 +104,6 @@ export class SpaceConfigComponent {
             this.space.inEditMode = false;
         });
     }
-
 
     public newDimensions(data): any {
         console.log(data[0]);

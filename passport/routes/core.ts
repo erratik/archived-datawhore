@@ -131,12 +131,10 @@ router.post('/endpoint/space', function (req, res) {
             // Access Token requests
             default:
 
-                if (!data.apiEndpointUrl.includes('?')) {
-                    data.apiEndpointUrl += '?erratik=datawhore'
-                }
+                data.apiEndpointUrl += !data.apiEndpointUrl.includes('?') ? `?erratik=datawhore` : `&v=${Date.now()}`;
 
                 options = {
-                    uri: `https://${data.apiUrl}${data.apiEndpointUrl}&access_token=${data.accessToken}`,
+                    uri: `https://${data.apiUrl}${data.apiEndpointUrl}&access_token=${data.accessToken}&oauth_token=${data.accessToken}`,
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
@@ -197,7 +195,7 @@ router.post('/endpoint/space', function (req, res) {
 });
 
 // UPLOADS
-// todo: see if i can change this to a put?
+// todo: change this to a put request
 router.post('/upload/:space/:folder/:filename', function (req, res) {
 
     const storage = multer.diskStorage({
@@ -238,8 +236,8 @@ function makeOAuthHeaders(data) {
     // helper to construct echo/oauth headers from URL
     const oauth = new OAuth.OAuth(`https://${data.apiUrl}/oauth/request_token`,
         `https://${data.apiUrl}/oauth/access_token`,
-        data.apiKey, // test app token
-        data.apiSecret, // test app secret
+        data.apiKey,
+        data.apiSecret,
         '1.0',
         null,
         'HMAC-SHA1');

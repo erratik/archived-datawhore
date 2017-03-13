@@ -110,11 +110,9 @@ router.post('/endpoint/space', function (req, res) {
                 break;
             // Access Token requests
             default:
-                if (!data.apiEndpointUrl.includes('?')) {
-                    data.apiEndpointUrl += '?erratik=datawhore';
-                }
+                data.apiEndpointUrl += !data.apiEndpointUrl.includes('?') ? "?erratik=datawhore" : "&v=" + Date.now();
                 options = {
-                    uri: "https://" + data.apiUrl + data.apiEndpointUrl + "&access_token=" + data.accessToken,
+                    uri: "https://" + data.apiUrl + data.apiEndpointUrl + "&access_token=" + data.accessToken + "&oauth_token=" + data.accessToken,
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
@@ -163,7 +161,7 @@ router.post('/endpoint/space', function (req, res) {
     }
 });
 // UPLOADS
-// todo: see if i can change this to a put?
+// todo: change this to a put request
 router.post('/upload/:space/:folder/:filename', function (req, res) {
     var storage = multer.diskStorage({
         destination: function (_req, file, cb) {
@@ -191,9 +189,7 @@ router.post('/upload/:space/:folder/:filename', function (req, res) {
 });
 function makeOAuthHeaders(data) {
     // helper to construct echo/oauth headers from URL
-    var oauth = new OAuth.OAuth("https://" + data.apiUrl + "/oauth/request_token", "https://" + data.apiUrl + "/oauth/access_token", data.apiKey, // test app token
-    data.apiSecret, // test app secret
-    '1.0', null, 'HMAC-SHA1');
+    var oauth = new OAuth.OAuth("https://" + data.apiUrl + "/oauth/request_token", "https://" + data.apiUrl + "/oauth/access_token", data.apiKey, data.apiSecret, '1.0', null, 'HMAC-SHA1');
     var orderedParams = oauth._prepareParameters(data.token, // test user token
     data.secret, // test user secret
     'GET', "https://" + data.apiUrl + data.apiEndpointUrl);
