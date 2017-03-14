@@ -14,6 +14,7 @@ import {DimensionSchema} from '../../../models/dimension-schema.model';
 export class RainFormComponent extends DimensionFormComponent implements OnInit {
 
     @Input() public isFetchingSchema;
+    @Input() public rainSchemaIndex;
     @Output() onRainSchema = new EventEmitter<any>();
     protected schemaObjectOverride: string = null;
     private schema;
@@ -28,10 +29,12 @@ export class RainFormComponent extends DimensionFormComponent implements OnInit 
         this.schema = this.model;
         this.model = this.model.propertyBucket;
         // this.dimSubType = this.dimType.includes('.') ? this.dimType : this.dimType.split('.')[0];
+        console.log(this.dimType);
     }
 
-    protected saveRain(): void {
-        this.saveDimensions();
+    protected saveRain(index): void {
+        debugger;
+        this.saveDimensions(this.model, index);
     }
 
     protected saveRawRain(): any {

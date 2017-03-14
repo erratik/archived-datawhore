@@ -139,7 +139,6 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
     }
 
     protected updateRainSchema(schema): any {
-
         console.log(schema);
         this.rainSchemas = this.rainSchemas.map(s => {
             if (s.type === schema.type) {

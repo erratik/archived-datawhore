@@ -106,8 +106,13 @@ export class SpaceConfigComponent {
     }
 
     public newDimensions(data): any {
-        console.log(data[0]);
-        this[data[1]].properties = data[0];
+        console.log(data);
+        // check if there is an index for an array
+        if (data.length === 3) {
+            this[data[1]][data[2]].properties = data[0];
+        } else {
+            this[data[1]].properties = data[0];
+        }
     }
 
 }

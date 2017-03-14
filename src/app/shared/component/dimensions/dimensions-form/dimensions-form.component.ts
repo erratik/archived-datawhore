@@ -25,13 +25,13 @@ export class DimensionFormComponent {
         return JSON.stringify(this.model) !== this.initialModel;
     }
 
-    public saveDimensions(propertyBucket = this.model): any {
+    public saveDimensions(propertyBucket = this.model, dimArrayIndex = null): any {
 
         this.dims = [];
 
         const dimensions$ = this[`${this.dimType}Service`].update(this.space.name, this.prepareDimensions(), propertyBucket).do((dims) => {
             this.dims = dims.map(dim => new Dimension(dim.friendlyName, dim.schemaPath));
-            this.onNewDimensions.emit([this.dims, this.dimType]);
+            this.onNewDimensions.emit([this.dims, this.dimType, dimArrayIndex]);
 
         });
 
@@ -41,16 +41,19 @@ export class DimensionFormComponent {
 
     private prepareDimensions(propertyBucket = this.model): any {
         const groupEnabled = (dimensions) => {
-            dimensions.forEach(dim => {
-                if (dim) {
-                    if (dim.grouped) {
-                        if (dim.content.enabled) {
-                            this.dims.push(dim.content);
-                        }
-                        groupEnabled(dim.content.value);
-                    } else if (dim.content.enabled) {
+            const groupDimensions = (dim) => {
+                if (dim.grouped) {
+                    if (dim.content.enabled) {
                         this.dims.push(dim.content);
                     }
+                    groupEnabled(dim.content.value);
+                } else if (dim.content.enabled) {
+                    this.dims.push(dim.content);
+                }
+            };
+            dimensions.forEach(dim => {
+                if (dim) {
+                    groupDimensions(dim);
                 }
             });
             return this.dims;

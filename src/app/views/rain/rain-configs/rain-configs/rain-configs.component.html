@@ -1,0 +1,88 @@
+
+<div [ngSwitch]="activeTab" class="columns">
+    <aside class="menu column is-2">
+        <p class="menu-label">
+            Rain Schemas
+        </p>
+        <ul class="menu-list">
+            <li (click)="setActiveTab(schema.type)" *ngFor="let schema of schemas">
+                <a [class.is-active]="activeTab === schema.type">{{schema.type}}</a>
+            </li>
+        </ul>
+    </aside>
+    <div class="column is-10" *ngFor="let schema of schemas; let $i = index;"
+             [class.is-hidden]="activeTab != schema.type">
+        <div class="column columns" *ngSwitchCase="schema.type">
+
+            <div class="column is-half">
+                <div class="header">
+                    <h3 class="is-pulled-left heading">{{schema.type}} Structure & Example</h3>
+                    <div class="is-flex-inline is-pulled-right">
+                        <a class="button is-small is-info" (click)="editRainType = !editRainType">
+                            <span class="icon is-small is-pulled-right">
+                              <i class="fa fa-pencil"></i>
+                            </span>
+                        </a>
+                        <a class="button is-small is-warning" [class.is-loading]="isFetchingSchema"
+                           (click)="resetRain('post')">
+                            <span class="icon is-small"><i class="fa fa-refresh"></i></span>
+                        </a>
+                    </div>
+                </div>
+                <div *ngIf="editRainType">
+                    <hr>
+                    <label class="label">
+                        <span class="icon is-primary"><i class="fa fa-tint is-small"></i></span>
+                        Override rain type
+                    </label>
+                    <div class="control is-flex">
+                        <input #overrideRainType class="input" type="text" [(ngModel)]="schema.type">
+                        <a class="button is-success" *ngIf="overrideRainType.value"
+                           (click)="saveRawRain(overrideRainType.value)">
+                            Save
+                        </a>
+                    </div>
+                </div>
+                <hr>
+                <div class="configure-rain">
+                    <datawhore-rain-form [model]="schema"
+                                         [rainSchemaIndex]="$i"
+                                         [dimType]="schema.type" [space]="space"
+                                         (onRainSchema)="updateRainSchema($event)"
+                                         (onNewDimensions)="newDimensions($event)">
+                    </datawhore-rain-form>
+                </div>
+            </div>
+            <div class="column is-half" *ngIf="rain.length">
+
+                <div class="header">
+                    <h3 class="is-pulled-left heading">{{schema.type}} Structure & Example</h3>
+                </div>
+                <hr>
+                <div *ngIf="!rain[$i]?.properties">
+                    No <strong>{{schema.type}}</strong> configuration yet.
+                </div>
+                <div *ngIf="rain[$i]?.properties">
+                    <div class="structure">
+                        <ul>
+                            <li *ngFor="let property of rain[$i].properties">
+                                {{property.friendlyName}} ⇢ <cite>{{property.schemaPath}}</cite>
+                            </li>
+                        </ul>
+                        <p *ngIf="!rain[$i].properties">
+                            No <strong>{{schema.type}}</strong> properties yet
+                        </p>
+                    </div>
+
+                    <div class="example" *ngIf="rain[$i].properties">
+                        <datawhore-space-item [properties]="rain[$i].properties"
+                                              [type]="schema.type"
+                                              [space]="space"
+                                              (linkingToSpace)="updateSpace($event)">
+                        </datawhore-space-item>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -111,51 +111,17 @@
         <div class="tab space" *ngSwitchCase="'rain'">
 
             <div class="header">
-                <h2 class="is-pulled-left heading">Rain Configuration</h2>
-                <a class="button is-small is-warning" [class.is-loading]="isFetchingSchema"
-                   (click)="resetRain('post')">
-                    <span class="icon is-small"><i class="fa fa-refresh"></i></span>
-                    <span>Fetch schema</span>
-                </a>
+                <!--<h2 class="is-pulled-left heading">Rain Configuration</h2>-->
             </div>
-            <article class="media columns" *ngFor="let rainSchema of rainSchemas; let $i = index;">
-                <div class="column is-half" *ngIf="profile">
-                    <div class=" configure-rain">
-                        <datawhore-rain-form
-                                [model]="rainSchema"
-                                [dimType]="'rain'" [space]="space"
-                                (onRainSchema)="updateRainSchema($event)"
-                                (onNewDimensions)="newDimensions($event)">
+            <datawhore-rain-configs
+                    (onResetRain)="resetRain('post')"
+                    [updateRainSchema]="updateRainSchema"
+                    [newDimensions]="newDimensions"
+                    [rain]="rain"
+                    [schemas]="rainSchemas"
+                    [space]="space">
+            </datawhore-rain-configs>
 
-                        </datawhore-rain-form>
-                    </div>
-                </div>
-                <div class="column is-half" *ngIf="rain.length">
-
-                    <div class="header">
-                        <h3 class="is-pulled-left heading">Profile Structure & Example</h3>
-                    </div>
-                    <hr>
-                    <div class="structure">
-                        <ul>
-                            <li *ngFor="let property of rain[$i].properties">
-                                {{property.friendlyName}} ⇢ <cite>{{property.schemaPath}}</cite>
-                            </li>
-                        </ul>
-                        <p *ngIf="!rain[$i].properties">
-                            No profile properties yet
-                        </p>
-                    </div>
-
-                    <div class="example" *ngIf="rain[$i].properties">
-                        <datawhore-space-item [properties]="rain[$i].properties"
-                                              [type]="'rain'"
-                                              [space]="space"
-                                              (linkingToSpace)="updateSpace($event)">
-                        </datawhore-space-item>
-                    </div>
-                </div>
-            </article>
         </div>
         <div class="tab space" *ngSwitchCase="'space'">
 

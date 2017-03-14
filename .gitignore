@@ -6,7 +6,7 @@
 
 # dependencies
 /node_modules
-/passport/node_modules
+/api/node_modules
 
 # IDEs and editors
 /.idea

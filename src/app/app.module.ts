@@ -33,6 +33,7 @@ import {OrderByPipe} from './shared/pipes/order-by.pipe';
 import {AddSpaceComponent} from './views/spaces/add-space/add-space.component';
 import {PopulateMatchesPipe} from './shared/pipes/populate-matches.pipe';
 import {RainFormComponent} from './views/rain/rain-form/rain-form.component';
+import { RainConfigsComponent } from './views/rain/rain-configs/rain-configs/rain-configs.component';
 
 const appRoutes: Routes = [
     {
@@ -82,7 +83,8 @@ const appRoutes: Routes = [
         OrderByPipe,
         AddSpaceComponent,
         PopulateMatchesPipe,
-        RainFormComponent
+        RainFormComponent,
+        RainConfigsComponent
     ],
     providers: [
         SpacesService,

@@ -4,6 +4,7 @@ import {ProfileService} from '../../../services/profile/profile.service';
 import {Space} from '../../../models/space.model';
 import {SpacesService} from '../../../services/spaces.service';
 import {RainService} from '../../../services/rain/rain.service';
+import {Observable} from 'rxjs';
 const objectPath = require('object-path');
 
 @Component({
@@ -13,12 +14,12 @@ const objectPath = require('object-path');
 })
 export class SpaceItemComponent implements OnInit {
 
+    @Output() public linkingToSpace = new EventEmitter<Space>();
     @Input() protected space: Space;
     @Input() protected type: string;
     @Input() protected properties: Array<Dimension>;
+    public itemSchema$ = new Observable<any>();
     protected schema: any;
-    @Output() public linkingToSpace: EventEmitter<Space> = new EventEmitter<Space>();
-
 
     constructor(private profileService: ProfileService,
                 private rainService: RainService,
@@ -26,14 +27,14 @@ export class SpaceItemComponent implements OnInit {
     }
 
     ngOnInit() {
-        const itemSchema$ = this[`${this.type}Service`].fetchSchema(this.space.name).do((rawSchema) => {
-            // debugger;
+        this.itemSchema$ = this[`${this.type}Service`].fetchSchema(this.space.name).do((rawSchema) => {
+            debugger;
             this.schema = rawSchema.length ? rawSchema[0] : rawSchema;
-        });
-        itemSchema$.subscribe(() => {
-            // debugger;
             this.findSpaceLinks();
         });
+        // itemSchema$.subscribe(() => {
+        //     // debugger;
+        // });
     }
 
     public findSpaceLinks(): void {
