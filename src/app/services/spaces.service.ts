@@ -11,6 +11,7 @@ export class SpacesService {
 
     // private instance variable to hold base url
     private apiServer = Paths.DATAWHORE_API_URL;
+    public spaceRainSchemas: Array<any> = [];
 
     constructor(private http: Http, private router: Router) {
     }

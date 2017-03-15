@@ -27,8 +27,11 @@ export class SpaceItemComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.type = this.type.includes('.') ? this.type.split('.')[0] : this.type;
+
+        // debugger;
         this.itemSchema$ = this[`${this.type}Service`].fetchSchema(this.space.name).do((rawSchema) => {
-            debugger;
+            // debugger;
             this.schema = rawSchema.length ? rawSchema[0] : rawSchema;
             this.findSpaceLinks();
         });

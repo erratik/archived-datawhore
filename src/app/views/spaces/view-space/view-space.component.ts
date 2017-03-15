@@ -60,9 +60,12 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
             // to know what's already selected and renamed
             if (this.profileSchema.propertyBucket) {
                 this.profile.createPropertyBucket(this.profileSchema.propertyBucket);
-                this.rain.forEach((r, i) => r.createPropertyBucket(this.rainSchemas[i].propertyBucket));
+                this.rain.forEach((r, i) => {
+                    if (this.rainSchemas[i]) {
+                        r.createPropertyBucket(this.rainSchemas[i].propertyBucket);
+                    }
+                });
             }
-
 
             this.uploader = new FileUploader({url: `${Paths.DATAWHORE_API_URL}/upload/${this.space.name}/space/icon`});
             this.uploader.onCompleteItem = (item, response, status) => {
@@ -85,17 +88,17 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
     private getRain(): any {
         return this.rainService.getRain(this.space.name).do((rain) => {
             this.rain = rain.map(r => new Rain(
-                    this.space.name,
-                    r.dimensions.map(dims => new Dimension(dims.friendlyName, dims.schemaPath)),
-                    'drop',
-                    r.modified
+                this.space.name,
+                r.dimensions.map(dims => new Dimension(dims.friendlyName, dims.schemaPath)),
+                'drop',
+                r.modified
             ));
         });
     }
 
     private getRawRain(): any {
         return this.spaceItemService.fetchSchema(this.space.name, 'rain').do((rain) => {
-            this.rainSchemas = rain.map(rainSchema => new DimensionSchema(rainSchema['type'], rainSchema['content'], rainSchema.modified));
+            this.spacesService.spaceRainSchemas = this.rainSchemas = rain.map(rainSchema => new DimensionSchema(rainSchema['type'], rainSchema['content'], rainSchema.modified));
         });
     }
 
@@ -105,8 +108,7 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
         });
     }
 
-    protected resetRain(): any {
-
+    protected writeRain(type: any = 'rain'): any {
         if (!this.rainFetchUrl) {
             console.error(`there is no profile getter path for ${this.space.name}`);
             return;
@@ -116,21 +118,23 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
         // start with spaceOauthSettings values, for most /api/space/endpoint usages
         const data = Object.assign(this.spaceOauthSettings);
-        data['apiEndpointUrl'] = this.rainFetchUrl;
+        data['apiEndpointUrl'] = typeof type === 'object' ? type.fetchUrl : this.rainFetchUrl;
         data['action'] = 'schema.write';
-        data['type'] = 'rain';
+        data['type'] = typeof type === 'object' ? type.typeName : type;
         data['space'] = this.space.name;
 
         const profileSchema$ = this.spacesService.spaceEndpoint(this.space, data).do((resetRainSchema) => {
-            this.rainSchemas = this.rainSchemas.map(schemas => {
-                if (schemas.type === data.type) {
-                    return new DimensionSchema(resetRainSchema['type'], resetRainSchema['content'], resetRainSchema.modified);
-                }
-            });
 
+            if (resetRainSchema.type === data.type) {
+                this.spacesService.spaceRainSchemas.push(new DimensionSchema(resetRainSchema['type'], resetRainSchema['content'], resetRainSchema.modified));
+            }
+
+            this.rainSchemas = this.spacesService.spaceRainSchemas;
         });
 
-        profileSchema$.subscribe(() => this.isFetchingSchema = false);
+        profileSchema$.subscribe(() => {
+            this.isFetchingSchema = false
+        });
 
     }
 
@@ -138,13 +142,22 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
         this.spacesService.updateSpace(space).subscribe();
     }
 
-    protected updateRainSchema(schema): any {
-        console.log(schema);
-        this.rainSchemas = this.rainSchemas.map(s => {
-            if (s.type === schema.type) {
-                return new DimensionSchema(schema['type'], schema['content'], schema.modified);
+    protected updateRainSchema(schemaData): any {
+        console.log(schemaData, this);
+
+        if (!this.rainSchemas) {
+            this.rainSchemas = [new DimensionSchema(schemaData.type, schemaData.content, schemaData.modified)];
+
+            debugger;
+        }
+        schemaData = [schemaData];
+        this.rainSchemas.map(s => {
+            // debugger;
+            if (s.type === schemaData[0].type) {
+                s = schemaData;
             }
-        });
+        })
+        // }
 
     }
 
@@ -159,6 +172,5 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
     public setActiveTab(tabName: string): void {
         this.activeTab = tabName;
     }
-
 
 }

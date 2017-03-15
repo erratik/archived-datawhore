@@ -3,6 +3,7 @@ let mongoose = require('mongoose');
 const colors = require('colors');
 let childSchema = new mongoose.Schema({
     type: String,
+    fetchUrl: String,
     modified: Number,
     content: {}
 });

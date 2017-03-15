@@ -31,7 +31,7 @@ const SettingSchema = {
             delete update._id;
             update.space = update.name;
             update.modified = Date.now();
-            update.connected = typeof update.connected !== 'undefined' ? false : update.connected;
+            update.connected = update.connected ? false : update.connected;
 
             // stamp the oauth extras with a type
             if (update.oauth.extras) {

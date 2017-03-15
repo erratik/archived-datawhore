@@ -24,6 +24,16 @@ figure {
   }
 }
 
+.heading + * {
+  margin-top: 10px;
+}
+
+@media screen and (min-width: 769px) {
+  .control-label {
+    flex-grow: 2;
+  }
+}
+
 .is-grey {
   color: @grey;
 }
@@ -54,6 +64,7 @@ figure {
     margin-left: inherit;
   }
 }
+
 .is-circle {
   border-radius: 100%;
   overflow: hidden;

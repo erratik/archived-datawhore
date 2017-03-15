@@ -147,7 +147,7 @@ router.post('/endpoint/space', function (req, res) {
                         res.send(error);
                     }
 
-                    if (typeof body !== 'undefined') {
+                    if (body) {
                         const err = JSON.parse(body).error || {};
                         // err.status = fakeError === 200 ? 200 : 401;
                         console.log('requestData running ...', err.status);

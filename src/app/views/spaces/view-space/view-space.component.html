@@ -114,10 +114,11 @@
                 <!--<h2 class="is-pulled-left heading">Rain Configuration</h2>-->
             </div>
             <datawhore-rain-configs
-                    (onResetRain)="resetRain('post')"
+                    (onResetRain)="writeRain($event)"
                     [updateRainSchema]="updateRainSchema"
                     [newDimensions]="newDimensions"
                     [rain]="rain"
+                    [isFetchingSchema]="isFetchingSchema"
                     [schemas]="rainSchemas"
                     [space]="space">
             </datawhore-rain-configs>

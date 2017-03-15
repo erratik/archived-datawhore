@@ -40,7 +40,8 @@ export class RainFormComponent extends DimensionFormComponent implements OnInit 
     protected saveRawRain(): any {
 
         const schema = objectPath.get(this.schema, `content.${this.schemaObjectOverride}`);
-        const profileSchema$ = this.rainService.updateSchema(this.space.name, schema).do((rainSchema) => {
+
+        const profileSchema$ = this.rainService.updateSchema(this.space.name, schema, this.dimType).do((rainSchema) => {
             this.onRainSchema.emit(new DimensionSchema(rainSchema['type'], rainSchema['content'], rainSchema.modified));
         });
 

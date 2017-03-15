@@ -1,5 +1,5 @@
-
 <div [ngSwitch]="activeTab" class="columns">
+
     <aside class="menu column is-2">
         <p class="menu-label">
             Rain Schemas
@@ -8,10 +8,65 @@
             <li (click)="setActiveTab(schema.type)" *ngFor="let schema of schemas">
                 <a [class.is-active]="activeTab === schema.type">{{schema.type}}</a>
             </li>
+            <li (click)="setActiveTab('new-schema')">
+                <small class="is-success"><span>+</span> add schema</small>
+            </li>
         </ul>
     </aside>
-    <div class="column is-10" *ngFor="let schema of schemas; let $i = index;"
-             [class.is-hidden]="activeTab != schema.type">
+
+    <div class="column is-10" *ngIf="activeTab === 'new-schema' || !schemas.length"
+         [class.is-hidden]="activeTab !== 'new-schema'">
+
+        <div class="header">
+            <h3 class="heading"><strong>Rain Schema & Subtypes</strong></h3>
+        </div>
+        <hr>
+        <p>
+            With social networks that only send one type of post, the default should be "<em>rain</em>".
+            <br>Whereas some networks have additional types of streams, i.e. <strong>facebook</strong> drops,
+            would be <em> posts</em> by default. But since it has other types of streams: <em>likes</em>,
+            <em>links</em>, etc.
+            <br>Some networks <em>only</em> send different types, like <strong>tumblr</strong>, that sends
+            things like <em>audio</em>, <em>text</em>, <em>photo</em>, etc.
+        </p>
+        <hr>
+        <h3 class="heading">Add rain schemas</h3>
+        <div class="is-flex columns">
+            <div class="column is-two-thirds">
+
+                <div class="control is-horizontal">
+                    <div class="control-label">
+                        <label class="label">Type</label>
+                    </div>
+                    <div class="control is-grouped">
+                        <p class="control is-expanded">
+                            <input #newRain class="input" type="text" placeholder="rain<.subtype>"
+                                   [(ngModel)]="newRainType">
+                        </p>
+                    </div>
+                </div>
+                <div class="control is-horizontal">
+                    <div class="control-label">
+                        <label class="label">Fetch URL</label>
+                    </div>
+                    <div class="control is-grouped">
+                        <p class="control is-expanded">
+                            <input #fetchUrl class="input" type="text"
+                                   placeholder="/v1/me/player/recently-played?limit=1"
+                                   [(ngModel)]="rainFetchUrl">
+                        </p>
+                    </div>
+                </div>
+
+                <a class="button is-success" *ngIf="newRain.value && fetchUrl.value"
+                   (click)="onResetRain.emit({typeName: newRain.value, fetchUrl: fetchUrl.value})">
+                    Save
+                </a>
+            </div>
+        </div>
+
+    </div>
+    <div class="column is-10" *ngFor="let schema of schemas; let $i = index;" [class.is-hidden]="activeTab !== schema.type">
         <div class="column columns" *ngSwitchCase="schema.type">
 
             <div class="column is-half">
@@ -24,7 +79,7 @@
                             </span>
                         </a>
                         <a class="button is-small is-warning" [class.is-loading]="isFetchingSchema"
-                           (click)="resetRain('post')">
+                           (click)="writeRain()">
                             <span class="icon is-small"><i class="fa fa-refresh"></i></span>
                         </a>
                     </div>

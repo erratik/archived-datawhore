@@ -24,6 +24,7 @@ export class SpaceConfigComponent {
     public hasExpiryToken: boolean;
     public tokenExpiryDate: number;
     public spaceOauthSettings = null;
+
     public retrieveSpace$: Observable<SpaceOauthSettings> = new Observable<SpaceOauthSettings>();
     @Output() public gotOauthSettings: EventEmitter<SpaceOauthSettings> = new EventEmitter<SpaceOauthSettings>();
     @ViewChild(SpaceItemComponent) public spaceItemComponent;

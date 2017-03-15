@@ -9,7 +9,8 @@ let SpaceSchema = {
         avatar: String,
         description: String,
         username: String,
-        icon: String
+        icon: String,
+        docUrl: String
     },
     self: {
         findByName: function (name, cb) {
