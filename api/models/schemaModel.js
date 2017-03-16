@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var colors = require('colors');
 var childSchema = new mongoose.Schema({
     type: String,
+    fetchUrl: String,
     modified: Number,
     content: {}
 });

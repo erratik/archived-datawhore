@@ -34,6 +34,14 @@ var postEndpoint = function (data, content, cb) {
         cb(resp);
     });
 };
+var makeOAuthHeaders = function (data) {
+    // helper to construct echo/oauth headers from URL
+    var oauth = new OAuth.OAuth("https://" + data.apiUrl + "/oauth/request_token", "https://" + data.apiUrl + "/oauth/access_token", data.apiKey, data.apiSecret, '1.0', null, 'HMAC-SHA1');
+    var orderedParams = oauth._prepareParameters(data.token, // test user token
+    data.secret, // test user secret
+    'GET', "https://" + data.apiUrl + data.apiEndpointUrl);
+    return oauth._buildAuthorizationHeaders(orderedParams);
+};
 router
     .get('/spaces', function (req, res) {
     Space.getAll(function (err, data) {
@@ -76,7 +84,7 @@ router
 });
 // SPACES: ENDPOINTS TO GET DATA FROM SPACES (TWITTER, INSTAGRAM, ETC)
 router.post('/endpoint/space', function (req, res) {
-    console.log('data', req.body.data);
+    console.log('dahjhta', req.body.data);
     var data = req.body.data;
     var options;
     if (data.apiEndpointUrl) {
@@ -95,17 +103,8 @@ router.post('/endpoint/space', function (req, res) {
                 https.get(options, function (result) {
                     var buffer = '';
                     result.setEncoding('utf8');
-                    result.on('data', function (dataReceived) {
-                        buffer += dataReceived;
-                    });
-                    result.on('end', function () {
-                        var response = JSON.parse(buffer);
-                        var endpointAction = objectPath.get(endpoints, data.action);
-                        endpointAction(data.space, response, data.type, function (updatedResponse) {
-                            res.json(updatedResponse);
-                        });
-                        // postEndpoint(req.body.data, response, (resp) => res.json(resp));
-                    });
+                    result.on('data', function (dataReceived) { return buffer += dataReceived; });
+                    result.on('end', function () { return postEndpoint(data, JSON.parse(buffer), function (resp) { return res.json(resp); }); });
                 });
                 break;
             // Access Token requests
@@ -118,14 +117,12 @@ router.post('/endpoint/space', function (req, res) {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     }
                 };
-                // let fakeError = 401;
                 var requestDataWithToken_1 = function () { return request(options, function (error, response, body) {
                     if (error) {
                         res.send(error);
                     }
-                    if (typeof body !== 'undefined') {
+                    if (body) {
                         var err = JSON.parse(body).error || {};
-                        // err.status = fakeError === 200 ? 200 : 401;
                         console.log('requestData running ...', err.status);
                         if (err.status === 401) {
                             console.log('refreshing tokens');
@@ -174,9 +171,8 @@ router.post('/upload/:space/:folder/:filename', function (req, res) {
             cb(null, _req.params.space + '-' + _req.params.filename + '.' + file.originalname.split('.')[file.originalname.split('.').length - 1]);
         }
     });
-    var upload = multer({
-        storage: storage
-    }).single('file');
+    // multer settings
+    var upload = multer({ storage: storage }).single('file');
     upload(req, res, function (err) {
         if (err) {
             res.json({ error_code: 1, err_desc: err });
@@ -187,12 +183,4 @@ router.post('/upload/:space/:folder/:filename', function (req, res) {
         // res.json(req.file);
     });
 });
-function makeOAuthHeaders(data) {
-    // helper to construct echo/oauth headers from URL
-    var oauth = new OAuth.OAuth("https://" + data.apiUrl + "/oauth/request_token", "https://" + data.apiUrl + "/oauth/access_token", data.apiKey, data.apiSecret, '1.0', null, 'HMAC-SHA1');
-    var orderedParams = oauth._prepareParameters(data.token, // test user token
-    data.secret, // test user secret
-    'GET', "https://" + data.apiUrl + data.apiEndpointUrl);
-    return oauth._buildAuthorizationHeaders(orderedParams);
-}
 module.exports = router;

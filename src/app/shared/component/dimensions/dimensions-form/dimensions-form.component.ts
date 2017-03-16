@@ -28,6 +28,7 @@ export class DimensionFormComponent {
     public saveDimensions(propertyBucket = this.model, dimArrayIndex = null): any {
 
         this.dims = [];
+        this.dimType = this.dimType.includes('.') ? this.dimType.split('.')[0] : this.dimType;
 
         const dimensions$ = this[`${this.dimType}Service`].update(this.space.name, this.prepareDimensions(), propertyBucket).do((dims) => {
             this.dims = dims.map(dim => new Dimension(dim.friendlyName, dim.schemaPath));

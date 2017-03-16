@@ -23,14 +23,12 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
     public space: Space = null;
     public rain: Array<Rain> = [];
-    public rainSchemas: Array<any> = [];
     public profile: Profile = null;
     public profileSchema: any = null;
     public uploader: FileUploader;
     protected isFetchingSchema = false;
     protected schemaObjectOverride: string = null;
     protected activeTab = 'rain';
-    private rainFetchUrl = null;
 
     constructor(spacesService: SpacesService,
                 oauthService: OauthSettingsService,
@@ -43,8 +41,6 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
     ngOnInit() {
         const spaceConfig$ = this.retrieveSpace$
-            .switchMap(() => this.getRain())
-            .switchMap(() => this.getRawRain())
             .switchMap(() => this.getProfile())
             .mergeMap(() => this.getRawProfile())
             .do((profileSchema) => {
@@ -53,18 +49,11 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
         spaceConfig$.subscribe(() => {
 
-            this.rainFetchUrl = Paths.DROP_FETCH_URL[this.space.name];
-
             window.document.title = `${this.space.name} | view space`;
 
             // to know what's already selected and renamed
             if (this.profileSchema.propertyBucket) {
                 this.profile.createPropertyBucket(this.profileSchema.propertyBucket);
-                this.rain.forEach((r, i) => {
-                    if (this.rainSchemas[i]) {
-                        r.createPropertyBucket(this.rainSchemas[i].propertyBucket);
-                    }
-                });
             }
 
             this.uploader = new FileUploader({url: `${Paths.DATAWHORE_API_URL}/upload/${this.space.name}/space/icon`});
@@ -85,80 +74,14 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
         });
     }
 
-    private getRain(): any {
-        return this.rainService.getRain(this.space.name).do((rain) => {
-            this.rain = rain.map(r => new Rain(
-                this.space.name,
-                r.dimensions.map(dims => new Dimension(dims.friendlyName, dims.schemaPath)),
-                'drop',
-                r.modified
-            ));
-        });
-    }
-
-    private getRawRain(): any {
-        return this.spaceItemService.fetchSchema(this.space.name, 'rain').do((rain) => {
-            this.spacesService.spaceRainSchemas = this.rainSchemas = rain.map(rainSchema => new DimensionSchema(rainSchema['type'], rainSchema['content'], rainSchema.modified));
-        });
-    }
-
     private getRawProfile(): any {
         return this.profileService.fetchSchema(this.space.name).do((profileSchema) => {
             this.profileSchema = new DimensionSchema(profileSchema['type'], profileSchema['content'], profileSchema.modified);
         });
     }
 
-    protected writeRain(type: any = 'rain'): any {
-        if (!this.rainFetchUrl) {
-            console.error(`there is no profile getter path for ${this.space.name}`);
-            return;
-        }
-
-        this.isFetchingSchema = true;
-
-        // start with spaceOauthSettings values, for most /api/space/endpoint usages
-        const data = Object.assign(this.spaceOauthSettings);
-        data['apiEndpointUrl'] = typeof type === 'object' ? type.fetchUrl : this.rainFetchUrl;
-        data['action'] = 'schema.write';
-        data['type'] = typeof type === 'object' ? type.typeName : type;
-        data['space'] = this.space.name;
-
-        const profileSchema$ = this.spacesService.spaceEndpoint(this.space, data).do((resetRainSchema) => {
-
-            if (resetRainSchema.type === data.type) {
-                this.spacesService.spaceRainSchemas.push(new DimensionSchema(resetRainSchema['type'], resetRainSchema['content'], resetRainSchema.modified));
-            }
-
-            this.rainSchemas = this.spacesService.spaceRainSchemas;
-        });
-
-        profileSchema$.subscribe(() => {
-            this.isFetchingSchema = false
-        });
-
-    }
-
     protected updateSpace(space: Space): void {
         this.spacesService.updateSpace(space).subscribe();
-    }
-
-    protected updateRainSchema(schemaData): any {
-        console.log(schemaData, this);
-
-        if (!this.rainSchemas) {
-            this.rainSchemas = [new DimensionSchema(schemaData.type, schemaData.content, schemaData.modified)];
-
-            debugger;
-        }
-        schemaData = [schemaData];
-        this.rainSchemas.map(s => {
-            // debugger;
-            if (s.type === schemaData[0].type) {
-                s = schemaData;
-            }
-        })
-        // }
-
     }
 
     public removeSpace(): void {

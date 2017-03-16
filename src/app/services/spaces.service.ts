@@ -39,6 +39,7 @@ export class SpacesService {
                     space.name,
                     space.modified,
                     null,
+                    null,
                     false,
                     space.icon,
                     space.username,

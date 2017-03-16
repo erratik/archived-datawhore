@@ -29,15 +29,13 @@ export class SpaceItemComponent implements OnInit {
     ngOnInit() {
         this.type = this.type.includes('.') ? this.type.split('.')[0] : this.type;
 
-        // debugger;
         this.itemSchema$ = this[`${this.type}Service`].fetchSchema(this.space.name).do((rawSchema) => {
-            // debugger;
             this.schema = rawSchema.length ? rawSchema[0] : rawSchema;
-            this.findSpaceLinks();
+            if (this.type == 'profile') {
+                this.findSpaceLinks();
+            }
         });
-        // itemSchema$.subscribe(() => {
-        //     // debugger;
-        // });
+        this.itemSchema$.subscribe();
     }
 
     public findSpaceLinks(): void {

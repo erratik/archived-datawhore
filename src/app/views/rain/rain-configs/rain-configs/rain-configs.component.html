@@ -5,8 +5,23 @@
             Rain Schemas
         </p>
         <ul class="menu-list">
-            <li (click)="setActiveTab(schema.type)" *ngFor="let schema of schemas">
-                <a [class.is-active]="activeTab === schema.type">{{schema.type}}</a>
+            <li *ngFor="let schema of rainSchemas">
+                <a (click)="setActiveTab(schema.type)"
+                   [class.is-active]="activeTab === schema.type">
+                    {{schema.type}}
+                </a>
+                <ul>
+                    <li (click)="setActiveTab(schema.type); activeSubTab = 'configs'"
+                        [class.is-bold]="activeTab === schema.type && activeSubTab === 'configs'">
+                        <a>config</a>
+                    </li>
+                    <li (click)="activeSubTab = 'structure'" [class.is-bold]="activeSubTab === 'structure'">
+                        <a>structure</a>
+                    </li>
+                    <li (click)="activeSubTab = 'drops'" [class.is-bold]="activeSubTab === 'drops'">
+                        <a>drops</a>
+                    </li>
+                </ul>
             </li>
             <li (click)="setActiveTab('new-schema')">
                 <small class="is-success"><span>+</span> add schema</small>
@@ -14,13 +29,11 @@
         </ul>
     </aside>
 
-    <div class="column is-10" *ngIf="activeTab === 'new-schema' || !schemas.length"
+    <div class="column" *ngIf="activeTab === 'new-schema' || !rainSchemas.length"
          [class.is-hidden]="activeTab !== 'new-schema'">
-
         <div class="header">
             <h3 class="heading"><strong>Rain Schema & Subtypes</strong></h3>
         </div>
-        <hr>
         <p>
             With social networks that only send one type of post, the default should be "<em>rain</em>".
             <br>Whereas some networks have additional types of streams, i.e. <strong>facebook</strong> drops,
@@ -59,47 +72,74 @@
                 </div>
 
                 <a class="button is-success" *ngIf="newRain.value && fetchUrl.value"
-                   (click)="onResetRain.emit({typeName: newRain.value, fetchUrl: fetchUrl.value})">
+                   (click)="writeRain({typeName: newRain.value, fetchUrl: fetchUrl.value})">
                     Save
                 </a>
             </div>
         </div>
 
     </div>
-    <div class="column is-10" *ngFor="let schema of schemas; let $i = index;" [class.is-hidden]="activeTab !== schema.type">
-        <div class="column columns" *ngSwitchCase="schema.type">
+    <div class="column is-10" *ngFor="let schema of rainSchemas; let $i = index;"
+         [class.is-hidden]="activeTab !== schema.type">
+        <div class="column columns" *ngIf="activeSubTab === 'structure'">
+            <div class="column is-half" *ngIf="rain[$i]?.properties">
+                <div class="header">
+                    <h3 class="is-pulled-left heading">{{schema.type}} Example</h3>
+                </div>
+                <hr>
+                <div class="example" *ngIf="rain[$i].properties">
+                    <datawhore-space-item [properties]="rain[$i].properties"
+                                          [type]="schema.type"
+                                          [space]="space"
+                                          (linkingToSpace)="updateSpace($event)">
+                    </datawhore-space-item>
+                </div>
+            </div>
+            <div class="column is-half" *ngIf="rain.length">
+
+                <div class="header">
+                    <h3 class="is-pulled-left heading">{{schema.type}} Structure</h3>
+                </div>
+                <hr>
+                <div *ngIf="!rain[$i]?.properties">
+                    No <strong>{{schema.type}}</strong> configuration yet.
+                </div>
+                <div class="structure" *ngIf="rain[$i]?.properties">
+                    <ul>
+                        <li *ngFor="let property of rain[$i].properties">
+                            {{property.friendlyName}} ⇢ <cite>{{property.schemaPath}}</cite>
+                        </li>
+                    </ul>
+                    <p *ngIf="!rain[$i].properties">
+                        No <strong>{{schema.type}}</strong> properties yet
+                    </p>
+                </div>
+
+            </div>
+        </div>
+        <div class="column columns" *ngSwitchCase="schema.type"
+             [class.is-hidden]="activeSubTab !== '' && activeSubTab !== 'configs'">
 
             <div class="column is-half">
                 <div class="header">
-                    <h3 class="is-pulled-left heading">{{schema.type}} Structure & Example</h3>
-                    <div class="is-flex-inline is-pulled-right">
-                        <a class="button is-small is-info" (click)="editRainType = !editRainType">
-                            <span class="icon is-small is-pulled-right">
-                              <i class="fa fa-pencil"></i>
-                            </span>
-                        </a>
-                        <a class="button is-small is-warning" [class.is-loading]="isFetchingSchema"
-                           (click)="writeRain()">
-                            <span class="icon is-small"><i class="fa fa-refresh"></i></span>
-                        </a>
-                    </div>
+                    <h3 class="is-pulled-left heading">{{schema.type}} Dimensions</h3>
                 </div>
-                <div *ngIf="editRainType">
+                <div class="configure-rain">
+
                     <hr>
-                    <label class="label">
-                        <span class="icon is-primary"><i class="fa fa-tint is-small"></i></span>
-                        Override rain type
+                    <label class="label is-inline-flex">
+                        <span class="icon is-warning is-pulled-right"><i class="fa fa-exclamation-circle"></i></span>
+                        <span>Override object path to rain schema</span>
                     </label>
                     <div class="control is-flex">
-                        <input #overrideRainType class="input" type="text" [(ngModel)]="schema.type">
-                        <a class="button is-success" *ngIf="overrideRainType.value"
-                           (click)="saveRawRain(overrideRainType.value)">
+                        <input #overrideRain class="input" type="text" placeholder="Enter object path (a.b.c)"
+                               [(ngModel)]="schemaObjectOverride">
+                        <a class="button is-success" *ngIf="overrideRain.value"
+                           (click)="saveRawRain($i, schema.type)">
                             Save
                         </a>
                     </div>
-                </div>
-                <hr>
-                <div class="configure-rain">
+
                     <datawhore-rain-form [model]="schema"
                                          [rainSchemaIndex]="$i"
                                          [dimType]="schema.type" [space]="space"
@@ -108,35 +148,33 @@
                     </datawhore-rain-form>
                 </div>
             </div>
-            <div class="column is-half" *ngIf="rain.length">
+            <div class="column is-half">
 
                 <div class="header">
-                    <h3 class="is-pulled-left heading">{{schema.type}} Structure & Example</h3>
+                    <h3 class="heading">{{schema.type}} Settings</h3>
                 </div>
                 <hr>
-                <div *ngIf="!rain[$i]?.properties">
-                    No <strong>{{schema.type}}</strong> configuration yet.
+                <label class="label">
+                    Rename rain type
+                </label>
+                <div class="control is-flex">
+                    <input #overrideRainType class="input" type="text" [(ngModel)]="schema.type">
+                    <a class="button is-success" *ngIf="overrideRainType.value"
+                       (click)="saveRawRain(overrideRainType.value)">
+                        Save
+                    </a>
                 </div>
-                <div *ngIf="rain[$i]?.properties">
-                    <div class="structure">
-                        <ul>
-                            <li *ngFor="let property of rain[$i].properties">
-                                {{property.friendlyName}} ⇢ <cite>{{property.schemaPath}}</cite>
-                            </li>
-                        </ul>
-                        <p *ngIf="!rain[$i].properties">
-                            No <strong>{{schema.type}}</strong> properties yet
-                        </p>
-                    </div>
-
-                    <div class="example" *ngIf="rain[$i].properties">
-                        <datawhore-space-item [properties]="rain[$i].properties"
-                                              [type]="schema.type"
-                                              [space]="space"
-                                              (linkingToSpace)="updateSpace($event)">
-                        </datawhore-space-item>
-                    </div>
-                </div>
+                <hr>
+                <a class="button is-warning" [class.is-loading]="isFetchingSchema"
+                   (click)="writeRain(schema.type)">
+                    <span class="icon is-small"><i class="fa fa-refresh"></i></span>
+                    <span>Fetch schema</span>
+                </a>
+                <a class="button is-danger" [class.is-loading]="isFetchingSchema"
+                   (click)="onResetRain.emit($event)">
+                    <span class="icon is-small"><i class="fa fa-refresh"></i></span>
+                    <span>Fetch schema</span>
+                </a>
             </div>
         </div>
     </div>

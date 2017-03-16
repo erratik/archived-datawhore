@@ -40,6 +40,24 @@ let postEndpoint = (data, content, cb) => {
     });
 };
 
+const makeOAuthHeaders = (data) => {
+    // helper to construct echo/oauth headers from URL
+    const oauth = new OAuth.OAuth(`https://${data.apiUrl}/oauth/request_token`,
+        `https://${data.apiUrl}/oauth/access_token`,
+        data.apiKey,
+        data.apiSecret,
+        '1.0',
+        null,
+        'HMAC-SHA1');
+    const orderedParams = oauth._prepareParameters(
+        data.token, // test user token
+        data.secret, // test user secret
+        'GET',
+        `https://${data.apiUrl}${data.apiEndpointUrl}`
+    );
+    return oauth._buildAuthorizationHeaders(orderedParams);
+};
+
 router
     .get('/spaces', function (req, res) {
         Space.getAll(function (err, data) {
@@ -89,7 +107,7 @@ router
 // SPACES: ENDPOINTS TO GET DATA FROM SPACES (TWITTER, INSTAGRAM, ETC)
 router.post('/endpoint/space', function (req, res) {
 
-    console.log('data', req.body.data);
+    console.log('dahjhta', req.body.data);
 
     const data = req.body.data;
 
@@ -109,22 +127,12 @@ router.post('/endpoint/space', function (req, res) {
                 };
                 console.log(options);
 
-                https.get(options, function (result) {
 
+                https.get(options, function (result) {
                     let buffer = '';
                     result.setEncoding('utf8');
-                    result.on('data', function (dataReceived) {
-                        buffer += dataReceived;
-                    });
-                    result.on('end', function () {
-                        const response = JSON.parse(buffer);
-                        const endpointAction = objectPath.get(endpoints, data.action);
-                        endpointAction(data.space, response, data.type, function (updatedResponse) {
-                            res.json(updatedResponse);
-                        });
-
-                        // postEndpoint(req.body.data, response, (resp) => res.json(resp));
-                    });
+                    result.on('data', (dataReceived) => buffer += dataReceived);
+                    result.on('end', () => postEndpoint(data, JSON.parse(buffer), (resp) => res.json(resp)));
                 });
                 break;
 
@@ -141,15 +149,13 @@ router.post('/endpoint/space', function (req, res) {
                     }
                 };
 
-                // let fakeError = 401;
-                const requestDataWithToken = () => request(options, function (error, response, body) {
+                const requestDataWithToken = () => request(options, (error, response, body) => {
                     if (error) {
                         res.send(error);
                     }
 
                     if (body) {
                         const err = JSON.parse(body).error || {};
-                        // err.status = fakeError === 200 ? 200 : 401;
                         console.log('requestData running ...', err.status);
                         if (err.status === 401) {
 
@@ -199,23 +205,21 @@ router.post('/endpoint/space', function (req, res) {
 router.post('/upload/:space/:folder/:filename', function (req, res) {
 
     const storage = multer.diskStorage({
-        destination: function (_req, file, cb) {
-
+        destination: (_req, file, cb) => {
             const folderName = '../public/uploads/' + _req.params.space + '/' + _req.params.folder;
             mkdirp(folderName, function (err) {
                 cb(null, folderName);
             });
-
         },
-        filename: function (_req, file, cb) {
+        filename: (_req, file, cb) => {
             cb(null, _req.params.space + '-' + _req.params.filename + '.' + file.originalname.split('.')[file.originalname.split('.').length - 1]);
         }
     });
-    const upload = multer({ // multer settings
-        storage: storage
-    }).single('file');
 
-    upload(req, res, function (err) {
+    // multer settings
+    const upload = multer({storage: storage}).single('file');
+
+    upload(req, res, function(err) {
 
         if (err) {
             res.json({error_code: 1, err_desc: err});
@@ -232,22 +236,5 @@ router.post('/upload/:space/:folder/:filename', function (req, res) {
     });
 });
 
-function makeOAuthHeaders(data) {
-    // helper to construct echo/oauth headers from URL
-    const oauth = new OAuth.OAuth(`https://${data.apiUrl}/oauth/request_token`,
-        `https://${data.apiUrl}/oauth/access_token`,
-        data.apiKey,
-        data.apiSecret,
-        '1.0',
-        null,
-        'HMAC-SHA1');
-    const orderedParams = oauth._prepareParameters(
-        data.token, // test user token
-        data.secret, // test user secret
-        'GET',
-        `https://${data.apiUrl}${data.apiEndpointUrl}`
-    );
-    return oauth._buildAuthorizationHeaders(orderedParams);
-}
 
 module.exports = router;

@@ -51,6 +51,7 @@ export class SpaceConfigComponent {
                     this.space.name,
                     this.space.modified,
                     oauth,
+                    this.space.fetchUrl,
                     false,
                     this.space.icon,
                     this.space.username,

@@ -6,17 +6,20 @@ var Rain = require('../models/rainModel');
 module.exports = {
     schema: {
         write: function (space, content, type, cb) {
-            // console.log(content)
-            // then we have other type of schema, using request(), instead of https(),
-            // so... not twitter, so far...
-            content = (typeof content === 'string') ? JSON.parse(content) : content;
-            var schema = {
-                type: type,
-                content: typeof content.data !== 'undefined' ? content.data : content
-            };
-            Schema.writeSchema(space, schema, function (updatedSchema) {
-                // console.log('[schema.write callback]', updatedSchema);
-                cb(updatedSchema);
+            Schema.findSchema(space, type, function (_schema) {
+                content = (typeof content === 'string') ? JSON.parse(content) : content;
+                var fetchUrl = content.fetchUrl;
+                delete content.fetchUrl;
+                content = content.data ? content.data : content;
+                var schema = {
+                    type: type,
+                    content: content,
+                    fetchUrl: !fetchUrl ? _schema.fetchUrl : fetchUrl
+                };
+                Schema.writeSchema(space, schema, function (updatedSchema) {
+                    console.log('[schema.write callback]', updatedSchema);
+                    cb(updatedSchema);
+                });
             });
         },
         get: function (space, type, cb) {
