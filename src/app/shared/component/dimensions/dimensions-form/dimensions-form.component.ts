@@ -42,6 +42,7 @@ export class DimensionFormComponent {
 
     private prepareDimensions(propertyBucket = this.model): any {
         const groupEnabled = (dimensions) => {
+
             const groupDimensions = (dim) => {
                 if (dim.grouped) {
                     if (dim.content.enabled) {
@@ -52,6 +53,9 @@ export class DimensionFormComponent {
                     this.dims.push(dim.content);
                 }
             };
+
+            dimensions = dimensions.propertyBucket ? dimensions.propertyBucket : dimensions;
+
             dimensions.forEach(dim => {
                 if (dim) {
                     groupDimensions(dim);

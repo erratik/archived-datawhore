@@ -4,6 +4,7 @@ import {Space} from '../../../models/space.model';
 import 'rxjs/add/operator/map';
 import {Router} from '@angular/router';
 import {OauthSettingsService} from '../../../services/space/oauth-settings.service';
+import {SpaceItemService} from '../../../shared/services/space-item/space-item.service';
 
 @Component({
     selector: 'datawhore-edit-spaces',
@@ -15,9 +16,10 @@ import {OauthSettingsService} from '../../../services/space/oauth-settings.servi
 export class EditSpacesComponent implements OnInit {
 
     protected isLoadingSpaces = true;
-    protected spaces: Array<any>;
+    protected spaces: Array<Space>;
 
     constructor(private spacesService: SpacesService,
+                private spaceItemService: SpaceItemService,
                 private oauthService: OauthSettingsService,
                 private router: Router) {
     }
@@ -27,11 +29,15 @@ export class EditSpacesComponent implements OnInit {
         const getSpaces$ = this.spacesService.getAllSpaces()
             .switchMap((spaces) => {
                 spaces.forEach(space => {
-                    this.oauthService.getOauthSettings(space.name).subscribe(settings => {
+                    const detailedSpaceInfo$ = this.spaceItemService.fetchSchema(space.name, 'rain')
+                        .do((rainSchemas) => space.rainSchemas = rainSchemas.map(s => s.type))
+                        .switchMap(() => this.oauthService.getOauthSettings(space.name));
+
+                    detailedSpaceInfo$.subscribe(settings => {
                         space.oauth = settings;
-                    });
+                    })
                 });
-                return this.spaces =  spaces;
+                this.spaces = spaces;
             })
             .do(() => this.isLoadingSpaces = false);
 

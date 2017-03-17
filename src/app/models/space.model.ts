@@ -9,7 +9,8 @@ export class Space {
                 public icon?: string,
                 public username?: string,
                 public description?: string,
-                public avatar?: string) {
+                public avatar?: string,
+                public rainSchemas?: any[]) {
     }
 
 }

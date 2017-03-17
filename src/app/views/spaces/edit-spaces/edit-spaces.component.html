@@ -18,22 +18,20 @@
                                     <img src="{{space.avatar}}">
                                 </figure>
                                 <var *ngIf="!space.username">{{space.name}}</var>
-                                <small *ngIf="space.username">@{{space.username}}</small>
+                                <span *ngIf="space.username">@{{space.username}}</span>
                             </div>
                             <p>{{space.description}}</p>
 
-                            <!--<div class="tag is-{{(space.oauth?.connected)? 'success' : 'danger'}}">
-                                <span class="icon is-small" *ngIf="space?.oauth">
-                                    <i class="fa fa-{{(space.oauth?.connected)? 'check' : 'exclamation'}}-circle"></i>
-                                </span>
-                                <span>{{(space.oauth?.connected)? 'Connected' : 'Not connected'}}</span>
-                            </div>-->
-                            <div class="is-flex">
+
+                            <div class="is-flex is-pulled-left">
                                 <span class="icon is-small" *ngIf="space?.oauth">
                                     <i class="fa fa-{{(space.oauth.connected)? 'check' : 'exclamation'}}-circle is-{{(space.oauth.connected)? 'success' : 'danger'}}"></i>
                                 </span>
                                 <small>Last modified: {{space.modified | date:'medium'}}</small>
                             </div>
+
+                            <span class="tag is-dark is-pulled-right" *ngFor="let rainType of space.rainSchemas">{{rainType
+                                }}</span>
                             <!--<pre>{{space|json}}</pre>-->
                         </div>
                     </div>
