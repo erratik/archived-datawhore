@@ -37,7 +37,7 @@ export class EditSpacesComponent implements OnInit {
                         space.oauth = settings;
                     })
                 });
-                this.spaces = spaces;
+                return this.spaces = spaces;
             })
             .do(() => this.isLoadingSpaces = false);
 
