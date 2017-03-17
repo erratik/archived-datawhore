@@ -14,10 +14,9 @@ const Space = require('../models/spaceModel');
 const Setting = require('../models/settingModel');
 const Schema = require('../models/schemaModel');
 
+
 const endpoints = require('./endpoints');
 const objectPath = require('object-path');
-const Utils = require('../lib/utils');
-
 
 // my own endpoints, read/write in mongo docs
 let getEndpoint = (data, cb) => {
@@ -34,6 +33,7 @@ let getEndpoint = (data, cb) => {
 
 let postEndpoint = (data, content, cb) => {
     console.log(`[postEndpoint] ${data.action} -> `, data);
+    content.fetchUrl = data.apiEndpointUrl;
     const endpointAction = objectPath.get(endpoints, data.action);
     return endpointAction(data.space, content, data.type, function (resp) {
         cb(resp);
@@ -70,10 +70,12 @@ router
         });
     })
     .delete('/space/:space', function (req, res) {
-        Space.removeSpace(req.params.space, function () {
-            res.status(200).send(`${req.params.space} was deleted`);
+        Space.removeSpace(req.params.space, () => res.status(200).send({message: `${req.params.space} was deleted`}));
+    })
+    .delete('/schema/:space/:type', function (req, res) {
+        Schema.removeSchema(req.params.space, req.params.type, function () {
+            res.status(200).send({message: `${req.params.space} schema was deleted for ${req.params.space}`});
         });
-
     });
 // SPACES: ENDPOINTS TO GET DATA FROM DATAWHORE API
 router

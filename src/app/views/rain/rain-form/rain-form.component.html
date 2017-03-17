@@ -1,6 +1,5 @@
-
-<div *ngIf="haveDimsChanged()">
-</div>
 <hr>
 <datawhore-dim-list [model]="model"></datawhore-dim-list>
-<a (click)="saveRain(rainSchemaIndex)" class="button is-success" *ngIf="haveDimsChanged() || !schemaObjectOverride">Save</a>
+<hr>
+<a (click)="saveRain(rainSchemaIndex)" class="button is-success is-outlined"
+   *ngIf="haveDimsChanged() || !schemaObjectOverride">Save Rain Configuration</a>

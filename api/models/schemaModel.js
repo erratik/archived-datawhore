@@ -33,6 +33,14 @@ var SchemaSchema = {
                 }
             });
         },
+        removeSchema: function (space, type, cb) {
+            var query = { space: space, 'schemas.type': type };
+            this.update(query, { $pull: { schemas: { type: type } } }, { multi: true }, function (error, _updated) {
+                if (_updated.ok) {
+                    cb();
+                }
+            });
+        },
         writeSchema: function (spaceName, schema, cb) {
             var query = { space: spaceName, 'schemas.type': schema.type };
             var that = this;

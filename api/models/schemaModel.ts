@@ -40,6 +40,18 @@ const SchemaSchema = {
                 }
             );
         },
+        removeSchema: function (space: string, type: string, cb) {
+            const query = {space: space, 'schemas.type': type};
+            this.update(
+                query,
+                {$pull: {schemas: {type: type}}},
+                {multi: true}, function (error, _updated) {
+                    if (_updated.ok) {
+                        cb();
+                    }
+                }
+            );
+        },
         writeSchema: function (spaceName: string, schema: any, cb) {
 
             const query = {space: spaceName, 'schemas.type': schema.type};

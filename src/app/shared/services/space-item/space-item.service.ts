@@ -32,6 +32,12 @@ export class SpaceItemService {
         }).catch(this.handleError);
     }
 
+    public removeSchema(space: string, schemaType = this.type): any {
+        return this.http.delete(`${this.apiServer}/schema/${space}/${schemaType}/`)
+            .map((res: Response) => res.json())
+            .catch(this.handleError);
+    }
+
     public handleError(error: Response | any) {
         // In a real world app, we might use a remote logging infrastructure
         let errMsg: string;

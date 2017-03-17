@@ -15,23 +15,19 @@ const objectPath = require('object-path');
 })
 export class RainConfigsComponent implements OnChanges, OnInit {
 
+    public rainSchemas: Array<any> = [];
+    protected rain: Array<Rain>;
     @Input() protected newDimensions: () => {};
     @Input() protected spaceOauthSettings;
     @Input() protected space: Space;
-    protected rain: Array<Rain>;
-    protected schemas = [];
 
-    public rainSchemas: Array<any> = [];
-    private rainFetchUrl = null;
-    protected newRainType: string;
-    protected schemaObjectOverride: string = null;
-
-
-    protected isFetchingSchema = false;
-
-    protected editRainMode = false;
     protected activeTab;
     protected activeSubTab = 'configs';
+    protected isFetchingSchema = false;
+
+    protected newRainType: string;
+    protected schemaObjectOverride: string = null;
+    private rainFetchUrl = null;
 
     constructor(private spacesService: SpacesService,
                 private spaceItemService: SpaceItemService,
@@ -44,7 +40,8 @@ export class RainConfigsComponent implements OnChanges, OnInit {
             .switchMap(() => this.getRawRain());
 
         getRainSchemas$.subscribe(() => {
-            console.log(this)
+            this.activeTab = this.rainSchemas.length ? this.rainSchemas[0].type : this.activeTab;
+            this.rainSchemas = this.spacesService.spaceRainSchemas;
         });
 
     }
@@ -54,7 +51,6 @@ export class RainConfigsComponent implements OnChanges, OnInit {
     }
 
     private getRain(): any {
-        // debugger;
         return this.rainService.getRain(this.space.name).do((rain) => {
 
             this.rain = rain.map(r => new Rain(
@@ -81,12 +77,14 @@ export class RainConfigsComponent implements OnChanges, OnInit {
     }
 
     protected writeRain(type: any = 'rain'): any {
-        // console.log(this.rain)
-        this.rainFetchUrl = this.rainSchemas.filter(s => s.type === type)[0].fetchUrl;
-        // debugger;
+
         if (!this.rainFetchUrl) {
             console.error(`there is no profile getter path for ${this.space.name}`);
             return;
+        }
+
+        if (this.rainSchemas.length) {
+            this.rainFetchUrl = this.rainSchemas.filter(s => s.type === type)[0].fetchUrl;
         }
 
         this.isFetchingSchema = true;
@@ -98,23 +96,20 @@ export class RainConfigsComponent implements OnChanges, OnInit {
         data['type'] = typeof type === 'object' ? type.typeName : type;
         data['space'] = this.space.name;
 
-        const schemas$ = this.spacesService.spaceEndpoint(this.space, data).do((resetRainSchema) => {
-
-            // if (resetRainSchema.type === data.type) {
+        const schemas$ = this.spacesService.spaceEndpoint(this.space, data).do((updatedSchema) => {
+            if (this.spacesService.spaceRainSchemas.length) {
                 this.spacesService.spaceRainSchemas.map(s => {
-                    if (s.type === resetRainSchema.type) {
-                        debugger;
-                        return new DimensionSchema(resetRainSchema['type'], resetRainSchema['content'], resetRainSchema.modified);
+                    if (s.type === updatedSchema.type) {
+                        return new DimensionSchema(updatedSchema['type'], updatedSchema['content'], updatedSchema.modified);
                     }
                 });
-                // this.spacesService.spaceRainSchemas.push(new DimensionSchema(resetRainSchema['type'], resetRainSchema['content'], resetRainSchema.modified));
-            // }
-
-            this.rainSchemas = this.spacesService.spaceRainSchemas;
+            } else {
+                this.spacesService.spaceRainSchemas.push(new DimensionSchema(updatedSchema['type'], updatedSchema['content'], updatedSchema.modified));
+            }
+            this.setActiveTab(updatedSchema['type']);
         });
 
         schemas$.subscribe(() => {
-
             this.rain.forEach((r, i) => {
                 if (this.rainSchemas[i]) {
                     r.createPropertyBucket(this.rainSchemas[i].propertyBucket);
@@ -130,9 +125,8 @@ export class RainConfigsComponent implements OnChanges, OnInit {
 
         const schema = objectPath.get(this.rainSchemas[index], `content.${this.schemaObjectOverride}`);
 
-        debugger;
         const profileSchema$ = this.rainService.updateSchema(this.space.name, schema, type).do((rainSchema) => {
-            this.spacesService.spaceRainSchemas.map(s => {
+            this.spacesService.spaceRainSchemas = this.rainSchemas = this.spacesService.spaceRainSchemas.map(s => {
                 if (s.type === rainSchema.type) {
                     return new DimensionSchema(rainSchema['type'], rainSchema['content'], rainSchema.modified);
                 }
@@ -144,32 +138,20 @@ export class RainConfigsComponent implements OnChanges, OnInit {
         });
     }
 
-    // protected updateRainSchema(schemaData): any {
-    //     console.log(schemaData, this);
-    //
-    //     debugger;
-    //     if (!this.rainSchemas) {
-    //         this.rainSchemas = [new DimensionSchema(schemaData.type, schemaData.content, schemaData.modified)];
-    //
-    //     }
-    //     schemaData = [schemaData];
-    //     this.rainSchemas.map(s => {
-    //         // debugger;
-    //         if (s.type === schemaData[0].type) {
-    //             s = schemaData;
-    //         }
-    //     });
-    //     // }
-    //
-    // }
+    public removeSchema(type: string): void {
+        this.spaceItemService.removeSchema(this.space.name, type).subscribe(() => {
+            this.spacesService.spaceRainSchemas = this.rainSchemas = this.rainSchemas.filter(s => s.type !== type);
+            this.getActiveTab();
+        });
+    }
 
     public setActiveTab(tabName: string): void {
         this.activeTab = tabName;
         this.activeSubTab = '';
-        console.log(this.activeTab, this.activeSubTab);
+        // console.log(this.activeTab, this.activeSubTab);
     }
 
     protected getActiveTab(): any {
-        return this.activeTab = this.schemas.length ? this.schemas[0].type : 'new-schema';
+        return this.activeTab = this.rainSchemas.length ? this.rainSchemas[0].type : 'new-schema';
     }
 }

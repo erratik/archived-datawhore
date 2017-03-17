@@ -1,6 +1,6 @@
 <div [ngSwitch]="activeTab" class="columns">
 
-    <aside class="menu column is-2">
+    <aside class="menu column is-2" *ngIf="rainSchemas.length">
         <p class="menu-label">
             Rain Schemas
         </p>
@@ -157,12 +157,23 @@
                 <label class="label">
                     Rename rain type
                 </label>
-                <div class="control is-flex">
-                    <input #overrideRainType class="input" type="text" [(ngModel)]="schema.type">
-                    <a class="button is-success" *ngIf="overrideRainType.value"
+                <div class="control has-addons">
+                    <input #overrideRainType class="input is-expanded" type="text" [(ngModel)]="schema.type">
+                    <a class="button is-success is-outlined" *ngIf="overrideRainType.value"
                        (click)="saveRawRain(overrideRainType.value)">
                         Save
                     </a>
+                </div>
+                <div class="control">
+                    <label class="label">
+                        API Fetch URL
+                    </label>
+                    <div class="control has-addons">
+                        <input #fetchUrl class="input is-expanded" type="text"
+                               placeholder="/v1/me/player/recently-played?limit=1"
+                               [(ngModel)]="schema.fetchUrl">
+                        <a class="button is-success is-outlined" (click)="saveRawRain(fetchUrl.value)">Save</a>
+                    </div>
                 </div>
                 <hr>
                 <a class="button is-warning" [class.is-loading]="isFetchingSchema"
@@ -170,10 +181,10 @@
                     <span class="icon is-small"><i class="fa fa-refresh"></i></span>
                     <span>Fetch schema</span>
                 </a>
-                <a class="button is-danger" [class.is-loading]="isFetchingSchema"
-                   (click)="onResetRain.emit($event)">
-                    <span class="icon is-small"><i class="fa fa-refresh"></i></span>
-                    <span>Fetch schema</span>
+                <a class="button is-danger"
+                   (click)="removeSchema(schema.type)">
+                    <span class="icon is-small"><i class="fa fa-trash"></i></span>
+                    <span>Delete schema</span>
                 </a>
             </div>
         </div>
