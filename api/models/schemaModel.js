@@ -19,17 +19,18 @@ var SchemaSchema = {
                     var schema = new Schema({
                         space: spaceName,
                         schemas: [{
-                                type: schemaType,
-                                modified: Date.now()
-                            }]
+                            type: schemaType,
+                            modified: Date.now()
+                        }]
                     });
                     docs.push(schema);
                 }
-                if (schemaType !== 'rain') {
+                if (!schemaType.includes('rain')) {
                     cb(docs[0].schemas.filter(function (schema) { return schema.type === schemaType; })[0]);
-                }
-                else {
-                    cb(docs[0].schemas.filter(function (schema) { return schema.type.includes('rain'); }));
+                } else {
+                    cb(docs[0].schemas.filter(function (schema) {
+                        return schema.type.includes('rain');
+                    }));
                 }
             });
         },
@@ -48,12 +49,15 @@ var SchemaSchema = {
                 schema.modified = Date.now();
                 that.findOneAndUpdate({ space: spaceName }, { modified: Date.now(), $push: { schemas: schema } }, { upsert: true, returnNewDocument: true }, function (err, updated) {
                     // console.log('... and updated', schema);
-                    callback(schema);
+                    that.find(query, { 'schemas.$': 1 }, (err, docs) => {
+                        if (err) cb(err);
+                        cb(docs[0].schemas[0]);
+                    });
                 });
             };
             this.findOne(query, { 'schemas.$': 1 }, function (_err, docs) {
                 if (docs) {
-                    that.update(query, { $pull: { schemas: { type: schema.type } } }, { multi: true }, function (error, _updated) {
+                    that.update(query, { $pull: { schemas: { type: schema.type } } }, { multi: false }, function (error, _updated) {
                         // console.log('pulled', _updated);
                         if (_updated.ok) {
                             addSchema(cb);
@@ -70,3 +74,4 @@ var SchemaSchema = {
 };
 Schema = require('./createModel')(mongoose, 'Schema', SchemaSchema);
 module.exports = Schema;
+//# sourceMappingURL=/Users/erratik/Sites/datawhore/admin/api/models/schemaModel.js.map

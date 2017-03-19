@@ -11,24 +11,25 @@ module.exports = function (app) {
 
     Setting.findSettings(space, (settings) => {
 
-        passport.use(new TwitterStrategy({
+        if (settings.oauth) {
+            passport.use(new TwitterStrategy({
                 consumerKey: settings.oauth.filter(s => s.keyName === 'apiKey')[0].value,
                 consumerSecret: settings.oauth.filter(s => s.keyName === 'apiSecret')[0].value,
                 callbackURL: `http://datawhore.erratik.ca:10010/auth/${space}/callback`
-                // callbackURL: settings.oauth.filter(s => s.keyName === 'redirectUrl')[0].value
             },
-            (token, tokenSecret, profile, done) => Utils.savePassport(settings, {
-                token: token,
-                tokenSecret: tokenSecret
-            }, profile, done)
-        ));
+                (token, tokenSecret, profile, done) => Utils.savePassport(settings, {
+                    token: token,
+                    tokenSecret: tokenSecret
+                }, profile, done)
+            ));
+        }
 
     });
 
-    app.get('/auth/twitter', passport.authenticate(space));
-    app.get('/auth/twitter/callback', passport.authenticate(space, {
+    app.get('/auth/${space}', passport.authenticate(space));
+    app.get('/auth/${space}/callback', passport.authenticate(space, {
         successRedirect: `http://datawhore.erratik.ca:4200/space/${space}`,
-            failureRedirect: 'http://datawhore.erratik.ca:4200'
-        }));
+        failureRedirect: 'http://datawhore.erratik.ca:4200'
+    }));
 
 };

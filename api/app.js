@@ -12,7 +12,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const flash = require('connect-flash');
 
 const routes = require('./routes/authenticate');
-const api = require('./routes/core.ts');
+const api = require('./routes/core');
 const users = require('./routes/users');
 
 const app = express();

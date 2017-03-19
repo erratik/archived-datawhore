@@ -43,8 +43,8 @@
     <div class="container" *ngIf="space?.oauth" [ngSwitch]="activeTab">
         <div class="tabs">
             <ul>
-                <li (click)="setActiveTab('profile')" [class.is-active]="activeTab === 'profile'"><a>Profile</a></li>
-                <li (click)="setActiveTab('rain')" [class.is-active]="activeTab === 'rain'"><a>Rain</a></li>
+                <li (click)="setActiveTab('profile')" [class.is-active]="activeTab === 'profile'" *ngIf="space.oauth.connected"><a>Profile</a></li>
+                <li (click)="setActiveTab('rain')" [class.is-active]="activeTab === 'rain'" *ngIf="space.oauth.connected"><a>Rain</a></li>
                 <li (click)="setActiveTab('space')" [class.is-active]="activeTab === 'space'"><a>Space</a></li>
             </ul>
         </div>
@@ -70,7 +70,7 @@
                         </p>
                     </div>
 
-                    <div class="example" *ngIf="profile?.properties">
+                    <div class="example" [class.is-hidden]="!profile?.properties">
                         <datawhore-space-item [properties]="profile.properties" [type]="'profile'"
                                               [space]="space"
                                               (linkingToSpace)="updateSpace($event)"></datawhore-space-item>

@@ -18,11 +18,17 @@ export class SpaceItemService {
             .catch(this.handleError);
     }
 
-    public updateSchema(space: string, schema: any, type = this.type): Observable<any> {
-        const bodyString = JSON.stringify({
+    public updateSchema(space: string, schema: any, type = this.type, topSchema = null): Observable<any> {
+        const payload = {
             data: schema,
             type: type
-        });
+        };
+        // debugger;
+        if (topSchema) {
+            payload['topSchema'] = topSchema;
+        }
+
+        const bodyString = JSON.stringify(payload);
 
         const headers = new Headers({'Content-Type': 'application/json'}); // ... Set content type to JSON
         const options = new RequestOptions({headers: headers}); // Create a request option

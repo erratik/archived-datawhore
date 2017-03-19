@@ -7,3 +7,4 @@ var User = new Schema({
 });
 User.plugin(passportLocalMongoose);
 module.exports = mongoose.model('users', User);
+//# sourceMappingURL=/Users/erratik/Sites/datawhore/admin/api/models/userModel.js.map

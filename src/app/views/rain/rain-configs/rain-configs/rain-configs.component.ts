@@ -1,10 +1,11 @@
-import {Component, OnInit, Input, Output, EventEmitter, OnChanges} from '@angular/core';
-import {Rain, Dimension} from '../../../../models/rain.model';
-import {Space} from '../../../../models/space.model';
-import {SpacesService} from '../../../../services/spaces.service';
-import {DimensionSchema} from '../../../../models/dimension-schema.model';
-import {SpaceItemService} from '../../../../shared/services/space-item/space-item.service';
-import {RainService} from '../../../../services/rain/rain.service';
+import { RainFormComponent } from '../../rain-form/rain-form.component';
+import { Component, OnInit, Input, Output, ViewChild, EventEmitter, OnChanges } from '@angular/core';
+import { Rain, Dimension } from '../../../../models/rain.model';
+import { Space } from '../../../../models/space.model';
+import { SpacesService } from '../../../../services/spaces.service';
+import { DimensionSchema } from '../../../../models/dimension-schema.model';
+import { SpaceItemService } from '../../../../shared/services/space-item/space-item.service';
+import { RainService } from '../../../../services/rain/rain.service';
 const objectPath = require('object-path');
 
 @Component({
@@ -20,6 +21,7 @@ export class RainConfigsComponent implements OnChanges, OnInit {
     @Input() protected newDimensions: () => {};
     @Input() protected spaceOauthSettings;
     @Input() protected space: Space;
+    @ViewChild(RainFormComponent) protected rainForm: RainFormComponent;
 
     protected activeTab;
     protected activeSubTab = 'configs';
@@ -30,8 +32,8 @@ export class RainConfigsComponent implements OnChanges, OnInit {
     private rainFetchUrl = null;
 
     constructor(private spacesService: SpacesService,
-                private spaceItemService: SpaceItemService,
-                private rainService: RainService) {
+        private spaceItemService: SpaceItemService,
+        private rainService: RainService) {
     }
 
     ngOnInit() {
@@ -64,27 +66,19 @@ export class RainConfigsComponent implements OnChanges, OnInit {
 
     private getRawRain(): any {
         return this.spaceItemService.fetchSchema(this.space.name, 'rain').do((rain) => {
-            this.spacesService.spaceRainSchemas = this.rainSchemas = rain.map(rainSchema => {
-                return new DimensionSchema(
-                    rainSchema.type,
-                    rainSchema.content,
-                    rainSchema.modified,
-                    null,
-                    rainSchema.fetchUrl
-                );
-            });
+            this.spacesService.spaceRainSchemas = this.rainSchemas = rain.map(rainSchema => this.toSchema(rainSchema));
         });
     }
 
-    protected writeRain(type: any = 'rain'): any {
+    protected writeRain(index: number, type: any = 'rain', override = false): any {
+
+        if (this.rainSchemas.length) {
+            this.rainFetchUrl = this.rainSchemas.filter(s => s.type === type)[0].fetchUrl;
+        }
 
         if (!this.rainFetchUrl) {
             console.error(`there is no profile getter path for ${this.space.name}`);
             return;
-        }
-
-        if (this.rainSchemas.length) {
-            this.rainFetchUrl = this.rainSchemas.filter(s => s.type === type)[0].fetchUrl;
         }
 
         this.isFetchingSchema = true;
@@ -95,17 +89,10 @@ export class RainConfigsComponent implements OnChanges, OnInit {
         data['action'] = 'schema.write';
         data['type'] = typeof type === 'object' ? type.typeName : type;
         data['space'] = this.space.name;
+        data['override'] = override;
 
-        const schemas$ = this.spacesService.spaceEndpoint(this.space, data).do((updatedSchema) => {
-            if (this.spacesService.spaceRainSchemas.length) {
-                this.spacesService.spaceRainSchemas.map(s => {
-                    if (s.type === updatedSchema.type) {
-                        return new DimensionSchema(updatedSchema['type'], updatedSchema['content'], updatedSchema.modified);
-                    }
-                });
-            } else {
-                this.spacesService.spaceRainSchemas.push(new DimensionSchema(updatedSchema['type'], updatedSchema['content'], updatedSchema.modified));
-            }
+        const schemas$ = this.spacesService.spaceEndpoint(this.space, data, this.rainSchemas[index]).do((updatedSchema) => {
+            this.toSchemas(updatedSchema);
             this.setActiveTab(updatedSchema['type']);
         });
 
@@ -115,27 +102,51 @@ export class RainConfigsComponent implements OnChanges, OnInit {
                     r.createPropertyBucket(this.rainSchemas[i].propertyBucket);
                 }
             });
-
-            this.isFetchingSchema = false
+            this.isFetchingSchema = false;
         });
 
     }
 
     protected saveRawRain(index: number, type: string): any {
 
-        const schema = objectPath.get(this.rainSchemas[index], `content.${this.schemaObjectOverride}`);
+        this.isFetchingSchema = true;
+        let schema = objectPath.get(this.spacesService.spaceRainSchemas[index], `content.${this.schemaObjectOverride}`);
+        this.spacesService.spaceRainSchemas[index].content = schema;
 
-        const profileSchema$ = this.rainService.updateSchema(this.space.name, schema, type).do((rainSchema) => {
-            this.spacesService.spaceRainSchemas = this.rainSchemas = this.spacesService.spaceRainSchemas.map(s => {
-                if (s.type === rainSchema.type) {
-                    return new DimensionSchema(rainSchema['type'], rainSchema['content'], rainSchema.modified);
-                }
-            });
+        if (!schema) {
+            schema = this.spacesService.spaceRainSchemas[index];
+        }
+
+        // todo: remove this silly param call, we don't need the schema AND the spacesService schema (topSchema)
+        const profileSchema$ = this.rainService.updateSchema(this.space.name, schema, type, this.spacesService.spaceRainSchemas[index]).do((updatedSchema) => {
+            this.toSchemas(updatedSchema);
+            this.rainForm.model = this.spacesService.spaceRainSchemas[index].propertyBucket;
         });
 
         profileSchema$.subscribe(() => {
             this.isFetchingSchema = false;
         });
+    }
+
+    private toSchemas(updatedSchema: any): void {
+        if (this.spacesService.spaceRainSchemas.length) {
+            this.spacesService.spaceRainSchemas = this.spacesService.spaceRainSchemas.map(s => {
+                if (s.type === updatedSchema.type) {
+                    return this.toSchema(updatedSchema);
+                }
+            });
+        } else {
+            this.spacesService.spaceRainSchemas.push(this.toSchema(updatedSchema));
+        }
+    }
+
+    private toSchema(preSchema): DimensionSchema {
+        return new DimensionSchema(
+            preSchema.type,
+            preSchema.content,
+            preSchema.modified,
+            preSchema.fetchUrl
+        );
     }
 
     public removeSchema(type: string): void {
@@ -148,7 +159,6 @@ export class RainConfigsComponent implements OnChanges, OnInit {
     public setActiveTab(tabName: string): void {
         this.activeTab = tabName;
         this.activeSubTab = '';
-        // console.log(this.activeTab, this.activeSubTab);
     }
 
     protected getActiveTab(): any {

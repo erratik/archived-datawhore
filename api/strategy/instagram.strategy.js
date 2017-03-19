@@ -11,16 +11,18 @@ module.exports = function (app) {
 
     Setting.findSettings(space, (settings) => {
 
-        passport.use(new InstagramStrategy({
+        if (settings.oauth) {
+            passport.use(new InstagramStrategy({
                 clientID: settings.oauth.filter(s => s.keyName === 'apiKey')[0].value,
                 clientSecret: settings.oauth.filter(s => s.keyName === 'apiSecret')[0].value,
                 callbackURL: `http://datawhore.erratik.ca:10010/auth/${space}/callback`
             },
-            (accessToken, refreshToken, profile, done) => Utils.savePassport(settings, {
-                accessToken: accessToken,
-                refreshToken: refreshToken
-            }, profile, done)
-        ));
+                (accessToken, refreshToken, profile, done) => Utils.savePassport(settings, {
+                    accessToken: accessToken,
+                    refreshToken: refreshToken
+                }, profile, done)
+            ));
+        }
 
     });
 

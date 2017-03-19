@@ -52,3 +52,4 @@ var SettingSchema = {
 };
 var Setting = require('./createModel')(mongoose, 'Setting', SettingSchema);
 module.exports = Setting;
+//# sourceMappingURL=/Users/erratik/Sites/datawhore/admin/api/models/settingModel.js.map

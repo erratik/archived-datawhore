@@ -121,34 +121,6 @@
              [class.is-hidden]="activeSubTab !== '' && activeSubTab !== 'configs'">
 
             <div class="column is-half">
-                <div class="header">
-                    <h3 class="is-pulled-left heading">{{schema.type}} Dimensions</h3>
-                </div>
-                <div class="configure-rain">
-
-                    <hr>
-                    <label class="label is-inline-flex">
-                        <span class="icon is-warning is-pulled-right"><i class="fa fa-exclamation-circle"></i></span>
-                        <span>Override object path to rain schema</span>
-                    </label>
-                    <div class="control is-flex">
-                        <input #overrideRain class="input" type="text" placeholder="Enter object path (a.b.c)"
-                               [(ngModel)]="schemaObjectOverride">
-                        <a class="button is-success" *ngIf="overrideRain.value"
-                           (click)="saveRawRain($i, schema.type)">
-                            Save
-                        </a>
-                    </div>
-
-                    <datawhore-rain-form [model]="schema"
-                                         [rainSchemaIndex]="$i"
-                                         [dimType]="schema.type" [space]="space"
-                                         (onRainSchema)="updateRainSchema($event)"
-                                         (onNewDimensions)="newDimensions($event)">
-                    </datawhore-rain-form>
-                </div>
-            </div>
-            <div class="column is-half">
 
                 <div class="header">
                     <h3 class="heading">{{schema.type}} Settings</h3>
@@ -159,10 +131,6 @@
                 </label>
                 <div class="control has-addons">
                     <input #overrideRainType class="input is-expanded" type="text" [(ngModel)]="schema.type">
-                    <a class="button is-success is-outlined" *ngIf="overrideRainType.value"
-                       (click)="saveRawRain(overrideRainType.value)">
-                        Save
-                    </a>
                 </div>
                 <div class="control">
                     <label class="label">
@@ -172,20 +140,48 @@
                         <input #fetchUrl class="input is-expanded" type="text"
                                placeholder="/v1/me/player/recently-played?limit=1"
                                [(ngModel)]="schema.fetchUrl">
-                        <a class="button is-success is-outlined" (click)="saveRawRain(fetchUrl.value)">Save</a>
+                        <a class="button is-warning" [class.is-loading]="isFetchingSchema"
+                        (click)="writeRain($i, schema.type, true)">
+                            <span class="icon is-small"><i class="fa fa-refresh"></i></span>
+                            <!--<span>Fetch schema</span>-->
+                        </a>
                     </div>
+                               {{fetchUrl.className}}
                 </div>
                 <hr>
-                <a class="button is-warning" [class.is-loading]="isFetchingSchema"
-                   (click)="writeRain(schema.type)">
-                    <span class="icon is-small"><i class="fa fa-refresh"></i></span>
-                    <span>Fetch schema</span>
-                </a>
+                        <a class="button is-success" (click)="saveRawRain($i, schema.type)">Update</a>
                 <a class="button is-danger"
                    (click)="removeSchema(schema.type)">
-                    <span class="icon is-small"><i class="fa fa-trash"></i></span>
-                    <span>Delete schema</span>
+                    <!--<span class="icon is-small"><i class="fa fa-trash"></i></span>-->
+                    <span>Delete</span>
                 </a>
+            </div>
+            <div class="column is-half">
+                <div class="header">
+                    <h3 class="is-pulled-left heading">{{schema.type}} Dimensions</h3>
+                </div>
+                <div class="configure-rain">
+
+                    <hr>
+                    <label class="label is-inline-flex">
+                        <span class="icon is-warning is-pulled-right"><i class="fa fa-exclamation-circle"></i></span>
+                        <span>Override object path to rain schema</span>
+                    </label>
+                    <div class="control has-addons">
+                        <input #overrideRain class="input is-expanded" type="text" placeholder="Enter object path (a.b.c)"
+                               [(ngModel)]="schemaObjectOverride">
+                        <a class="button is-success" *ngIf="overrideRain.value"
+                           (click)="saveRawRain($i, schema.type)">
+                            Override
+                        </a>
+                    </div>
+                    <datawhore-rain-form [model]="schema"
+                                         [rainSchemaIndex]="$i"
+                                         [dimType]="schema.type" [space]="space"
+                                         (onRainSchema)="updateRainSchema($event)"
+                                         (onNewDimensions)="newDimensions($event)">
+                    </datawhore-rain-form>
+                </div>
             </div>
         </div>
     </div>

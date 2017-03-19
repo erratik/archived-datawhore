@@ -31,7 +31,7 @@ export class SpaceItemComponent implements OnInit {
 
         this.itemSchema$ = this[`${this.type}Service`].fetchSchema(this.space.name).do((rawSchema) => {
             this.schema = rawSchema.length ? rawSchema[0] : rawSchema;
-            if (this.type == 'profile') {
+            if (this.type === 'profile' && this.properties) {
                 this.findSpaceLinks();
             }
         });
@@ -39,8 +39,10 @@ export class SpaceItemComponent implements OnInit {
     }
 
     public findSpaceLinks(): void {
+        const space = this.space;
         this.properties.forEach(property => {
-            if (Object.keys(this.space).includes(property.friendlyName)) {
+            const spaceKeys = Object.keys(this.space);
+            if (spaceKeys.includes(property.friendlyName)) {
                 property.linkableToSpace = true;
             }
         });

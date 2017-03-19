@@ -8,7 +8,8 @@ var SpaceSchema = {
         avatar: String,
         description: String,
         username: String,
-        icon: String
+        icon: String,
+        docUrl: String
     },
     self: {
         findByName: function (name, cb) {
@@ -34,3 +35,4 @@ var SpaceSchema = {
 };
 var Space = require('./createModel')(mongoose, 'Space', SpaceSchema);
 module.exports = Space;
+//# sourceMappingURL=/Users/erratik/Sites/datawhore/admin/api/models/spaceModel.js.map

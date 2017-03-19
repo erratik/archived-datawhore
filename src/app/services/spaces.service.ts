@@ -67,14 +67,18 @@ export class SpacesService {
         }).catch(this.handleError);
     }
 
-    public spaceEndpoint(space: Space, queryData, endpointPath = ''): Observable<any> {
+    public spaceEndpoint(space: Space, queryData, data, endpointPath = ''): Observable<any> {
 
         endpointPath = (endpointPath === '') ? 'endpoint/space' : endpointPath;
         const url = `${this.apiServer}/${endpointPath}`;
-        const bodyString = JSON.stringify({
+        const payload = {
             data: queryData,
             space: space.name
-        });
+        };
+        if (data) {
+            payload['more'] = data;
+        }
+        const bodyString = JSON.stringify(payload);
 
         const headers = new Headers({'Content-Type': 'application/json'}); // ... Set content type to JSON
         const options = new RequestOptions({headers: headers}); // Create a request option

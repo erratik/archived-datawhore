@@ -4,8 +4,8 @@ export class DimensionSchema {
     constructor(public type: string,
                 public content: any,
                 public modified: number = null,
-                public propertyBucket = null,
-                public fetchUrl?: string) {
+                public fetchUrl?: string,
+                public propertyBucket = null) {
 
         this.propertyBucket = this.assignValues();
     }

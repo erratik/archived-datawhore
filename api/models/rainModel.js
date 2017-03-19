@@ -29,3 +29,4 @@ var RainSchema = {
 };
 var Rain = require('./createModel')(mongoose, 'rain', RainSchema);
 module.exports = Rain;
+//# sourceMappingURL=/Users/erratik/Sites/datawhore/admin/api/models/rainModel.js.map

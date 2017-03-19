@@ -26,8 +26,9 @@ var ProfileSchema = {
         },
         removeProfile: function (name, cb) {
             this.remove({ space: name }, cb);
-        }
+        },
     }
 };
 var Profile = require('./createModel')(mongoose, 'Profile', ProfileSchema);
 module.exports = Profile;
+//# sourceMappingURL=/Users/erratik/Sites/datawhore/admin/api/models/profileModel.js.map

@@ -3,6 +3,7 @@ import {Space} from '../../../../models/space.model';
 import {Dimension} from '../../../../models/profile.model';
 import {ProfileService} from '../../../../services/profile/profile.service';
 import {RainService} from '../../../../services/rain/rain.service';
+import {SpacesService} from '../../../../services/spaces.service';
 
 @Component({
     selector: 'datawhore-dim-form',
@@ -18,8 +19,9 @@ export class DimensionFormComponent {
     @Input() public dimType: string;
     @Output() public onNewDimensions = new EventEmitter<any>();
 
-    constructor(public profileService: ProfileService,
-                public rainService: RainService) {}
+    constructor(public profileService?: ProfileService,
+                public rainService?: RainService,
+                public spacesService?: SpacesService) {}
 
     public haveDimsChanged(): boolean {
         return JSON.stringify(this.model) !== this.initialModel;

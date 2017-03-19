@@ -21,10 +21,10 @@ import {RainService} from '../../../services/rain/rain.service';
 
 export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
-    public space: Space = null;
+    public space: Space;
     public rain: Array<Rain> = [];
-    public profile: Profile = null;
-    public profileSchema: any = null;
+    public profile: Profile;
+    public profileSchema: DimensionSchema;
     public uploader: FileUploader;
     protected isFetchingSchema = false;
     protected schemaObjectOverride: string = null;
@@ -44,8 +44,19 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
             .switchMap(() => this.getProfile())
             .mergeMap(() => this.getRawProfile())
             .do((profileSchema) => {
+            // debugger;
                 this.profileSchema = new DimensionSchema(profileSchema['type'], profileSchema['content'], profileSchema['modified']);
+                if (!this.space.oauth.connected) {
+                    this.activeTab = 'space';
+                } else if (!this.spacesService.spaceRainSchemas.length) {
+                    this.activeTab = 'profile';
+                }
+
+                if (this.profile.properties) {
+                    this.activeTab = 'rain';
+                }
             });
+
 
         spaceConfig$.subscribe(() => {
 
