@@ -44,19 +44,16 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
             .switchMap(() => this.getProfile())
             .mergeMap(() => this.getRawProfile())
             .do((profileSchema) => {
-            // debugger;
                 this.profileSchema = new DimensionSchema(profileSchema['type'], profileSchema['content'], profileSchema['modified']);
                 if (!this.space.oauth.connected) {
                     this.activeTab = 'space';
                 } else if (!this.spacesService.spaceRainSchemas.length) {
                     this.activeTab = 'profile';
                 }
-
                 if (this.profile.properties) {
                     this.activeTab = 'rain';
                 }
             });
-
 
         spaceConfig$.subscribe(() => {
 

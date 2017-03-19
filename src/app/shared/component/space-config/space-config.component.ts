@@ -65,7 +65,7 @@ export class SpaceConfigComponent {
                     apiUrl: Paths.SPACE_API_URL[this.space.name]
                 };
 
-                // todo : this is disgusting, make it look nice!
+                // todo: this is disgusting, make it look nice!
                 // this could easily be turned into a function
                 // this.space.oauth.extras.filter(settings => settings.label === 'accessToken')
                 if (this.space.oauth.connected) {
