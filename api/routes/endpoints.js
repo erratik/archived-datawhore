@@ -68,8 +68,8 @@ module.exports = {
         }*/
     },
     rain: {
-        write: function (space, content, type = null, cb) {
-            Rain.updateRain(space.name, content, (updatedRain) => {
+        write: function (data, content, type = null, cb) {
+            Rain.updateRain(data.space, content, (updatedRain) => {
                 console.log(updatedRain);
                 cb(content);
             });

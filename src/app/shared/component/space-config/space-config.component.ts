@@ -113,7 +113,7 @@ export class SpaceConfigComponent {
             this[data[1]][data[2]].properties = data[0];
         } else {
             this[data[1]].properties = data[0];
-            this.spaceItemComponent.findSpaceLinks();
+            // this.spaceItemComponent.findSpaceLinks();
         }
     }
 

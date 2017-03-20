@@ -19,8 +19,9 @@ export class RainFormComponent extends DimensionFormComponent implements OnInit 
     @Input() public model;
     @Output() onRainSchema = new EventEmitter<any>();
 
-    constructor(spacesService: SpacesService) {
-        super(null, null, spacesService)
+    constructor(spacesService: SpacesService,
+                rainService: RainService) {
+        super(null, rainService, spacesService)
     }
 
     ngOnInit() {

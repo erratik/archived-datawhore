@@ -44,6 +44,12 @@ export class RainConfigsComponent implements OnChanges, OnInit {
         getRainSchemas$.subscribe(() => {
             this.activeTab = this.rainSchemas.length ? this.rainSchemas[0].type : this.activeTab;
             this.rainSchemas = this.spacesService.spaceRainSchemas;
+
+            this.rainSchemas.forEach((rainSchema, i) => {
+                if (rainSchema.propertyBucket) {
+                    this.rain[i].createPropertyBucket(rainSchema.propertyBucket);
+                }
+            });
         });
 
     }
@@ -53,8 +59,8 @@ export class RainConfigsComponent implements OnChanges, OnInit {
     }
 
     private getRain(): any {
-        return this.rainService.getRain(this.space.name).do((rain) => {
 
+        return this.rainService.getRain(this.space.name).do((rain) => {
             this.rain = rain.map(r => new Rain(
                 this.space.name,
                 r.dimensions.map(dims => new Dimension(dims.friendlyName, dims.schemaPath)),

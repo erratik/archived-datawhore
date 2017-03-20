@@ -28,7 +28,7 @@ export class DimensionFormComponent {
     }
 
     public saveDimensions(propertyBucket = this.model, dimArrayIndex = null): any {
-
+        //console.log(this.rainService);
         this.dims = [];
         this.dimType = this.dimType.includes('.') ? this.dimType.split('.')[0] : this.dimType;
 

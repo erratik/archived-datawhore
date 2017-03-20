@@ -18,11 +18,15 @@ var RainSchema = {
         },
         updateRain: function (space, dimensions, cb) {
             // update.type = 'drop';
+            const that = this;
             dimensions.modified = Date.now();
             dimensions.forEach(function (dim, i) { return dimensions[i].type = 'drop'; });
             this.findOneAndUpdate({ space: space }, { modified: Date.now(), dimensions: dimensions }, { upsert: true, returnNewDocument: true }, function (err, updated) {
-                console.log('model update ->', updated);
-                cb(updated);
+                that.find({ space: space }, (err, docs) => {
+                    if (err) cb(err);
+                    console.log('model update ->', docs[0]);
+                    cb(docs[0]);
+                });
             });
         }
     }
