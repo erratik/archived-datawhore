@@ -25,6 +25,7 @@ export class SpaceConfigComponent implements OnInit {
     @Input() public spaceOauthSettings;
     public uploader: FileUploader;
     public isPassportCapable = true;
+    public isLegacy = true;
 
     public retrieveSpace$: Observable<SpaceOauthSettings> = new Observable<SpaceOauthSettings>();
     @Output() public gotOauthSettings: EventEmitter<SpaceOauthSettings> = new EventEmitter<SpaceOauthSettings>();
@@ -86,6 +87,10 @@ export class SpaceConfigComponent implements OnInit {
 
     public setSpace(): void {
         this.space = this.spacesService.space;
+    }
+
+    public addLegacySettings(): void {
+        this.space.oauth.addLegacySettings(this.isPassportCapable);
     }
 
     public updateSpaceSettings(): any {
