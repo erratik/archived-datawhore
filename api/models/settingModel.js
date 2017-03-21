@@ -32,15 +32,15 @@ var SettingSchema = {
 
             if (update.oauth.extras) {
                 update.extras = update.oauth.extras.map(function (settings) {
+                    settings.type = 'oauth';
                     if (settings.label === 'access_token') {
                         update.connected = true;
                         settings.label = 'accessToken';
                     }
-                    settings.type = 'oauth';
                     return settings;
                 });
 
-                update.extras.forEach(s => extrasKeys.push(s.keyName));
+                update.extras.forEach(s => extrasKeys.push(s.label));
             }
 
             if (!extrasKeys.includes('authorizationUrl')) {

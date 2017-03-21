@@ -24,6 +24,7 @@ export class SpaceConfigComponent implements OnInit {
     @Input() public space: Space;
     @Input() public spaceOauthSettings;
     public uploader: FileUploader;
+    public isPassportCapable = true;
 
     public retrieveSpace$: Observable<SpaceOauthSettings> = new Observable<SpaceOauthSettings>();
     @Output() public gotOauthSettings: EventEmitter<SpaceOauthSettings> = new EventEmitter<SpaceOauthSettings>();
