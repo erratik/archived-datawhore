@@ -16,13 +16,6 @@
                 <span class="icon is-small" *ngIf="space?.oauth">
                     <i class="fa fa-{{(space.oauth.connected)? 'check' : 'exclamation'}}-circle is-{{(space.oauth.connected)? 'success' : 'danger'}}"></i>
                 </span>
-                <div *ngIf="uploadImage">
-                    <input type="file" class="form-control" name="single" ng2FileSelect
-                           [uploader]="uploader"/>
-                    <a type="button" class="btn btn-success btn-s" (click)="uploader.uploadAll()">
-                        <span class="fa fa-cloud-upload"></span>
-                    </a>
-                </div>
                 <small>
                     Last modified: {{space.modified | date:'medium'}}
                 </small>
@@ -49,9 +42,6 @@
             </ul>
         </div>
         <div class="tab profile" *ngSwitchDefault>
-            <div class="header">
-                <h2 class="is-pulled-left heading">space Item: Profile</h2>
-            </div>
             <div class="columns">
                 <div class="column is-half" *ngIf="profile">
 
@@ -110,9 +100,6 @@
         </div>
         <div class="tab space" *ngSwitchCase="'rain'">
 
-            <div class="header">
-                <!--<h2 class="is-pulled-left heading">Rain Configuration</h2>-->
-            </div>
             <datawhore-rain-configs
                     [spaceOauthSettings]="spaceOauthSettings"
                     [newDimensions]="newDimensions"
@@ -121,76 +108,10 @@
 
         </div>
         <div class="tab space" *ngSwitchCase="'space'">
+            <datawhore-space-config
+                    (onRemoveSpace)="removeSpace()"
+                    (onToggleEditSpace)="toggleEditSpace()"></datawhore-space-config>
 
-            <div class="header">
-                <h2 class="is-pulled-left heading">space Oauth Settings</h2>
-
-                <span class="tag is-warning" *ngIf="hasExpiryToken">
-                    <i class="fa fa-exclamation-triangle icon is-small"></i>
-                    <span>Token expires on {{tokenExpiryDate | date:'medium'}}</span>
-                </span>
-            </div>
-            <div>
-                <div *ngIf="space?.oauth?.settings?.length && !space?.inEditMode">
-                    <table>
-                        <tr *ngFor="let spaceProp of space?.oauth.settings">
-                            <td class="label"><strong>{{spaceProp.label}}</strong></td>
-                            <td *ngIf="spaceProp.value">{{spaceProp.value}}</td>
-                            <td *ngIf="!spaceProp.value">(<em>{{spaceProp.keyName}}</em>) has not been
-                                set yet</td>
-                        </tr>
-                    </table>
-                </div>
-                <div *ngIf="space?.inEditMode">
-
-                    <div *ngFor="let spaceProp of space?.oauth.settings" class="control is-horizontal">
-                        <div class="control-label">
-                            <strong>{{spaceProp.label}}</strong>
-                        </div>
-                        <div class="control">
-                            <input type="text" class="input" [(ngModel)]="spaceProp.value">
-                        </div>
-                    </div>
-                    <div *ngIf="space?.oauth.settings.length">
-                        <a class="button is-primary"
-                           href="{{space.oauth.settings | populateMatches: 'authorizationUrl'}}"
-                           *ngIf="space.oauth && space.oauth.authorizationUrl">
-                            <span *ngIf="!space.oauth.connected">Connect</span>
-                            <span *ngIf="space.oauth.connected">Reconnect</span>
-                        </a>
-                        <a class="button is-success" (click)="updateSpaceSettings()">
-                            <span>Save</span>
-                        </a>
-                        <a class="button" (click)="space.inEditMode = false">
-                            <span>Cancel</span>
-                        </a>
-                    </div>
-
-                </div>
-                <div *ngIf="space?.oauth?.extras?.length && !space?.inEditMode">
-                    <details>
-                        <summary>Acquired Oauth Settings</summary>
-
-                        <table>
-                            <tr *ngFor="let spaceProp of space?.oauth.extras">
-                                <td class="label"><strong>{{spaceProp.label}}</strong></td>
-                                <td>{{spaceProp.value}}</td>
-                            </tr>
-                        </table>
-                    </details>
-                </div>
-                <a class="button is-{{(space?.oauth.configured)? 'primary' : 'success'}}"
-                   (click)="toggleEditSpace(space)" *ngIf="!space?.inEditMode">
-                    <span class="fa fa-{{(space?.oauth.configured)? 'edit' : 'plus-circle'}} icon"></span>
-                    <span>{{(space?.oauth.configured) ? 'Edit' : 'Add'}} Oauth Settings</span>
-                </a>
-                <a class="button is-danger"
-                   (click)="removeSpace(space)">
-                    <span class="fa fa-trash icon"></span>
-                    <span>Remove space</span>
-                </a>
-
-            </div>
         </div>
 
 

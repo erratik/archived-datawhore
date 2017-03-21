@@ -6,7 +6,6 @@ import {Space} from '../../../models/space.model';
 import {Paths} from '../../../classes/paths.class';
 import {DimensionSchema} from '../../../models/dimension-schema.model';
 import {OauthSettingsService} from '../../../services/space/oauth-settings.service';
-import {FileUploader} from 'ng2-file-upload';
 import {ProfileService} from '../../../services/profile/profile.service';
 import {Profile} from '../../../models/profile.model';
 import {Rain, Dimension} from '../../../models/rain.model';
@@ -25,7 +24,6 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
     public rain: Array<Rain> = [];
     public profile: Profile;
     public profileSchema: DimensionSchema;
-    public uploader: FileUploader;
     protected isFetchingSchema = false;
     protected schemaObjectOverride: string = null;
     protected activeTab = 'rain';
@@ -63,15 +61,6 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
             if (this.profileSchema.propertyBucket) {
                 this.profile.createPropertyBucket(this.profileSchema.propertyBucket);
             }
-
-            this.uploader = new FileUploader({url: `${Paths.DATAWHORE_API_URL}/upload/${this.space.name}/space/icon`});
-            this.uploader.onCompleteItem = (item, response, status) => {
-                if (status === 200) {
-                    const res = JSON.parse(response);
-                    this.space.icon = res.icon;
-                    this.space.modified = res.modified;
-                }
-            };
         });
 
     }

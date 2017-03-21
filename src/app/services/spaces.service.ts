@@ -1,32 +1,48 @@
-import {Space} from '../models/space.model';
-import {Injectable} from '@angular/core';
-import {Http, Response, Headers, RequestOptions} from '@angular/http';
+import { Space } from '../models/space.model';
+import { Injectable } from '@angular/core';
+import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import 'rxjs/add/operator/map';
-import {Observable} from 'rxjs';
-import {Paths} from '../classes/paths.class';
-import {Router} from '@angular/router';
+import { Observable } from 'rxjs';
+import { Paths } from '../classes/paths.class';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class SpacesService {
 
     // private instance variable to hold base url
     private apiServer = Paths.DATAWHORE_API_URL;
+
     public spaceRainSchemas: Array<any> = [];
+    public space: Space;
 
     constructor(private http: Http, private router: Router) {
     }
 
     public getSpace(spaceName: string): Observable<Space> {
         return this.http.get(`${this.apiServer}/space/${spaceName}`).map((res: Response) => {
-            return res.json();
+            // debugger;
+            res = res.json();
+            this.space = new Space(
+                res['name'],
+                res['modified'],
+                null,
+                res['fetchUrl'],
+                false,
+                res['icon'],
+                res['username'],
+                res['description'],
+                res['avatar']
+            );
+
+            return this.space;
         }).catch(this.handleError);
     }
 
     public removeSpace(spaceName: string): any {
         return this.http.delete(`${this.apiServer}/space/${spaceName}`).map((res: Response) => {
-           if (res.status === 200) {
-               this.router.navigate([`/spaces`]);
-           }
+            if (res.status === 200) {
+                this.router.navigate([`/spaces`]);
+            }
         }).catch(this.handleError);
     }
 
@@ -59,8 +75,8 @@ export class SpacesService {
             data: space
         });
 
-        const headers = new Headers({'Content-Type': 'application/json'}); // ... Set content type to JSON
-        const options = new RequestOptions({headers: headers}); // Create a request option
+        const headers = new Headers({ 'Content-Type': 'application/json' }); // ... Set content type to JSON
+        const options = new RequestOptions({ headers: headers }); // Create a request option
 
         return this.http.put(url, bodyString, options).map((res: Response) => {
             return res.json();
@@ -80,8 +96,8 @@ export class SpacesService {
         }
         const bodyString = JSON.stringify(payload);
 
-        const headers = new Headers({'Content-Type': 'application/json'}); // ... Set content type to JSON
-        const options = new RequestOptions({headers: headers}); // Create a request option
+        const headers = new Headers({ 'Content-Type': 'application/json' }); // ... Set content type to JSON
+        const options = new RequestOptions({ headers: headers }); // Create a request option
 
         return this.http.post(url, bodyString, options).map((res: Response) => {
             return res.json();

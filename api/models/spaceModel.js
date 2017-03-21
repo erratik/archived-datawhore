@@ -9,7 +9,8 @@ var SpaceSchema = {
         description: String,
         username: String,
         icon: String,
-        docUrl: String
+        docUrl: String,
+        apiUrl: String
     },
     self: {
         findByName: function (name, cb) {

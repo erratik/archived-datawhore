@@ -46,7 +46,7 @@ export class RainConfigsComponent implements OnChanges, OnInit {
             this.rainSchemas = this.spacesService.spaceRainSchemas;
 
             this.rainSchemas.forEach((rainSchema, i) => {
-                if (rainSchema.propertyBucket) {
+                if (this.rain[i] && rainSchema.propertyBucket) {
                     this.rain[i].createPropertyBucket(rainSchema.propertyBucket);
                 }
             });

@@ -1,4 +1,4 @@
-import {Component, Output, EventEmitter, ViewChild} from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import {Space} from '../../../models/space.model';
 import {ActivatedRoute, Router} from '@angular/router';
 import {SpacesService} from '../../../services/spaces.service';
@@ -11,22 +11,24 @@ import {Profile} from '../../../models/profile.model';
 import {SpaceItemComponent} from '../space-item/space-item.component';
 import {SpaceItemService} from '../../services/space-item/space-item.service';
 import {RainService} from '../../../services/rain/rain.service';
+import {FileUploader} from 'ng2-file-upload';
+
 
 @Component({
     selector: 'datawhore-space-config',
     templateUrl: 'space-config.component.html',
     styleUrls: ['space-config.component.less']
 })
-export class SpaceConfigComponent {
+export class SpaceConfigComponent implements OnInit {
 
-    public space: Space = null;
-    public profile: Profile = null;
-    public hasExpiryToken: boolean;
-    public tokenExpiryDate: number;
-    public spaceOauthSettings = null;
+    @Input() public space: Space;
+    @Input() public spaceOauthSettings;
+    public uploader: FileUploader;
 
     public retrieveSpace$: Observable<SpaceOauthSettings> = new Observable<SpaceOauthSettings>();
     @Output() public gotOauthSettings: EventEmitter<SpaceOauthSettings> = new EventEmitter<SpaceOauthSettings>();
+    @Output() public onRemoveSpace: EventEmitter<any> = new EventEmitter<any>();
+    @Output() public onToggleEditSpace: EventEmitter<any> = new EventEmitter<any>();
     @ViewChild(SpaceItemComponent) public spaceItemComponent;
 
     constructor(public spacesService: SpacesService,
@@ -37,27 +39,12 @@ export class SpaceConfigComponent {
                 private activatedRoute?: ActivatedRoute,
                 public router?: Router) {
 
-        this.retrieveSpace$ = this.activatedRoute.params.do(params => {
-                return params;
-            })
+        this.retrieveSpace$ = this.activatedRoute.params.do(params => params)
             .mergeMap(params => this.spacesService.getSpace(params['space']))
-            .switchMap(spaceModel => {
-                this.space = spaceModel;
-                return this.oauthService.getOauthSettings(spaceModel.name);
-            })
+            .switchMap(space => this.oauthService.getOauthSettings(space.name))
             .do(oauth => {
-
-                this.space = new Space(
-                    this.space.name,
-                    this.space.modified,
-                    oauth,
-                    this.space.fetchUrl,
-                    false,
-                    this.space.icon,
-                    this.space.username,
-                    this.space.description,
-                    this.space.avatar
-                );
+                this.space = this.spacesService.space;
+                this.space.oauth = oauth;
 
                 this.spaceOauthSettings = {
                     apiKey: this.space.oauth.settings.filter(settings => settings.keyName === 'apiKey')[0].value,
@@ -76,27 +63,28 @@ export class SpaceConfigComponent {
                     if (this.space.oauth.extras.filter(settings => settings.label === 'refreshToken').length) {
                         this.spaceOauthSettings.refreshToken = this.space.oauth.extras.filter(settings => settings.label === 'refreshToken')[0].value;
                     }
-                    // check if we have refresh token data and when it expires
-                    this.space.oauth.extras.filter(extra => {
-                        if (extra.label.indexOf('expire') !== -1) {
-                            this.hasExpiryToken = true;
-                            this.tokenExpiryDate = oauth.modified + Number(extra.value) * 1000;
-                        }
-                        return extra.value;
-                    });
-
-
-                    if (this.tokenExpiryDate < Date.now()) {
-                        // todo: offer a manual way to do refresh token
-                        // display warning when less than 30 minutes
-                        // make sure it happens when we start working and loading posts, etc
-                        window.location.href = this.space.oauth.authorizationUrl;
-                    }
                 }
 
                 this.gotOauthSettings.emit(this.space.oauth);
-                return this.space;
+                this.spacesService.space = this.space;
             });
+    }
+
+    ngOnInit() {
+        this.setSpace();
+
+        this.uploader = new FileUploader({url: `${Paths.DATAWHORE_API_URL}/upload/${this.space.name}/space/icon`});
+        this.uploader.onCompleteItem = (item, response, status) => {
+            if (status === 200) {
+                const res = JSON.parse(response);
+                this.space.icon = res.icon;
+                this.space.modified = res.modified;
+            }
+        };
+    }
+
+    public setSpace(): void {
+        this.space = this.spacesService.space;
     }
 
     public updateSpaceSettings(): any {

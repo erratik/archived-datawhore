@@ -1,75 +1,83 @@
-hjkhj
-<!--
-<header class="card-header">
-  <div class="card-header-title is-inline-flex">
-    <figure class="image is-32x32">
-      <img src="{{(space?.icon) ? space?.icon : 'http://bulma.io/images/placeholders/32x32.png'}}">
-    </figure>
-    <span>{{space?.name}}</span>
-  </div>
-  <a class="card-header-icon" (click)="toggleEditSpace(space)">
-        <span class="icon">
-          <i class="fa fa-edit"></i>
-        </span>
-  </a>
-</header>
-
-<div class="card-content stretched">
-  <div class="content">
-    <div *ngIf="!space?.inEditMode && space?.oauth">
-
-      <ul>
-        <li *ngFor="let spaceProp of space?.oauth.settings">
-          <div *ngIf="spaceProp.value">
-            <strong>{{spaceProp.label}}</strong>: {{spaceProp.value}}
-          </div>
-          <div *ngIf="!spaceProp.value">
-            <strong>{{spaceProp.label}}</strong> (<em>{{spaceProp.keyName}}</em>) has not been set yet
-          </div>
-        </li>
-      </ul>
-      <details *ngIf="space?.oauth.extras.length">
-        <summary>Acquired Oauth Settings</summary>
-        <ul *ngFor="let spaceProp of space?.oauth.extras">
-          <li>
-            <strong>{{spaceProp.label}}</strong>: {{spaceProp.value}}
-          </li>
-        </ul>
-      </details>
+<div class="columns">
+  <div class="column is-half">
+    <div class="header">
+      <h3 class="is-pulled-left heading">Oauth Settings</h3>
     </div>
-    <div *ngIf="space?.inEditMode && space?.oauth">
+    <hr>
+  <!--<pre>{{ space.oauth | json}}</pre>-->
+    <div *ngIf="space.oauth.settings.length && !space.inEditMode">
+      <table class="is-small">
+        <tr *ngFor="let spaceProp of space.oauth.settings">
+          <td class="label"><strong>{{spaceProp.label}}</strong></td>
+          <td *ngIf="spaceProp.value">{{spaceProp.value}}</td>
+          <td *ngIf="!spaceProp.value">(<em>{{spaceProp.keyName}}</em>) has not been set yet</td>
+        </tr>
+      </table>
+      <hr>
+      <div *ngIf="space.oauth.extras.length && !space.inEditMode">
+        <table class="is-small">
+          <tr *ngFor="let spaceProp of space.oauth.extras">
+            <td class="label"><strong>{{spaceProp.label}}</strong></td>
+            <td>{{spaceProp.value}}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div *ngIf="space.inEditMode">
 
-      <div class="form-group">
-        <input type="file" class="form-control" name="single" ng2FileSelect
-               [uploader]="uploader"/>
-        <button type="button" class="btn btn-success btn-s"
-                (click)="uploader.uploadAll()" >
-          <span class="glyphicon glyphicon-upload"></span> Upload all
-        </button>
-        <br/>
+      <div *ngFor="let spaceProp of space.oauth.settings" class="control is-horizontal">
+        <div class="control-label">
+          <strong>{{spaceProp.label}}</strong>
+        </div>
+        <div class="control">
+          <input type="text" class="input" [(ngModel)]="spaceProp.value">
+        </div>
+      </div>
+      <div *ngIf="space.oauth.settings.length">
+        <a class="button is-success" (click)="updateSpaceSettings()">
+          <span>Save</span>
+        </a>
+        <a class="button" (click)="space.inEditMode = false">
+          <span>Cancel</span>
+        </a>
       </div>
 
-      <ul *ngFor="let spaceProp of space?.oauth.settings">
-        <li class="control">
-          <strong>{{spaceProp.label}}</strong>
-          <input type="text" class="input" [(ngModel)]="spaceProp.value">
-        </li>
-      </ul>
+    </div>
+
+    <a class="button is-{{(space.oauth.configured)? 'primary' : 'success'}}" (click)="onToggleEditSpace.emit()" *ngIf="!space.inEditMode">
+      <!--<span class="fa fa-{{(space.oauth.configured)? 'edit' : 'plus-circle'}} icon"></span>-->
+      <span>{{(space.oauth.configured) ? 'Edit' : 'Add'}} Oauth Settings</span>
+    </a>
+  </div>
+  <div class="column">
+    <div class="header">
+      <h3 class="is-pulled-left heading">Space Settings</h3>
+    </div>
+    <hr>
+    <div>
+      <div class="label">
+        Space image
+      </div>
+      <a (click)="uploader.uploadAll()">
+        <span class="fa fa-cloud-upload"></span>
+      </a>
+      <input type="file" class="is-expanded" name="single" ng2FileSelect [uploader]="uploader" />
+    </div>
+    <hr>
+    <div class="space-actions is-flex">
+      <div *ngIf="space.oauth.settings.length">
+        <a
+          class="button is-{{(space.oauth.connected) ? 'success' : 'warning'}}"
+          href="{{space.oauth.extras | populateMatches: 'authorizationUrl'}}"
+          *ngIf="space.oauth && space.oauth.authorizationUrl">
+          <span *ngIf="!space.oauth.connected">Connect</span>
+          <span *ngIf="space.oauth.connected">Reconnect</span>
+        </a>
+      </div>
+      <a class="button is-danger" (click)="onRemoveSpace.emit()">
+        <span>Remove space</span>
+      </a>
     </div>
   </div>
-  <details>
-    <summary class="tag">space | json</summary>
-    <pre>{{space | json}}</pre>
-  </details>
-  <small>Last modified: {{space?.modified | date:'medium'}}</small>
 </div>
-<footer class="card-footer">
-  <a href="{{space?.oauth.authorizationUrl}}" class="card-footer-item"
-     *ngIf="space?.oauth && space?.oauth.authorizationUrl">
-    <span>Connect</span>
-  </a>
-  <a class="card-footer-item is-success" (click)="updateSpaceSettings(space)" *ngIf="space?.inEditMode && space?.oauth">
-    <span>Save</span>
-  </a>
-  <a class="card-footer-item">Delete</a>
-</footer>-->
+<!--<pre>{{space | json}}</pre>-->

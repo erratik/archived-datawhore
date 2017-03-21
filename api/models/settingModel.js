@@ -26,7 +26,10 @@ var SettingSchema = {
             update.space = update.name;
             update.modified = Date.now();
             update.connected = update.connected ? false : update.connected;
-            // stamp the oauth extras with a type
+
+
+            let extrasKeys = [];
+
             if (update.oauth.extras) {
                 update.extras = update.oauth.extras.map(function (settings) {
                     if (settings.label === 'access_token') {
@@ -36,17 +39,25 @@ var SettingSchema = {
                     settings.type = 'oauth';
                     return settings;
                 });
+
+                update.extras.forEach(s => extrasKeys.push(s.keyName));
             }
+
+            if (!extrasKeys.includes('authorizationUrl')) {
+                update.extras.push({
+                    type: 'oauth',
+                    label: 'authorizationUrl',
+                    value: `http://datawhore.erratik.ca:10010/auth/${update.space}`
+                })
+            }
+
             if (update.oauth.settings) {
                 update.oauth = update.oauth.settings;
-            }
-            else {
+            } else {
                 delete update.oauth;
             }
-            this.findOneAndUpdate(query, update, { upsert: true, returnNewDocument: true }, function (err, updated) {
-                // console.log('updated?', updated);
-                cb(updated);
-            });
+
+            this.findOneAndUpdate(query, update, { upsert: true, returnNewDocument: true }, (err, updated) => cb(updated));
         }
     }
 };
