@@ -77,8 +77,8 @@
     <div class="space-actions is-flex">
       <div *ngIf="space.oauth.settings.length">
         <a
-          class="button is-{{(space.oauth.connected) ? 'success' : 'warning'}}"
-          href="{{space.oauth.extras | populateMatches: 'authorizationUrl'}}"
+          class="button is-{{(!space.oauth.connected) ? 'success' : 'warning'}}"
+          href="{{space.oauth.authorizationUrl}}"
           *ngIf="space.oauth && space.oauth.authorizationUrl">
           <span *ngIf="!space.oauth.connected">Connect</span>
           <span *ngIf="space.oauth.connected">Reconnect</span>

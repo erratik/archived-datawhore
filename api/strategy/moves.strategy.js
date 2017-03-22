@@ -17,7 +17,7 @@ module.exports = function (app) {
                 callbackURL: `http://datawhore.erratik.ca:10010/auth/${space}/callback`
                 // callbackURL: settings.oauth.filter(s => s.keyName === 'redirectUrl')[0].value
             },
-                (accessToken, refreshToken, profile, done) => Utils.savePassport(settings, {
+                (accessToken, refreshToken, profile, done) => Utils.savePassport(space, settings, {
                     accessToken: accessToken,
                     refreshToken: refreshToken
                 }, profile, done)
@@ -28,8 +28,8 @@ module.exports = function (app) {
 
     });
 
-    app.get('/auth/${space}', passport.authenticate(space, { scope: ['default', 'activity', 'location'] }));
-    app.get('/auth/${space}/callback', passport.authenticate(space, {
+    app.get(`/auth/${space}`, passport.authenticate(space, { scope: ['default', 'activity', 'location'] }));
+    app.get(`/auth/${space}/callback`, passport.authenticate(space, {
         successRedirect: `http://datawhore.erratik.ca:4200/space/${space}`,
         failureRedirect: 'http://datawhore.erratik.ca:4200'
     }));

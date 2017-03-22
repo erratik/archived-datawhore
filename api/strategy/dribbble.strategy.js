@@ -1,8 +1,8 @@
-const space = 'github';
+const space = 'dribbble';
 const Utils = require('../lib/utils');
 const Setting = require('../models/settingModel');
 const passport = require('passport')
-    , GitHubStrategy = require('passport-github').Strategy;
+    , DribbbleStrategy = require('passport-dribbble').Strategy;
 
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((user, done) => done(null, user));
@@ -10,22 +10,26 @@ passport.deserializeUser((user, done) => done(null, user));
 module.exports = function (app) {
 
     Setting.findSettings(space, (settings) => {
+        settings.space = space;
         if (settings.oauth) {
-            passport.use(new GitHubStrategy({
+            passport.use(new DribbbleStrategy({
                 clientID: settings.oauth.filter(s => s.keyName === 'apiKey')[0].value,
                 clientSecret: settings.oauth.filter(s => s.keyName === 'apiSecret')[0].value,
-                callbackURL: `http://datawhore.erratik.ca:10010/auth/${space}/callback`
+                callbackURL: `http://datawhore.erratik.ca:10010/auth/${space}/callback`,
+                passReqToCallback: true
             },
-                (accessToken, refreshToken, profile, done) => Utils.savePassport(space, settings, {
+                (req, accessToken, refreshToken, profile, done) => Utils.savePassport(space, settings, {
                     accessToken: accessToken,
                     refreshToken: refreshToken
                 }, profile, done)
             ));
+
         }
+
     });
 
-    app.get(`/auth/${space}`, passport.authenticate(space, { scope: ['default', 'activity', 'location'] }));
-    app.get(`/auth/${space}/callback`, passport.authenticate(space, {
+    app.get(`/auth/dribbble`, passport.authenticate(space, { scope: 'public write comment upload' }));
+    app.get(`/auth/dribbble/callback`, passport.authenticate(space, {
         successRedirect: `http://datawhore.erratik.ca:4200/space/${space}`,
         failureRedirect: 'http://datawhore.erratik.ca:4200'
     }));

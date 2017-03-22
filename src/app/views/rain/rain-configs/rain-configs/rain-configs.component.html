@@ -25,6 +25,7 @@
                 <small class="is-success"><span>+</span> add schema</small>
             </li>
         </ul>
+        {{overrideRainName | json}}
     </aside>
 
     <div class="column" *ngIf="activeTab === 'new-schema' || !rainSchemas.length" [class.is-hidden]="activeTab !== 'new-schema'">
@@ -60,12 +61,12 @@
                     </div>
                     <div class="control is-grouped">
                         <p class="control is-expanded">
-                            <input #fetchUrl class="input" type="text" placeholder="/v1/me/player/recently-played?limit=1" [(ngModel)]="rainFetchUrl">
+                            <input #fetchUrl class="input" type="text" placeholder="/v1/me/player/recently-played?limit=1" [(ngModel)]="newRainFetchUrl">
                         </p>
                     </div>
                 </div>
 
-                <a class="button is-success" *ngIf="newRain.value && fetchUrl.value" (click)="writeRain({typeName: newRain.value, fetchUrl: fetchUrl.value})">
+                <a class="button is-success" *ngIf="newRain.value && fetchUrl.value" (click)="writeRain($i, newRain.value)">
                     Save
                 </a>
             </div>
@@ -118,7 +119,7 @@
                     Rename rain type
                 </label>
                 <div class="control has-addons">
-                    <input #overrideRainType class="input is-expanded" type="text" [(ngModel)]="schema.type">
+                    <input #overrideRainType class="input is-expanded" type="text" [(ngModel)]="overrideRainName[schema.type]">
                 </div>
                 <div class="control">
                     <label class="label">
@@ -133,7 +134,7 @@
                     </div>
                 </div>
                 <hr>
-                <a class="button is-success" (click)="saveRawRain($i, schema.type)">Update</a>
+                <a class="button is-success" (click)="updateRainSchema($i, schema.type)">Update</a>
                 <a class="button is-danger" (click)="removeSchema(schema.type)">
                     <span>Delete</span>
                 </a>
@@ -150,13 +151,13 @@
                         <span>Override object path to rain schema</span>
                     </label>
                     <div class="control has-addons" *ngIf="toggleOverrideSchema">
-                        <input #overrideRain class="input is-expanded" type="text" placeholder="Enter object path (a.b.c)" [(ngModel)]="schemaObjectOverride">
-                        <a class="button is-success" *ngIf="overrideRain.value" (click)="saveRawRain($i, schema.type)">
+                        <input #overrideRain class="input is-expanded" type="text" placeholder="Enter object path (a.b.c)" [(ngModel)]="overrideSchemaPath">
+                        <a class="button is-success" *ngIf="overrideRain.value" (click)="updateRainSchema($i, schema.type)">
                             Override
                         </a>
                     </div>
                     <datawhore-rain-form
-                        [model]="schema"
+
                         [rainSchemaIndex]="$i"
                         [dimType]="schema.type"
                         [space]="space"
@@ -166,5 +167,7 @@
                 </div>
             </div>
         </div>
+        <pre class="column is-10">{{rainSchemas | json}} </pre>
     </div>
+
 </div>

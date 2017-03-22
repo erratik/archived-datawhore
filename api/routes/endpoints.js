@@ -6,31 +6,35 @@ const Rain = require('../models/rainModel');
 
 module.exports = {
     schema: {
-        write: function (space, content, type, cb) {
-            const spaceName = !space.name ? space.space : space.name;
-            Schema.findSchema(spaceName, type, (_schema) => {
-                content = (typeof content === 'string') ? JSON.parse(content) : content;
+        update: function (space, data, type, cb, rainFetchUrl) {
+            Schema.findSchema(space, type, (_schema) => {
 
+                const schema = data;
 
-                let schema = {
-                    type: type,
-                    content: content.content,
-                    fetchUrl: content.fetchUrl
-                };
-                if (!schema.content) {
-                    _schema.map(_s => {
-                        if (_s.type === type) {
-                            schema.content = _s.content;
-                        }
-                    });
-                }
-
-                Schema.writeSchema(spaceName, schema, (updatedSchema) => {
-                    console.log('[schema.write callback]', updatedSchema);
+                Schema.writeSchema(space, schema, (updatedSchema) => {
+                    console.log('[schema.update callback]', updatedSchema);
                     cb(updatedSchema);
                 });
 
             });
+        },
+        write: function (space, data, type, cb, fetchUrl = null) {
+
+            let schema = {
+                type: type,
+                content: (typeof data === 'string') ? JSON.parse(data) : data
+            }
+
+            if (type.includes('rain')) {
+                schema['fetchUrl'] = fetchUrl;
+            }
+
+            Schema.writeSchema(space, schema, (updatedSchema) => {
+                console.log('[schema.write callback]', updatedSchema);
+                cb(updatedSchema);
+            });
+
+
         },
         get: function (space, type, cb) {
 

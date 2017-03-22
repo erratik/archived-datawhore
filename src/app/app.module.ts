@@ -4,6 +4,7 @@ import {FormsModule} from '@angular/forms';
 import {HttpModule} from '@angular/http';
 import {RouterModule, Routes} from '@angular/router';
 import {MomentModule} from 'angular2-moment';
+import * as _ from "lodash";
 
 import {FileSelectDirective, FileDropDirective} from 'ng2-file-upload';
 

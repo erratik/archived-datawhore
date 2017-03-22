@@ -16,6 +16,8 @@ const Schema = require('../models/schemaModel');
 
 const endpoints = require('./endpoints');
 const objectPath = require('object-path');
+const Utils = require('../lib/utils'), pluck = Utils.pluck;
+
 
 // my own endpoints, read/write in mongo docs
 let getEndpoint = (data, cb) => {
@@ -33,20 +35,12 @@ let getEndpoint = (data, cb) => {
 let postEndpoint = (data, content, cb) => {
     // console.log(`[postEndpoint] ${data.action} -> `, data);
     const endpointAction = objectPath.get(endpoints, data.action);
-    const sendObj = {space: data.space};
-    if (!data.override) {
-        content = data.more ? data.more : content;
-    } else {
-        content = {
-            content: content,
-            type: data.type
-        };
-    }
-    if (data.type.includes('rain') && data.more) content['fetchUrl'] = data.more.fetchUrl;
 
-    return endpointAction(sendObj, content, data.type, function (resp) {
+    if (data.type.includes('rain') && !data.action.includes('update')) content['fetchUrl'] = data.fetchUrl;
+
+    return endpointAction(data.space, content, data.type, function (resp) {
         cb(resp);
-    });
+    }, data.fetchUrl);
 };
 
 const makeOAuthHeaders = (data) => {
@@ -106,12 +100,9 @@ router
         const data = {
             space: req.params.space,
             type: req.body.type ? req.body.type : req.params.endpoint,
-            action: `${req.params.endpoint}.write`
+            action: req.body.action ? req.body.action : `${req.params.endpoint}.write`
         };
 
-        req.body.data = (req.body.topSchema) ? req.body.topSchema : req.body.data;
-
-        console.log(req.body);
         postEndpoint(data, req.body.data, (resp) => {
             res.json(resp);
         })
@@ -120,16 +111,19 @@ router
 // SPACES: ENDPOINTS TO GET DATA FROM SPACES (TWITTER, INSTAGRAM, ETC)
 router.post('/endpoint/space', function (req, res) {
 
-    console.log('dahjhta', req.body.data);
-
     let data = req.body.data;
 
-                    if (req.body.more) {
-                        data['more'] = req.body.more;
-                    }
+    Setting.findSettings(data.space, (o) => {
 
-    let options;
-    if (data.apiEndpointUrl) {
+        data.apiUrl = pluck('apiUrl', o.oauth);
+        data.apiKey = pluck('apiKey', o.oauth);
+        data.apiSecret = pluck('apiSecret', o.oauth);
+        data.accessToken = pluck('accessToken', o.extras);
+        data.fetchUrl = data.apiEndpointUrl;
+        console.log('dahjhta', data);
+
+        let options;
+        if (data.apiEndpointUrl) {
         switch (data.space) {
 
             // OAuth Authorization requests
@@ -142,8 +136,7 @@ router.post('/endpoint/space', function (req, res) {
                         Authorization: makeOAuthHeaders(data)
                     }
                 };
-                console.log(options);
-
+                //console.log(options);
 
                 https.get(options, function (result) {
                     let buffer = '';
@@ -166,6 +159,7 @@ router.post('/endpoint/space', function (req, res) {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     }
                 };
+                //console.log(options);
 
                 const requestDataWithToken = () => request(options, (error, response, body) => {
                     if (error) {
@@ -213,9 +207,10 @@ router.post('/endpoint/space', function (req, res) {
                 });
 
                 requestDataWithToken();
-        }
+            }
 
-    }
+        }
+    });
 
 });
 

@@ -17,7 +17,7 @@ module.exports = function (app) {
                 clientSecret: settings.oauth.filter(s => s.keyName === 'apiSecret')[0].value,
                 callbackURL: `http://datawhore.erratik.ca:10010/auth/${space}/callback`
             },
-                (accessToken, refreshToken, profile, done) => Utils.savePassport(settings, {
+                (accessToken, refreshToken, profile, done) => Utils.savePassport(space, settings, {
                     accessToken: accessToken,
                     refreshToken: refreshToken
                 }, profile, done)

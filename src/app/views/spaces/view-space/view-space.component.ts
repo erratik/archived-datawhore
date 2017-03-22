@@ -25,7 +25,7 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
     public profile: Profile;
     public profileSchema: DimensionSchema;
     protected isFetchingSchema = false;
-    protected schemaObjectOverride: string = null;
+    protected overrideSchemaPath: string = null;
     protected activeTab = 'rain';
 
     constructor(spacesService: SpacesService,
@@ -62,7 +62,6 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
                 this.profile.createPropertyBucket(this.profileSchema.propertyBucket);
             }
         });
-
     }
 
     private getProfile(): any {

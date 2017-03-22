@@ -7,7 +7,7 @@
     </label>
     <div class="control is-flex">
         <input #override class="input" type="text" placeholder="Enter object path (a.b.c)"
-               [(ngModel)]="schemaObjectOverride">
+               [(ngModel)]="overrideSchemaPath">
         <a class="button is-success" *ngIf="override.value"
            (click)="saveRawProfile(override.value)">
             Save

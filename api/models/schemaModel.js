@@ -1,21 +1,24 @@
-var mongoose = require('mongoose');
-var colors = require('colors');
-var childSchema = new mongoose.Schema({
+const mongoose = require('mongoose');
+const colors = require('colors');
+const ObjectId = require('mongodb').ObjectId;
+
+const childSchema = new mongoose.Schema({
     type: String,
     fetchUrl: String,
     modified: Number,
     content: {}
 });
-var Schema;
-var SchemaSchema = {
+
+let Schema;
+const SchemaSchema = {
     schema: {
         space: String,
         schemas: [childSchema]
     },
     self: {
         findSchema: function (spaceName, schemaType, cb) {
-            this.find({ space: spaceName }, function (err, docs) {
-                if (!docs.length) {
+            this.findOne({ space: spaceName }, function (err, docs) {
+                if (!docs.schemas.length) {
                     var schema = new Schema({
                         space: spaceName,
                         schemas: [{
@@ -23,12 +26,15 @@ var SchemaSchema = {
                             modified: Date.now()
                         }]
                     });
-                    docs.push(schema);
+                    docs.schemas.push(schema);
                 }
                 if (!schemaType.includes('rain')) {
-                    cb(docs[0].schemas.filter(function (schema) { return schema.type === schemaType; })[0]);
+                    cb(docs.schemas.filter(function (schema) {
+                        return schema.type === schemaType;
+                    })[0]);
                 } else {
-                    cb(docs[0].schemas.filter(function (schema) {
+                    cb(docs.schemas.filter(function (schema) {
+                        const type = schema.type;
                         return schema.type.includes('rain');
                     }));
                 }
@@ -43,21 +49,27 @@ var SchemaSchema = {
             });
         },
         writeSchema: function (spaceName, schema, cb) {
-            var query = { space: spaceName, 'schemas.type': schema.type };
-            var that = this;
-            var addSchema = function (callback) {
+            const sid = new ObjectId(schema.id);
+            const squery = sid;
+            const query = { space: spaceName, 'schemas._id': sid };
+            const that = this;
+
+            const addSchema = function (callback) {
                 schema.modified = Date.now();
-                that.findOneAndUpdate({ space: spaceName }, { modified: Date.now(), $push: { schemas: schema } }, { upsert: true, returnNewDocument: true }, function (err, updated) {
-                    // console.log('... and updated', schema);
-                    that.find(query, { 'schemas.$': 1 }, (err, docs) => {
+                console.log(schema);
+                that.findOneAndUpdate({ space: spaceName }, { $push: { schemas: schema } }, { upsert: true, returnNewDocument: true }, function (err, updated) {
+
+                    that.find({ space: spaceName, 'schemas.type': schema.type }, { 'schemas.$': 1 }, (err, docs) => {
                         if (err) cb(err);
+                        console.log('... and updated', docs[0].schemas[0]);
                         cb(docs[0].schemas[0]);
                     });
                 });
             };
+
             this.findOne(query, { 'schemas.$': 1 }, function (_err, docs) {
                 if (docs) {
-                    that.update(query, { $pull: { schemas: { type: schema.type } } }, { multi: false }, function (error, _updated) {
+                    that.update(query, { $pull: { schemas: { '_id': sid } } }, { multi: false }, function (error, _updated) {
                         // console.log('pulled', _updated);
                         if (_updated.ok) {
                             addSchema(cb);

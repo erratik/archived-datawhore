@@ -16,7 +16,7 @@ export class RainFormComponent extends DimensionFormComponent implements OnInit 
 
     @Input() public isFetchingSchema;
     @Input() public rainSchemaIndex;
-    @Input() public model;
+    public model;
     @Output() onRainSchema = new EventEmitter<any>();
 
     constructor(spacesService: SpacesService,
@@ -25,7 +25,7 @@ export class RainFormComponent extends DimensionFormComponent implements OnInit 
     }
 
     ngOnInit() {
-        this.model = this.model.propertyBucket;
+        this.model = this.spacesService.spaceRainSchemas[this.rainSchemaIndex].propertyBucket;
     }
 
     protected saveRain(index): void {

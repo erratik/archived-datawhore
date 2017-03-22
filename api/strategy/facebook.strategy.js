@@ -19,7 +19,7 @@ module.exports = function (app) {
                 profileFields: ['about', 'cover', 'id', 'updated_time', 'picture', 'friends']
                 // callbackURL: settings.oauth.filter(s => s.keyName === 'redirectUrl')[0].value
             },
-                (accessToken, refreshToken, profile, done) => Utils.savePassport(settings, {
+                (accessToken, refreshToken, profile, done) => Utils.savePassport(space, settings, {
                     accessToken: accessToken,
                     refreshToken: refreshToken
                 }, profile, done)

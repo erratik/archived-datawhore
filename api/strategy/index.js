@@ -10,5 +10,6 @@ module.exports = function (app) {
     require('./twitter.strategy')(app);
     require('./swarm.strategy')(app);
     require('./spotify.strategy')(app);
+    require('./dribbble.strategy')(app);
 
 };

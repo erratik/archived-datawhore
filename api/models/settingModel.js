@@ -27,7 +27,6 @@ var SettingSchema = {
             update.modified = Date.now();
             update.connected = update.connected ? false : update.connected;
 
-
             let extrasKeys = [];
 
             if (update.oauth.extras) {
@@ -47,7 +46,7 @@ var SettingSchema = {
                 update.extras.push({
                     type: 'oauth',
                     label: 'authorizationUrl',
-                    value: `http://datawhore.erratik.ca:10010/auth/${update.space}`
+                    value: `http://datawhore.erratik.ca:10010/auth/${query.space}`
                 })
             }
 

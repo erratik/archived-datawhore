@@ -20,7 +20,7 @@ export class SpacesService {
 
     public getSpace(spaceName: string): Observable<Space> {
         return this.http.get(`${this.apiServer}/space/${spaceName}`).map((res: Response) => {
-            // debugger;
+
             res = res.json();
             this.space = new Space(
                 res['name'],

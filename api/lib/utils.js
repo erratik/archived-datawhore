@@ -1,14 +1,14 @@
 
 let Setting = require('../models/settingModel');
-
 let endpoints = require('../routes/endpoints');
 
 module.exports = {
-    savePassport: function (settings, extras, profile, done) {
+    savePassport: function (space, settings, extras, profile, done) {
 
 
-        endpoints.schema.write(settings.space, profile, 'profile', function(schema) {
+        endpoints.schema.write(space, profile, 'profile', function(schema) {
             console.log('connect profile saving', profile);
+
             settings.extras  = Object.keys(extras).map(key => {
                 return {
                     'type': 'oauth',
@@ -24,6 +24,15 @@ module.exports = {
             );
         });
 
+    },
+    pluck: (key, array) => {
+        const plucked = array.filter(arr => {
+            const _key = arr.keyName ? arr.keyName : arr.label;
+            if (_key === key) {
+                return arr.value;
+            }
+        })[0];
+        return plucked.value;
     }
 };
 

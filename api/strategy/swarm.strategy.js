@@ -18,7 +18,7 @@ module.exports = function (app) {
                 callbackURL: `http://datawhore.erratik.ca:10010/auth/${space}/callback`
                 // callbackURL: settings.oauth.filter(s => s.keyName === 'redirectUrl')[0].value
             },
-                (accessToken, refreshToken, profile, done) => Utils.savePassport(settings, {
+                (accessToken, refreshToken, profile, done) => Utils.savePassport(space, settings, {
                     accessToken: accessToken,
                     refreshToken: refreshToken
                 }, profile, done)

@@ -6,6 +6,8 @@ import { SpacesService } from '../../../../services/spaces.service';
 import { DimensionSchema } from '../../../../models/dimension-schema.model';
 import { SpaceItemService } from '../../../../shared/services/space-item/space-item.service';
 import { RainService } from '../../../../services/rain/rain.service';
+import * as _ from 'lodash';
+
 const objectPath = require('object-path');
 
 @Component({
@@ -16,20 +18,22 @@ const objectPath = require('object-path');
 })
 export class RainConfigsComponent implements OnChanges, OnInit {
 
-    public rainSchemas: Array<any> = [];
-    protected rain: Array<Rain>;
+    public rainSchemas: any[] = [];
+    protected rain: Rain[];
     @Input() protected newDimensions: () => {};
     @Input() protected spaceOauthSettings;
     @Input() protected space: Space;
     @ViewChild(RainFormComponent) protected rainForm: RainFormComponent;
 
-    protected activeTab;
+    protected activeTab: string;
     protected activeSubTab = 'configs';
     protected isFetchingSchema = false;
 
-    protected newRainType: string;
-    protected schemaObjectOverride: string = null;
-    private rainFetchUrl = null;
+    public newRainType: string;
+    public newRainFetchUrl: string;
+
+    public overrideRainName: any = {};
+    public overrideSchemaPath: string;
 
     constructor(private spacesService: SpacesService,
         private spaceItemService: SpaceItemService,
@@ -37,7 +41,6 @@ export class RainConfigsComponent implements OnChanges, OnInit {
     }
 
     ngOnInit() {
-
         const getRainSchemas$ = this.getRain()
             .switchMap(() => this.getRawRain());
 
@@ -49,6 +52,7 @@ export class RainConfigsComponent implements OnChanges, OnInit {
                 if (this.rain[i] && rainSchema.propertyBucket) {
                     this.rain[i].createPropertyBucket(rainSchema.propertyBucket);
                 }
+                this.overrideRainName[rainSchema.type] = rainSchema.type;
             });
         });
 
@@ -59,7 +63,6 @@ export class RainConfigsComponent implements OnChanges, OnInit {
     }
 
     private getRain(): any {
-
         return this.rainService.getRain(this.space.name).do((rain) => {
             this.rain = rain.map(r => new Rain(
                 this.space.name,
@@ -76,29 +79,20 @@ export class RainConfigsComponent implements OnChanges, OnInit {
         });
     }
 
-    protected writeRain(index: number, type: any = 'rain', override = false): any {
-
-        if (this.rainSchemas.length) {
-            this.rainFetchUrl = this.rainSchemas.filter(s => s.type === type)[0].fetchUrl;
-        }
-
-        if (!this.rainFetchUrl) {
-            console.error(`there is no profile getter path for ${this.space.name}`);
-            return;
-        }
+    protected writeRain(index: number, type: any = 'rain'): any {
 
         this.isFetchingSchema = true;
 
-        // start with spaceOauthSettings values, for most /api/space/endpoint usages
-        const data = Object.assign(this.spaceOauthSettings);
-        data['apiEndpointUrl'] = typeof type === 'object' ? type.fetchUrl : this.rainFetchUrl;
-        data['action'] = 'schema.write';
-        data['type'] = typeof type === 'object' ? type.typeName : type;
-        data['space'] = this.space.name;
-        data['override'] = override;
+        const data = {
+            apiEndpointUrl: this.newRainFetchUrl,
+            action: 'schema.write',
+            type: type,
+            space: this.space.name
+        }
 
         const schemas$ = this.spacesService.spaceEndpoint(this.space, data, this.rainSchemas[index]).do((updatedSchema) => {
-            this.toSchemas(updatedSchema);
+
+            this.toSchemas(updatedSchema, type);
             this.setActiveTab(updatedSchema['type']);
         });
 
@@ -113,51 +107,67 @@ export class RainConfigsComponent implements OnChanges, OnInit {
 
     }
 
-    protected saveRawRain(index: number, type: string): any {
+    protected updateRainSchema(index: number, type: string): any {
 
         this.isFetchingSchema = true;
-        let schema = objectPath.get(this.spacesService.spaceRainSchemas[index], `content.${this.schemaObjectOverride}`);
-        this.spacesService.spaceRainSchemas[index].content = schema;
 
-        if (!schema) {
-            schema = this.spacesService.spaceRainSchemas[index];
+        const schema = this.spacesService.spaceRainSchemas[index];
+        schema.type = this.overrideRainName[type] !== schema.type ? this.overrideRainName[type] : schema.type;
+
+        if (this.overrideSchemaPath) {
+            schema.content = objectPath.get(this.spacesService.spaceRainSchemas[index], `content.${this.overrideSchemaPath}`);
         }
-
-        // todo: remove this silly param call, we don't need the schema AND the spacesService schema (topSchema)
-        const profileSchema$ = this.rainService.updateSchema(this.space.name, schema, type, this.spacesService.spaceRainSchemas[index]).do((updatedSchema) => {
-            this.toSchemas(updatedSchema);
-            this.rainForm.model = this.spacesService.spaceRainSchemas[index].propertyBucket;
+        debugger;
+        const profileSchema$ = this.rainService.updateSchema(this.space.name, schema, type).do((updatedSchema) => {
+            this.toSchemas(updatedSchema, type);
         });
 
         profileSchema$.subscribe(() => {
             this.isFetchingSchema = false;
+            this.rainSchemas = this.spacesService.spaceRainSchemas;
+            this.setActiveTab(schema.type);
         });
     }
 
-    private toSchemas(updatedSchema: any): void {
-        if (this.spacesService.spaceRainSchemas.length) {
+    private toSchemas(updatedSchema: any, overrideRainName: string): void {
+        if (_.some(this.spacesService.spaceRainSchemas, {type: updatedSchema.type})) {
+
             this.spacesService.spaceRainSchemas = this.spacesService.spaceRainSchemas.map(s => {
                 if (s.type === updatedSchema.type) {
+                    delete this.overrideRainName[overrideRainName];
                     return this.toSchema(updatedSchema);
                 }
             });
         } else {
             this.spacesService.spaceRainSchemas.push(this.toSchema(updatedSchema));
         }
+        this.overrideRainName[updatedSchema.type] = updatedSchema.type;
     }
 
     private toSchema(preSchema): DimensionSchema {
+        this.overrideRainName[preSchema.type] = preSchema.type;
+        this.overrideSchemaPath = null;
+
         return new DimensionSchema(
             preSchema.type,
             preSchema.content,
             preSchema.modified,
-            preSchema.fetchUrl
+            preSchema.fetchUrl,
+            preSchema._id
         );
     }
 
     public removeSchema(type: string): void {
         this.spaceItemService.removeSchema(this.space.name, type).subscribe(() => {
-            this.spacesService.spaceRainSchemas = this.rainSchemas = this.rainSchemas.filter(s => s.type !== type);
+            this.spacesService.spaceRainSchemas = this.rainSchemas = this.rainSchemas.filter(s => {
+
+                if (s.type !== type) {
+                    return s;
+                } else {
+                    delete this.overrideRainName[s.type];
+                }
+            });
+
             this.getActiveTab();
         });
     }

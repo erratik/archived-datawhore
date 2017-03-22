@@ -19,14 +19,12 @@ export class SpaceItemService {
     }
 
     public updateSchema(space: string, schema: any, type = this.type, topSchema = null): Observable<any> {
+        delete schema.propertyBucket;
         const payload = {
             data: schema,
-            type: type
+            type: type,
+            action: 'schema.update'
         };
-        // debugger;
-        if (topSchema) {
-            payload['topSchema'] = topSchema;
-        }
 
         const bodyString = JSON.stringify(payload);
 
