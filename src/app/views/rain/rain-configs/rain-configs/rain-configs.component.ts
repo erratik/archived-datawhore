@@ -117,7 +117,7 @@ export class RainConfigsComponent implements OnChanges, OnInit {
         if (this.overrideSchemaPath) {
             schema.content = objectPath.get(this.spacesService.spaceRainSchemas[index], `content.${this.overrideSchemaPath}`);
         }
-        debugger;
+        // debugger;
         const profileSchema$ = this.rainService.updateSchema(this.space.name, schema, type).do((updatedSchema) => {
             this.toSchemas(updatedSchema, type);
         });
@@ -160,7 +160,6 @@ export class RainConfigsComponent implements OnChanges, OnInit {
     public removeSchema(type: string): void {
         this.spaceItemService.removeSchema(this.space.name, type).subscribe(() => {
             this.spacesService.spaceRainSchemas = this.rainSchemas = this.rainSchemas.filter(s => {
-
                 if (s.type !== type) {
                     return s;
                 } else {

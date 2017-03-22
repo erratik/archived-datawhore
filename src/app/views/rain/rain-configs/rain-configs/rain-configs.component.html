@@ -1,6 +1,6 @@
 <div [ngSwitch]="activeTab" class="columns">
 
-    <aside class="menu column is-2" *ngIf="rainSchemas.length">
+    <aside class="menu column is-2" *ngIf="rainSchemas.length && rainSchemas">
         <p class="menu-label">
             Rain Schemas
         </p>
@@ -20,6 +20,7 @@
                         <a>drops</a>
                     </li>
                 </ul>
+                <!--<pre>{{schema | json}}</pre>-->
             </li>
             <li (click)="setActiveTab('new-schema')">
                 <small class="is-success"><span>+</span> add schema</small>
@@ -169,5 +170,4 @@
         </div>
         <pre class="column is-10">{{rainSchemas | json}} </pre>
     </div>
-
 </div>

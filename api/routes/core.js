@@ -18,7 +18,6 @@ const endpoints = require('./endpoints');
 const objectPath = require('object-path');
 const Utils = require('../lib/utils'), pluck = Utils.pluck;
 
-
 // my own endpoints, read/write in mongo docs
 let getEndpoint = (data, cb) => {
     // console.log(`[getEndpoint] ${data.action} -> `, data);
