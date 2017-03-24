@@ -27,9 +27,14 @@ export class ProfileService extends SpaceItemService {
         const headers = new Headers({'Content-Type': 'application/json'}); // ... Set content type to JSON
         const options = new RequestOptions({headers: headers}); // Create a request option
 
-        return this.http.put(`${this.apiServer}/update/profile/${space}`, bodyString, options).map((res: Response) => {
-            return res.json();
-        }).catch(this.handleError);
+        return this.http.put(`${this.apiServer}/update/profile/${space}`, bodyString, options)
+            .map((res: Response) => res.json())
+            .catch(this.handleError);
+    }
+
+    public findSpaceLinks(properties, space): void {
+        const spaceKeys = Object.keys(space);
+        properties.forEach(property => property.linkableToSpace = spaceKeys.includes(property.friendlyName));
     }
 
 }

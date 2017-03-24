@@ -1,12 +1,12 @@
 
 <div>
     <hr>
-    <label class="label">
-        <span class="icon is-primary"><i class="fa fa-exclamation-circle"></i></span>
-        Override object path to profile schema
+    <label class="label is-inline-flex">
+        <a class="icon is-warning" (click)="toggleOverrideSchema =! toggleOverrideSchema"><i class="fa fa-gavel"></i></a>
+        <span>Override object path to profile schema</span>
     </label>
-    <div class="control is-flex">
-        <input #override class="input" type="text" placeholder="Enter object path (a.b.c)"
+    <div class="control has-addons" *ngIf="toggleOverrideSchema">
+        <input #override class="input is-expanded" type="text" placeholder="Enter object path (a.b.c)"
                [(ngModel)]="overrideSchemaPath">
         <a class="button is-success" *ngIf="override.value"
            (click)="saveRawProfile(override.value)">

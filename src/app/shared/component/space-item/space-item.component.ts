@@ -24,8 +24,7 @@ export class SpaceItemComponent implements OnInit {
 
     constructor(private profileService: ProfileService,
                 private rainService: RainService,
-                private spacesService: SpacesService) {
-    }
+                private spacesService: SpacesService) {}
 
     ngOnInit() {
         this.type = this.type.includes('.') ? this.type.split('.')[0] : this.type;
@@ -33,7 +32,8 @@ export class SpaceItemComponent implements OnInit {
         const itemSchema$ = this[`${this.type}Service`].fetchSchema(this.space.name).do((rawSchema) => {
             this.schema = rawSchema.length ? rawSchema[0] : rawSchema;
             if (this.type === 'profile' && this.properties) {
-                this.findSpaceLinks();
+                console.log(this.properties);
+                this.profileService.findSpaceLinks(this.properties, this.space);
             } else if (this.rainService.type.includes('rain')) {
                 this.properties = this.rainService.rain.filter(rain => rain.rainType === this.rainService.type)[0].properties;
             }
@@ -42,15 +42,6 @@ export class SpaceItemComponent implements OnInit {
         itemSchema$.subscribe();
     }
 
-    public findSpaceLinks(): void {
-        const space = this.space;
-        this.properties.forEach(property => {
-            const spaceKeys = Object.keys(this.space);
-            if (spaceKeys.includes(property.friendlyName)) {
-                property.linkableToSpace = true;
-            }
-        });
-    }
 
     protected linkItemToSpace(property): void {
         this.space[property.friendlyName] = objectPath.get(this.schema, property.schemaPath);

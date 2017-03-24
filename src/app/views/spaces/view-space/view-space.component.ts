@@ -1,4 +1,5 @@
-import {Component, OnInit} from '@angular/core';
+import { SpaceItemComponent } from '../../../shared/component/space-item/space-item.component';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {SpacesService} from '../../../services/spaces.service';
 import {ActivatedRoute} from '@angular/router';
 import {SpaceConfigComponent} from '../../../shared/component/space-config/space-config.component';
@@ -27,6 +28,7 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
     protected isFetchingSchema = false;
     protected overrideSchemaPath: string = null;
     protected activeTab = 'rain';
+    @ViewChild(SpaceItemComponent) protected profileComponent;
 
     constructor(spacesService: SpacesService,
                 oauthService: OauthSettingsService,

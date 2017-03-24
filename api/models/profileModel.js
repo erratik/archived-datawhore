@@ -19,6 +19,7 @@ var ProfileSchema = {
             });
         },
         writeProfile: function (spaceName, profileBucket, cb) {
+            profileBucket.map(prop => prop.type = 'profile');
             var update = { modified: Date.now(), profile: profileBucket };
             this.findOneAndUpdate({ space: spaceName }, update, { upsert: true, returnNewDocument: true }, function (err, updated) {
                 cb(updated);

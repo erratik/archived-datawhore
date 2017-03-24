@@ -45,11 +45,9 @@ export class SpaceConfigComponent implements OnInit {
             .mergeMap(params => this.spacesService.getSpace(params['space']))
             .switchMap(space => this.oauthService.getOauthSettings(space.name))
             .do(oauth => {
-
                 this.space = this.spacesService.space;
                 this.space.oauth = oauth;
                 this.gotOauthSettings.emit(this.space.oauth);
-
             });
     }
 
@@ -82,14 +80,14 @@ export class SpaceConfigComponent implements OnInit {
     }
 
     public newDimensions(data, rainType): any {
-
         if (data[1] === 'profile') {
             this[data[1]].properties = data[0];
+            console.log(this[data[1]].properties);
+            this.profileService.findSpaceLinks(this[data[1]].properties, this.space);
         } else {
             const dimRain = this.rainService.rain.filter(r => r.rainType === rainType)[0];
             dimRain.properties = data[0];
         }
-
     }
 
 }

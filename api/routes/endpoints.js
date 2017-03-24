@@ -47,7 +47,7 @@ module.exports = {
     },
     profile: {
         write: function (space, content, type = null, cb) {
-            Profile.writeProfile(space.name, content, (updatedProfile) => {
+            Profile.writeProfile(space, content, (updatedProfile) => {
                 // console.log(updatedProfile);
                 cb(content);
             });
@@ -60,7 +60,7 @@ module.exports = {
     },
     space: {
         write: function (space, content, type = null, cb) {
-            Space.updateSpace(space.name, content, (updatedProfile) => {
+            Space.updateSpace(space, content, (updatedProfile) => {
                 // todo: make sure to return what's updated, not what's intended for updated
                 cb(content);
             });
