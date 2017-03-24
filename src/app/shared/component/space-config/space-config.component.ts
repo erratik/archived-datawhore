@@ -45,30 +45,11 @@ export class SpaceConfigComponent implements OnInit {
             .mergeMap(params => this.spacesService.getSpace(params['space']))
             .switchMap(space => this.oauthService.getOauthSettings(space.name))
             .do(oauth => {
+
                 this.space = this.spacesService.space;
                 this.space.oauth = oauth;
-
-                this.spaceOauthSettings = {
-                    apiKey: this.space.oauth.settings.filter(settings => settings.keyName === 'apiKey')[0].value,
-                    apiSecret: this.space.oauth.settings.filter(settings => settings.keyName === 'apiSecret')[0].value,
-                    apiUrl: Paths.SPACE_API_URL[this.space.name]
-                };
-
-                // todo: this is disgusting, make it look nice!
-                // this could easily be turned into a function
-                // this.space.oauth.extras.filter(settings => settings.label === 'accessToken')
-                if (this.space.oauth.connected) {
-                    this.spaceOauthSettings.accessToken = this.space.oauth.extras.filter(settings => settings.label === 'accessToken')[0].value;
-                    if (this.space.oauth.extras.filter(settings => settings.label === 'tokenSecret').length) {
-                        this.spaceOauthSettings.tokenSecret = this.space.oauth.extras.filter(settings => settings.label === 'tokenSecret')[0].value;
-                    }
-                    if (this.space.oauth.extras.filter(settings => settings.label === 'refreshToken').length) {
-                        this.spaceOauthSettings.refreshToken = this.space.oauth.extras.filter(settings => settings.label === 'refreshToken')[0].value;
-                    }
-                }
-
                 this.gotOauthSettings.emit(this.space.oauth);
-                this.spacesService.space = this.space;
+
             });
     }
 
@@ -100,15 +81,15 @@ export class SpaceConfigComponent implements OnInit {
         });
     }
 
-    public newDimensions(data): any {
-        console.log(data);
-        // check if there is an index for an array
-        if (data[3]) {
-            this[data[1]][data[2]].properties = data[0];
-        } else {
+    public newDimensions(data, rainType): any {
+
+        if (data[1] === 'profile') {
             this[data[1]].properties = data[0];
-            // this.spaceItemComponent.findSpaceLinks();
+        } else {
+            const dimRain = this.rainService.rain.filter(r => r.rainType === rainType)[0];
+            dimRain.properties = data[0];
         }
+
     }
 
 }

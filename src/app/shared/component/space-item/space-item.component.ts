@@ -1,5 +1,6 @@
 import {Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
 import {Dimension} from '../../../models/profile.model';
+import {RainDimension} from '../../../models/rain.model';
 import {ProfileService} from '../../../services/profile/profile.service';
 import {Space} from '../../../models/space.model';
 import {SpacesService} from '../../../services/spaces.service';
@@ -14,12 +15,12 @@ const objectPath = require('object-path');
 })
 export class SpaceItemComponent implements OnInit {
 
-    @Output() public linkingToSpace = new EventEmitter<Space>();
+    protected schema: any;
+    @Input() protected properties: any[];
     @Input() protected space: Space;
     @Input() protected type: string;
-    @Input() protected properties: Array<Dimension>;
+    @Output() public linkingToSpace = new EventEmitter<Space>();
     public itemSchema$ = new Observable<any>();
-    protected schema: any;
 
     constructor(private profileService: ProfileService,
                 private rainService: RainService,
@@ -29,13 +30,16 @@ export class SpaceItemComponent implements OnInit {
     ngOnInit() {
         this.type = this.type.includes('.') ? this.type.split('.')[0] : this.type;
 
-        this.itemSchema$ = this[`${this.type}Service`].fetchSchema(this.space.name).do((rawSchema) => {
+        const itemSchema$ = this[`${this.type}Service`].fetchSchema(this.space.name).do((rawSchema) => {
             this.schema = rawSchema.length ? rawSchema[0] : rawSchema;
             if (this.type === 'profile' && this.properties) {
                 this.findSpaceLinks();
+            } else if (this.rainService.type.includes('rain')) {
+                this.properties = this.rainService.rain.filter(rain => rain.rainType === this.rainService.type)[0].properties;
             }
         });
-        this.itemSchema$.subscribe();
+
+        itemSchema$.subscribe();
     }
 
     public findSpaceLinks(): void {

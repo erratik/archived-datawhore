@@ -1,3 +1,4 @@
+import { RainService } from './rain/rain.service';
 import { Space } from '../models/space.model';
 import { Injectable } from '@angular/core';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
@@ -12,7 +13,6 @@ export class SpacesService {
     // private instance variable to hold base url
     private apiServer = Paths.DATAWHORE_API_URL;
 
-    public spaceRainSchemas: Array<any> = [];
     public space: Space;
 
     constructor(private http: Http, private router: Router) {

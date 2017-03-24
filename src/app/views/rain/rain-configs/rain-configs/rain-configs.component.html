@@ -81,27 +81,25 @@
                     <h3 class="is-pulled-left heading">{{schema.type}} Example</h3>
                 </div>
                 <hr>
-                <div class="example" *ngIf="rain[$i].properties">
-                    <datawhore-space-item [properties]="rain[$i].properties" [type]="schema.type" [space]="space" (linkingToSpace)="updateSpace($event)">
-                    </datawhore-space-item>
+                <div class="example" *ngIf="getRainProperties(schema.type)">
+                    <datawhore-space-item [type]="schema.type" [space]="space"></datawhore-space-item>
                 </div>
             </div>
-            <div class="column is-half" *ngIf="rain.length">
-
+            <div class="column is-half">
                 <div class="header">
                     <h3 class="is-pulled-left heading">{{schema.type}} Structure</h3>
                 </div>
                 <hr>
-                <div *ngIf="!rain[$i]?.properties">
+                <div *ngIf="!getRainProperties(schema.type)">
                     No <strong>{{schema.type}}</strong> configuration yet.
                 </div>
-                <div class="structure" *ngIf="rain[$i]?.properties">
+                <div class="structure">
                     <ul>
-                        <li *ngFor="let property of rain[$i].properties">
+                        <li *ngFor="let property of getRainProperties(schema.type)">
                             {{property.friendlyName}} ⇢ <cite>{{property.schemaPath}}</cite>
                         </li>
                     </ul>
-                    <p *ngIf="!rain[$i].properties">
+                    <p *ngIf="!getRainProperties(schema.type)">
                         No <strong>{{schema.type}}</strong> properties yet
                     </p>
                 </div>
@@ -163,7 +161,7 @@
                         [dimType]="schema.type"
                         [space]="space"
                         (onRainSchema)="updateRainSchema($event)"
-                        (onNewDimensions)="newDimensions($event)">
+                        (onNewDimensions)="newDimensions($event, schema.type)">
                     </datawhore-rain-form>
                 </div>
             </div>

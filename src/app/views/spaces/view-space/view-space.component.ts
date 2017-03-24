@@ -8,7 +8,7 @@ import {DimensionSchema} from '../../../models/dimension-schema.model';
 import {OauthSettingsService} from '../../../services/space/oauth-settings.service';
 import {ProfileService} from '../../../services/profile/profile.service';
 import {Profile} from '../../../models/profile.model';
-import {Rain, Dimension} from '../../../models/rain.model';
+import {Rain, RainDimension} from '../../../models/rain.model';
 import {SpaceItemService} from '../../../shared/services/space-item/space-item.service';
 import {RainService} from '../../../services/rain/rain.service';
 
@@ -45,7 +45,7 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
                 this.profileSchema = new DimensionSchema(profileSchema['type'], profileSchema['content'], profileSchema['modified']);
                 if (!this.space.oauth.connected) {
                     this.activeTab = 'space';
-                } else if (!this.spacesService.spaceRainSchemas.length) {
+                } else if (!this.rainService.rainSchemas.length) {
                     this.activeTab = 'profile';
                 }
                 if (this.profile.properties) {

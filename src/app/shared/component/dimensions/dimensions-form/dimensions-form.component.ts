@@ -1,9 +1,11 @@
 import {Component, Input, EventEmitter, Output} from '@angular/core';
 import {Space} from '../../../../models/space.model';
 import {Dimension} from '../../../../models/profile.model';
+import {RainDimension} from '../../../../models/rain.model';
 import {ProfileService} from '../../../../services/profile/profile.service';
 import {RainService} from '../../../../services/rain/rain.service';
 import {SpacesService} from '../../../../services/spaces.service';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'datawhore-dim-form',
@@ -13,7 +15,7 @@ import {SpacesService} from '../../../../services/spaces.service';
 export class DimensionFormComponent {
 
     public initialModel: string;
-    public dims: Array<Dimension> = [];
+    public dims: Dimension[] = [];
     @Input() public space: Space;
     @Input() public model: any;
     @Input() public dimType: string;
@@ -34,7 +36,13 @@ export class DimensionFormComponent {
         this.dimType = this.dimType.includes('.') ? this.dimType.split('.')[0] : this.dimType;
 
         const dimensions$ = this[`${this.dimType}Service`].update(this.space.name, this.prepareDimensions(dimSubType), propertyBucket).do((dims) => {
-            this.dims = dims.map(dim => new Dimension(dim.friendlyName, dim.schemaPath, dim.type));
+            if (this.dimType === 'rain') {
+                this.dims = dims.map(dim => new RainDimension(dim.friendlyName, dim.schemaPath, dim.type));
+            } else {
+                this.dims = dims.map(dim => new Dimension(dim.friendlyName, dim.schemaPath, dim.type));
+            }
+            // this[`${this.dimType}Service`].dimensions = this.dims;
+            this[`${this.dimType}Service`].dimensions = _.merge(this[`${this.dimType}Service`].dimensions, this.dims);
             this.onNewDimensions.emit([this.dims, this.dimType, dimArrayIndex]);
         });
 

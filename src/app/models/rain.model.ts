@@ -1,4 +1,4 @@
-export class Dimension {
+export class RainDimension {
     constructor(public friendlyName: string,
                 public schemaPath: string,
                 public type: string) {
@@ -7,16 +7,16 @@ export class Dimension {
 
 export class Rain {
     constructor(public space: string,
-                public properties: Array<Dimension>,
-                public dropType: string = null,
+                public properties: Array<RainDimension>,
+                public rainType: string = null,
                 public modified?: number) {
         if (this.properties) {
             this.properties = this.assignProperties();
         }
     }
 
-    private assignProperties(): Array<Dimension> {
-        return this.properties.filter(dim => new Dimension(dim.friendlyName, dim.schemaPath, dim.type));
+    private assignProperties(): Array<RainDimension> {
+        return this.properties.filter(dim => new RainDimension(dim.friendlyName, dim.schemaPath, dim.type));
     }
 
     public createPropertyBucket(propertyBucket) {

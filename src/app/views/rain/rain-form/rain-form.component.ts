@@ -25,7 +25,7 @@ export class RainFormComponent extends DimensionFormComponent implements OnInit 
     }
 
     ngOnInit() {
-        this.model = this.spacesService.spaceRainSchemas[this.rainSchemaIndex].propertyBucket;
+        this.model = this.rainService.rainSchemas[this.rainSchemaIndex].propertyBucket;
     }
 
     protected saveRain(index): void {
