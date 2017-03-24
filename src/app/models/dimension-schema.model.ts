@@ -33,11 +33,11 @@ export class DimensionSchema {
                 },
                 grouped: typeof schema[keyName] === 'object'
             };
+
             if (obj.grouped && obj.content['value'] !== null) {
-
                 obj.content['value'] = this.assignValues(obj.content['value'], path);
-
             }
+
             if (schema[keyName] !== null) {
                 return obj;
             }

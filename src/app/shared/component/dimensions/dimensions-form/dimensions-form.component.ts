@@ -28,21 +28,21 @@ export class DimensionFormComponent {
     }
 
     public saveDimensions(propertyBucket = this.model, dimArrayIndex = null): any {
-        //console.log(this.rainService);
+
         this.dims = [];
+        const dimSubType = this.rainService.type;
         this.dimType = this.dimType.includes('.') ? this.dimType.split('.')[0] : this.dimType;
 
-        const dimensions$ = this[`${this.dimType}Service`].update(this.space.name, this.prepareDimensions(), propertyBucket).do((dims) => {
-            this.dims = dims.map(dim => new Dimension(dim.friendlyName, dim.schemaPath));
+        const dimensions$ = this[`${this.dimType}Service`].update(this.space.name, this.prepareDimensions(dimSubType), propertyBucket).do((dims) => {
+            this.dims = dims.map(dim => new Dimension(dim.friendlyName, dim.schemaPath, dim.type));
             this.onNewDimensions.emit([this.dims, this.dimType, dimArrayIndex]);
-
         });
 
         dimensions$.subscribe();
 
     }
 
-    private prepareDimensions(propertyBucket = this.model): any {
+    private prepareDimensions(type, propertyBucket = this.model): any {
         const groupEnabled = (dimensions) => {
 
             const groupDimensions = (dim) => {
@@ -69,7 +69,8 @@ export class DimensionFormComponent {
         return groupEnabled(propertyBucket).map(dims => {
             return {
                 friendlyName: dims.friendlyName,
-                schemaPath: dims.schemaPath
+                schemaPath: dims.schemaPath,
+                type: type
             };
         });
 

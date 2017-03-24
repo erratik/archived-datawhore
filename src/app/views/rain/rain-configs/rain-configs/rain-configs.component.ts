@@ -19,7 +19,7 @@ const objectPath = require('object-path');
 export class RainConfigsComponent implements OnChanges, OnInit {
 
     public rainSchemas: any[] = [];
-    protected rain: Rain[];
+    protected rain: Rain[] = [];
     @Input() protected newDimensions: () => {};
     @Input() protected spaceOauthSettings;
     @Input() protected space: Space;
@@ -41,19 +41,16 @@ export class RainConfigsComponent implements OnChanges, OnInit {
     }
 
     ngOnInit() {
-        const getRainSchemas$ = this.getRain()
-            .switchMap(() => this.getRawRain());
+
+        const getRainSchemas$ = this.getRawRain()
+            .switchMap(() => this.getRain());
 
         getRainSchemas$.subscribe(() => {
             this.activeTab = this.rainSchemas.length ? this.rainSchemas[0].type : this.activeTab;
             this.rainSchemas = this.spacesService.spaceRainSchemas;
+            this.rainService.type = this.rainSchemas[0].type;
 
-            this.rainSchemas.forEach((rainSchema, i) => {
-                if (this.rain[i] && rainSchema.propertyBucket) {
-                    this.rain[i].createPropertyBucket(rainSchema.propertyBucket);
-                }
-                this.overrideRainName[rainSchema.type] = rainSchema.type;
-            });
+            this.rainSchemas.forEach(rainSchema => this.overrideRainName[rainSchema.type] = rainSchema.type);
         });
 
     }
@@ -63,13 +60,32 @@ export class RainConfigsComponent implements OnChanges, OnInit {
     }
 
     private getRain(): any {
+        // debugger;
         return this.rainService.getRain(this.space.name).do((rain) => {
-            this.rain = rain.map(r => new Rain(
-                this.space.name,
-                r.dimensions.map(dims => new Dimension(dims.friendlyName, dims.schemaPath)),
-                'drop',
-                r.modified
-            ));
+
+            const types = _.uniq(rain.dimensions.map(dim => dim.type));
+
+            types.forEach((type: string, i: number) => {
+                if (this.rainSchemas.filter(s => s.type === type).length) {
+
+                    this.rain.push(new Rain(
+                        this.space.name,
+                        rain.dimensions.filter(dims => {
+                            if (dims.type === type) {
+                                return new Dimension(dims.friendlyName, dims.schemaPath, dims.type)}
+                            }
+                        ),
+                        type,
+                        rain.modified
+                    ));
+
+                    this.rain.forEach(r => {
+                        if (r.dropType === type) {
+                            r.createPropertyBucket(this.rainSchemas.filter(s => s.type === type)[0].propertyBucket);
+                        }
+                    })
+                }
+            });
         });
     }
 
@@ -97,11 +113,6 @@ export class RainConfigsComponent implements OnChanges, OnInit {
         });
 
         schemas$.subscribe(() => {
-            this.rain.forEach((r, i) => {
-                if (this.rainSchemas[i]) {
-                    r.createPropertyBucket(this.rainSchemas[i].propertyBucket);
-                }
-            });
             this.isFetchingSchema = false;
         });
 
@@ -131,7 +142,6 @@ export class RainConfigsComponent implements OnChanges, OnInit {
 
     private toSchemas(updatedSchema: any, overrideRainName: string): void {
         if (_.some(this.spacesService.spaceRainSchemas, {type: updatedSchema.type})) {
-
             this.spacesService.spaceRainSchemas = this.spacesService.spaceRainSchemas.map(s => {
                 if (s.type === updatedSchema.type) {
                     delete this.overrideRainName[overrideRainName];
@@ -172,7 +182,7 @@ export class RainConfigsComponent implements OnChanges, OnInit {
     }
 
     public setActiveTab(tabName: string): void {
-        this.activeTab = tabName;
+        this.activeTab = this.rainService.type = tabName;
         this.activeSubTab = '';
     }
 

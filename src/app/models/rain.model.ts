@@ -1,14 +1,14 @@
 export class Dimension {
     constructor(public friendlyName: string,
                 public schemaPath: string,
-                public linkableToSpace = false) {
+                public type: string) {
     }
 }
 
 export class Rain {
     constructor(public space: string,
                 public properties: Array<Dimension>,
-                public rainType: string = null,
+                public dropType: string = null,
                 public modified?: number) {
         if (this.properties) {
             this.properties = this.assignProperties();
@@ -16,7 +16,7 @@ export class Rain {
     }
 
     private assignProperties(): Array<Dimension> {
-        return this.properties.filter(dim => new Dimension(dim.friendlyName, dim.schemaPath));
+        return this.properties.filter(dim => new Dimension(dim.friendlyName, dim.schemaPath, dim.type));
     }
 
     public createPropertyBucket(propertyBucket) {
@@ -24,7 +24,6 @@ export class Rain {
         // 1. needed for this dimension form to display values as enabled
         if (this.properties) {
             this.properties.map(property => {
-
                 propertyBucket.filter(bucketProp => {
                     if (bucketProp && bucketProp.content.schemaPath === property.schemaPath) {
                         bucketProp.content.enabled = true;

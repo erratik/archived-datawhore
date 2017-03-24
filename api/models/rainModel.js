@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+var _ = require('lodash');
 var dimensionSchema = new mongoose.Schema({
     type: String,
     friendlyName: String,
@@ -12,22 +13,47 @@ var RainSchema = {
     },
     self: {
         findBySpace: function (space, cb) {
-            return this.find({ space: space }, function (err, rain) {
+            return this.findOne({ space: space }, function (err, rain) {
                 cb(rain);
             });
         },
-        updateRain: function (space, dimensions, cb) {
-            // update.type = 'drop';
-            const that = this;
-            dimensions.modified = Date.now();
-            dimensions.forEach(function (dim, i) { return dimensions[i].type = 'drop'; });
-            this.findOneAndUpdate({ space: space }, { modified: Date.now(), dimensions: dimensions }, { upsert: true, returnNewDocument: true }, function (err, updated) {
-                that.find({ space: space }, (err, docs) => {
-                    if (err) cb(err);
-                    console.log('model update ->', docs[0]);
-                    cb(docs[0]);
+        updateRain: function (space, dimensions, rainType, cb) {
+
+            const dimType = rainType;
+            const query = { space: space, 'dimensions.type': dimType };
+
+            var that = this;
+            let existingDims = [];
+            var addSchema = function (callback) {
+
+                that.findOneAndUpdate({ space: space }, {  dimensions: dimensions.concat(existingDims) }, { upsert: true, returnNewDocument: true }, function (err, updated) {
+                    that.find(query, { 'dimensions.$': 1 }, (err, docs) => {
+                        if (err) cb(err);
+                        updated.dimensions = docs[0].dimensions;
+                        cb(updated);
+                    });
                 });
-            });
+            };
+
+            this.findOne({ space: space }, function (errata, dimList) {
+
+                existingDims = dimList.dimensions.filter(dim => dim.type !== dimType);
+
+                that.find(query, { 'dimensions.$': 1 }, function (_err, _docs) {
+                    if (_docs.length) {
+                        that.update(query, { $pull: { dimensions: { type: dimType } } }, { multi: true }, function (error, _updated) {
+                            console.log('pulled', _updated);
+                            if (_updated.ok) {
+                                addSchema(cb);
+                            }
+                        });
+                    }
+                    else {
+                        addSchema(cb);
+                    }
+                });
+             });
+
         }
     }
 };

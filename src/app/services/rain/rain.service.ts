@@ -7,6 +7,7 @@ import {SpaceItemService} from '../../shared/services/space-item/space-item.serv
 export class RainService extends SpaceItemService {
 
   public type = 'rain';
+  public dimensions = {};
 
   constructor(http: Http) {
     super(http);
@@ -19,9 +20,11 @@ export class RainService extends SpaceItemService {
   }
 
   public update(space: string, rain: any): Observable<any> {
+
     const bodyString = JSON.stringify({
       data: rain
     });
+
 
     const headers = new Headers({'Content-Type': 'application/json'}); // ... Set content type to JSON
     const options = new RequestOptions({headers: headers}); // Create a request option
