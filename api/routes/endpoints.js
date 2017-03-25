@@ -9,7 +9,14 @@ module.exports = {
         update: function (space, data, type, cb, rainFetchUrl) {
             Schema.findSchema(space, type, (_schema) => {
 
-                const schema = data;
+                let schema = data;
+
+                if (type === 'profile') {
+                    schema = {
+                        type: type,
+                        content: data
+                    }
+                }
 
                 Schema.writeSchema(space, schema, (updatedSchema) => {
                     console.log('[schema.update callback]', updatedSchema);
@@ -47,6 +54,7 @@ module.exports = {
     },
     profile: {
         write: function (space, content, type = null, cb) {
+
             Profile.writeProfile(space, content, (updatedProfile) => {
                 // console.log(updatedProfile);
                 cb(content);

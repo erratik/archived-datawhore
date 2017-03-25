@@ -110,6 +110,7 @@
         <div class="tab space" *ngSwitchCase="'space'">
             <datawhore-space-config
                     (onRemoveSpace)="removeSpace()"
+                    (onUpdateSpace)="updateSpace($event)"
                     (onToggleEditSpace)="toggleEditSpace()"></datawhore-space-config>
 
         </div>

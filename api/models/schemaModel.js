@@ -35,7 +35,7 @@ const SchemaSchema = {
                 } else {
                     cb(docs.schemas.filter(function (schema) {
                         const type = schema.type;
-                        return schema.type.includes('rain');
+                        return type.includes('rain');
                     }));
                 }
             });
@@ -49,19 +49,21 @@ const SchemaSchema = {
             });
         },
         writeSchema: function (spaceName, schema, cb) {
+            const that = this;
             const sid = new ObjectId(schema.id);
             const squery = sid;
-            const query = { space: spaceName, 'schemas._id': sid };
-            const that = this;
+            const query = schema.type === 'profile' ? { space: spaceName, 'schemas.type': schema.type } : { space: spaceName, 'schemas._id': sid };
+            const schemaQuery = schema.type === 'profile' ? { 'type': schema.type } : { '_id': sid };
+
 
             const addSchema = function (callback) {
                 schema.modified = Date.now();
-                console.log(schema);
+                // console.log(schema);
                 that.findOneAndUpdate({ space: spaceName }, { $push: { schemas: schema } }, { upsert: true, returnNewDocument: true }, function (err, updated) {
 
                     that.find({ space: spaceName, 'schemas.type': schema.type }, { 'schemas.$': 1 }, (err, docs) => {
                         if (err) cb(err);
-                        console.log('... and updated', docs[0].schemas[0]);
+                        // console.log('... and updated', docs[0].schemas[0]);
                         cb(docs[0].schemas[0]);
                     });
                 });
@@ -69,7 +71,7 @@ const SchemaSchema = {
 
             this.findOne(query, { 'schemas.$': 1 }, function (_err, docs) {
                 if (docs) {
-                    that.update(query, { $pull: { schemas: { '_id': sid } } }, { multi: false }, function (error, _updated) {
+                    that.update(query, { $pull: { schemas: schemaQuery } }, { multi: false }, function (error, _updated) {
                         // console.log('pulled', _updated);
                         if (_updated.ok) {
                             addSchema(cb);

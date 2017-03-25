@@ -21,6 +21,9 @@ const app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
+// app.use(express.static(path.join(__dirname, '../public')));
+
+
 // Add headers
 app.use(function (req, res, next) {
 
@@ -55,7 +58,6 @@ app.use(require('express-session')({
 app.use(passport.initialize());
 app.use(flash());
 app.use(passport.session());
-app.use(express.static(path.join(__dirname, '../public')));
 
 
 // passport config

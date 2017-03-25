@@ -63,17 +63,29 @@
     <div class="header">
       <h3 class="is-pulled-left heading">Space Settings</h3>
     </div>
+
     <hr>
+
+    <div class="control">
+      <div class="label">Description</div>
+      <textarea [(ngModel)]="space.description" class="textarea"></textarea>
+      <a class="button is-success" (click)="onUpdateSpace.emit()">
+        <span>Save</span>
+      </a>
+    </div>
+
+    <hr>
+
     <div>
-      <div class="label">
-        Space image
-      </div>
+      <div class="label">Logo</div>
       <a (click)="uploader.uploadAll()">
         <span class="fa fa-cloud-upload"></span>
       </a>
       <input type="file" class="is-expanded" name="single" ng2FileSelect [uploader]="uploader" />
     </div>
+
     <hr>
+
     <div class="space-actions is-flex">
       <div *ngIf="space.oauth.settings.length">
         <a

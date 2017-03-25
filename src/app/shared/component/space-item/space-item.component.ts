@@ -34,7 +34,7 @@ export class SpaceItemComponent implements OnInit {
             if (this.type === 'profile' && this.properties) {
                 console.log(this.properties);
                 this.profileService.findSpaceLinks(this.properties, this.space);
-            } else if (this.rainService.type.includes('rain')) {
+            } else if (this.type !== 'profile' && this.rainService.type.includes('rain')) {
                 this.properties = this.rainService.rain.filter(rain => rain.rainType === this.rainService.type)[0].properties;
             }
         });

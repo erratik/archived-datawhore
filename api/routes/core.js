@@ -213,13 +213,16 @@ router.post('/endpoint/space', function (req, res) {
 
 });
 
+
+
 // UPLOADS
 // todo: change this to a put request
 router.post('/upload/:space/:folder/:filename', function (req, res) {
 
+    // multer settings
     const storage = multer.diskStorage({
         destination: (_req, file, cb) => {
-            const folderName = '../public/uploads/' + _req.params.space + '/' + _req.params.folder;
+            const folderName = './public/uploads/' + _req.params.space + '/' + _req.params.folder;
             mkdirp(folderName, function (err) {
                 cb(null, folderName);
             });
@@ -228,8 +231,6 @@ router.post('/upload/:space/:folder/:filename', function (req, res) {
             cb(null, _req.params.space + '-' + _req.params.filename + '.' + file.originalname.split('.')[file.originalname.split('.').length - 1]);
         }
     });
-
-    // multer settings
     const upload = multer({ storage: storage }).single('file');
 
     upload(req, res, function (err) {
@@ -238,7 +239,7 @@ router.post('/upload/:space/:folder/:filename', function (req, res) {
             res.json({ error_code: 1, err_desc: err });
             return;
         }
-
+        console.log(req.file);
         // todo: return base64 string for the icon
         Space.updateSpace(
             req.params.space,

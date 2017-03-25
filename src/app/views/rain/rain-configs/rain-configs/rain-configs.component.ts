@@ -78,12 +78,12 @@ export class RainConfigsComponent implements OnChanges, OnInit {
         this.isFetchingSchema = true;
 
         const data = {
-            apiEndpointUrl: this.newRainFetchUrl,
+            apiEndpointUrl: this.newRainFetchUrl || this.rainSchemas[index].fetchUrl,
             action: 'schema.write',
             type: type,
             space: this.space.name
         }
-
+        debugger;
         const schemas$ = this.spacesService.spaceEndpoint(this.space, data, this.rainSchemas[index]).do((updatedSchema) => {
 
             this.toSchemas(updatedSchema, type);

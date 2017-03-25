@@ -29,6 +29,7 @@ export class SpaceConfigComponent implements OnInit {
 
     public retrieveSpace$: Observable<SpaceOauthSettings> = new Observable<SpaceOauthSettings>();
     @Output() public gotOauthSettings: EventEmitter<SpaceOauthSettings> = new EventEmitter<SpaceOauthSettings>();
+    @Output() public onUpdateSpace: EventEmitter<any> = new EventEmitter<any>();
     @Output() public onRemoveSpace: EventEmitter<any> = new EventEmitter<any>();
     @Output() public onToggleEditSpace: EventEmitter<any> = new EventEmitter<any>();
     @ViewChild(SpaceItemComponent) public spaceItemComponent;
