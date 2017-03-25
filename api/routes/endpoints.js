@@ -1,12 +1,13 @@
 const Schema = require('../models/schemaModel');
 const Setting = require('../models/settingModel');
 const Space = require('../models/spaceModel');
+const Drop = require('../models/dropModel');
 const Profile = require('../models/profileModel');
 const Rain = require('../models/rainModel');
 
 module.exports = {
     schema: {
-        update: function (space, data, type, cb, rainFetchUrl) {
+        update: function (space, data, type, cb, dropFetchUrl) {
             Schema.findSchema(space, type, (_schema) => {
 
                 let schema = data;
@@ -97,6 +98,16 @@ module.exports = {
         },
         get: function (space, type, cb) {
             Setting.findSettings(space, (settings) => cb(settings));
+        }
+    },
+    drops: {
+        // write: function (space, content, type = null, cb) {
+        //     Setting.updateSettings(content, (updatedSettings) => cb(content));
+        // },
+        get: function (space, type, cb) {
+            Drop.findDrops(space, type, function (data) {
+                cb(data);
+            });
         }
     }
 };

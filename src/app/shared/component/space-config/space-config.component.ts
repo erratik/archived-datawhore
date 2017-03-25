@@ -39,7 +39,7 @@ export class SpaceConfigComponent implements OnInit {
                 public spaceItemService?: SpaceItemService,
                 public profileService?: ProfileService,
                 public rainService?: RainService,
-                private activatedRoute?: ActivatedRoute,
+                public activatedRoute?: ActivatedRoute,
                 public router?: Router) {
 
         this.retrieveSpace$ = this.activatedRoute.params.do(params => params)

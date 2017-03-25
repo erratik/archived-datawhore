@@ -1,3 +1,4 @@
+import { ActivatedRoute } from '@angular/router';
 import { RainFormComponent } from '../../rain-form/rain-form.component';
 import { Component, OnInit, Input, Output, ViewChild, EventEmitter, OnChanges } from '@angular/core';
 import { Rain, RainDimension } from '../../../../models/rain.model';
@@ -36,9 +37,9 @@ export class RainConfigsComponent implements OnChanges, OnInit {
     public overrideSchemaPath: string;
 
     constructor(private spacesService: SpacesService,
-        private spaceItemService: SpaceItemService,
-        private rainService: RainService) {
-    }
+                private spaceItemService: SpaceItemService,
+                private activatedRoute: ActivatedRoute,
+                private rainService: RainService) {}
 
     ngOnInit() {
 
@@ -83,7 +84,7 @@ export class RainConfigsComponent implements OnChanges, OnInit {
             type: type,
             space: this.space.name
         }
-        debugger;
+
         const schemas$ = this.spacesService.spaceEndpoint(this.space, data, this.rainSchemas[index]).do((updatedSchema) => {
 
             this.toSchemas(updatedSchema, type);
@@ -141,6 +142,7 @@ export class RainConfigsComponent implements OnChanges, OnInit {
             preSchema.content,
             preSchema.modified,
             preSchema.fetchUrl,
+            preSchema.dropUrl,
             preSchema._id
         );
     }
@@ -165,10 +167,16 @@ export class RainConfigsComponent implements OnChanges, OnInit {
     }
 
     protected getActiveTab(): any {
-        return this.activeTab = this.rainSchemas.length ? this.rainSchemas[0].type : 'new-schema';
+        const activeTab = this.rainSchemas.length ? this.rainSchemas[0].type : 'new-schema';
+        // this.activatedRoute.params['tab'] = activeTab;
+        return this.activeTab = activeTab;
+
     }
 
     protected getRainProperties(rainType: string): any {
-        return this.rainService.rain.filter(r => r.rainType === rainType)[0].properties;
+        const schema = this.rainService.rain.filter(r => r.rainType === rainType)[0];
+        if (schema) {
+            return this.rainService.rain.filter(r => r.rainType === rainType)[0].properties;
+        }
     }
 }

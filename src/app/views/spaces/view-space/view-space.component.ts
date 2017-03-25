@@ -1,7 +1,8 @@
+
 import { SpaceItemComponent } from '../../../shared/component/space-item/space-item.component';
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {SpacesService} from '../../../services/spaces.service';
-import {ActivatedRoute} from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {SpaceConfigComponent} from '../../../shared/component/space-config/space-config.component';
 import {Space} from '../../../models/space.model';
 import {Paths} from '../../../classes/paths.class';
@@ -55,6 +56,7 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
                 }
             });
 
+
         spaceConfig$.subscribe(() => {
 
             window.document.title = `${this.space.name} | view space`;
@@ -92,6 +94,8 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
     public setActiveTab(tabName: string): void {
         this.activeTab = tabName;
+
+        // this.activatedRoute.params['tab'] = this.activeTab;
     }
 
 }

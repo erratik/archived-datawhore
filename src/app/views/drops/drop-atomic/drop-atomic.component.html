@@ -1,0 +1,14 @@
+
+<div class="is-flex center">
+  <!--<i class="fa fa-{{drop.space}} icon is-small"></i>-->
+  <figure class="image is-16x16">
+      <img src="public/uploads/instagram/space/{{drop.space}}-icon.png">
+  </figure>
+  <span class="date">{{drop.content.date | date:'short'}}</span>
+  <span class="caption">{{drop.content.caption}}</span>
+</div>
+
+<details>
+  <summary>{{drop.type}} raw</summary>
+  <pre>{{drop | json}}</pre>
+</details>

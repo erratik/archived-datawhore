@@ -22,7 +22,7 @@ import {FooterComponent} from './wrapper/footer/footer.component';
 import {SettingsViewComponent} from './views/settings/settings.component';
 import {EditSpacesComponent} from './views/spaces/edit-spaces/edit-spaces.component';
 
-import {ValuesPipePipe} from './shared/pipes/values-pipe.pipe';
+import {ValuesPipe} from './shared/pipes/values-pipe.pipe';
 import {SpaceViewComponent} from './views/spaces/view-space/view-space.component';
 import {SpaceConfigComponent} from './shared/component/space-config/space-config.component';
 import {DimensionListComponent} from './shared/component/dimensions/dimensions-list/dimensions-list.component';
@@ -35,6 +35,9 @@ import {AddSpaceComponent} from './views/spaces/add-space/add-space.component';
 import {PopulateMatchesPipe} from './shared/pipes/populate-matches.pipe';
 import {RainFormComponent} from './views/rain/rain-form/rain-form.component';
 import { RainConfigsComponent } from './views/rain/rain-configs/rain-configs/rain-configs.component';
+import { DropsComponent } from './views/drops/drops/drops.component';
+import { DropAtomicComponent } from './views/drops/drop-atomic/drop-atomic.component';
+import { KeyPipe } from './shared/pipes/key-pipe.pipe';
 
 const appRoutes: Routes = [
     {
@@ -73,7 +76,6 @@ const appRoutes: Routes = [
         SettingsViewComponent,
         FileSelectDirective,
         EditSpacesComponent,
-        ValuesPipePipe,
         SpaceViewComponent,
         SpaceConfigComponent,
         DimensionListComponent,
@@ -85,7 +87,11 @@ const appRoutes: Routes = [
         AddSpaceComponent,
         PopulateMatchesPipe,
         RainFormComponent,
-        RainConfigsComponent
+        RainConfigsComponent,
+        DropsComponent,
+        DropAtomicComponent,
+        ValuesPipe,
+        KeyPipe
     ],
     providers: [
         SpacesService,

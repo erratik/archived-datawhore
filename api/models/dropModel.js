@@ -2,54 +2,46 @@ const mongoose = require('mongoose');
 const colors = require('colors');
 const ObjectId = require('mongodb').ObjectId;
 
-const childSchema = new mongoose.Schema({
+const dropSchema = new mongoose.Schema({
     type: String,
-    fetchUrl: String,
-    dropUrl: String,
-    modified: Number,
     content: {}
 });
 
-let Schema;
-const SchemaSchema = {
+let Drop;
+const DropSchema = {
     schema: {
         space: String,
-        schemas: [childSchema]
+        drops: [dropSchema]
     },
     self: {
-        findSchema: function (spaceName, schemaType, cb) {
-            this.findOne({ space: spaceName }, function (err, docs) {
-                if (!docs.schemas.length) {
-                    var schema = new Schema({
-                        space: spaceName,
-                        schemas: [{
-                            type: schemaType,
-                            modified: Date.now()
-                        }]
-                    });
-                    docs.schemas.push(schema);
-                }
-                if (!schemaType.includes('rain')) {
-                    cb(docs.schemas.filter(function (schema) {
-                        return schema.type === schemaType;
-                    })[0]);
-                } else {
-                    cb(docs.schemas.filter(function (schema) {
-                        const type = schema.type;
-                        return type.includes('rain');
-                    }));
+        findDrops: function (space, type, cb) {
+            const query = { space: space};
+            this.findOne({space: space}, function (err, docs) {
+                if (docs) {
+                    cb(docs);
                 }
             });
         },
-        removeSchema: function (space, type, cb) {
-            var query = { space: space, 'schemas.type': type };
-            this.update(query, { $pull: { schemas: { type: type } } }, { multi: true }, function (error, _updated) {
-                if (_updated.ok) {
-                    cb();
-                }
+        findDrop: function (space, id, cb) {
+
+            const dropid = new ObjectId(id);
+            const query = { space: space, 'drops._id': dropid };
+            const subQuery = { '_id': dropid };
+
+            this.find(query, { 'drops.$': 1 }, function (err, docs) {
+                cb(docs)
             });
+
         },
-        writeSchema: function (spaceName, schema, cb) {
+        // removeDrop: function (space, type, cb) {
+        //     var query = { space: space, 'schemas.type': type };
+        //     this.update(query, { $pull: { schemas: { type: type } } }, { multi: true }, function (error, _updated) {
+        //         if (_updated.ok) {
+        //             cb();
+        //         }
+        //     });
+        // },
+        writeDrop: function (spaceName, schema, cb) {
             const that = this;
             const sid = new ObjectId(schema.id);
             const squery = sid;
@@ -87,6 +79,6 @@ const SchemaSchema = {
         }
     }
 };
-Schema = require('./createModel')(mongoose, 'Schema', SchemaSchema);
-module.exports = Schema;
-//# sourceMappingURL=/Users/erratik/Sites/datawhore/admin/api/models/schemaModel.js.map
+Drop = require('./createModel')(mongoose, 'Drop', DropSchema);
+module.exports = Drop;
+//# sourceMappingURL=/Users/erratik/Sites/datawhore/admin/api/models/dropModel.js.map

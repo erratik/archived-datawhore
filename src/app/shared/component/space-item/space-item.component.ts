@@ -1,8 +1,9 @@
-import {Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
+import { pbkdf2 } from 'crypto';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import {Dimension} from '../../../models/profile.model';
 import {RainDimension} from '../../../models/rain.model';
-import {ProfileService} from '../../../services/profile/profile.service';
 import {Space} from '../../../models/space.model';
+import {ProfileService} from '../../../services/profile/profile.service';
 import {SpacesService} from '../../../services/spaces.service';
 import {RainService} from '../../../services/rain/rain.service';
 import {Observable} from 'rxjs';
@@ -13,23 +14,24 @@ const objectPath = require('object-path');
     templateUrl: './space-item.component.html',
     styleUrls: ['./space-item.component.less']
 })
-export class SpaceItemComponent implements OnInit {
+export class SpaceItemComponent implements OnInit, OnDestroy {
 
     protected schema: any;
-    @Input() protected properties: any[];
-    @Input() protected space: Space;
-    @Input() protected type: string;
+    @Input() public properties: any[];
+    @Input() public space: Space;
+    @Input() public type: string;
     @Output() public linkingToSpace = new EventEmitter<Space>();
     public itemSchema$ = new Observable<any>();
+    public obsRx;
 
     constructor(private profileService: ProfileService,
-                private rainService: RainService,
-                private spacesService: SpacesService) {}
+                public rainService: RainService,
+                public spacesService: SpacesService) {}
 
     ngOnInit() {
         this.type = this.type.includes('.') ? this.type.split('.')[0] : this.type;
 
-        const itemSchema$ = this[`${this.type}Service`].fetchSchema(this.space.name).do((rawSchema) => {
+       this.itemSchema$ = this[`${this.type}Service`].fetchSchema(this.space.name).do((rawSchema) => {
             this.schema = rawSchema.length ? rawSchema[0] : rawSchema;
             if (this.type === 'profile' && this.properties) {
                 console.log(this.properties);
@@ -39,9 +41,12 @@ export class SpaceItemComponent implements OnInit {
             }
         });
 
-        itemSchema$.subscribe();
+        this.obsRx = this.itemSchema$.subscribe();
     }
 
+    ngOnDestroy() {
+        this.obsRx.unsubscribe();
+    }
 
     protected linkItemToSpace(property): void {
         this.space[property.friendlyName] = objectPath.get(this.schema, property.schemaPath);

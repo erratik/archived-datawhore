@@ -1,0 +1,13 @@
+
+
+<div *ngIf="drops">
+  <div *ngFor="let dropGroup of drops | keys">
+    <span class="heading">{{dropGroup.key}} Drops</span>
+    <hr>
+    <div *ngFor="let drop of dropGroup.value">
+      <datawhore-drop-atomic [drop]="drop"></datawhore-drop-atomic>
+    </div>
+    <hr>
+  </div>
+</div>
+

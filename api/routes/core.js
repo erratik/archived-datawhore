@@ -11,6 +11,7 @@ const OAuth = require('oauth');
 const refresh = require('passport-oauth2-refresh');
 
 const Space = require('../models/spaceModel');
+
 const Setting = require('../models/settingModel');
 const Schema = require('../models/schemaModel');
 
@@ -27,7 +28,7 @@ let getEndpoint = (data, cb) => {
             cb(resp);
         });
     } else {
-        cb('no endpoints set for ' + data.action)
+        cb({message: 'no endpoints set for ' + data.action});
     }
 };
 
@@ -109,9 +110,7 @@ router
 
 // SPACES: ENDPOINTS TO GET DATA FROM SPACES (TWITTER, INSTAGRAM, ETC)
 router.post('/endpoint/space', function (req, res) {
-
     let data = req.body.data;
-
     Setting.findSettings(data.space, (o) => {
 
         data.apiUrl = pluck('apiUrl', o.oauth);
@@ -210,10 +209,7 @@ router.post('/endpoint/space', function (req, res) {
 
         }
     });
-
 });
-
-
 
 // UPLOADS
 // todo: change this to a put request
@@ -249,6 +245,5 @@ router.post('/upload/:space/:folder/:filename', function (req, res) {
         // res.json(req.file);
     });
 });
-
 
 module.exports = router;

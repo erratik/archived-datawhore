@@ -39,6 +39,7 @@
                 <li (click)="setActiveTab('profile')" [class.is-active]="activeTab === 'profile'" *ngIf="space.oauth.connected"><a>Profile</a></li>
                 <li (click)="setActiveTab('rain')" [class.is-active]="activeTab === 'rain'" *ngIf="space.oauth.connected"><a>Rain</a></li>
                 <li (click)="setActiveTab('space')" [class.is-active]="activeTab === 'space'"><a>Space</a></li>
+                <li (click)="setActiveTab('drops')" [class.is-active]="activeTab === 'drops'"><a>Drops</a></li>
             </ul>
         </div>
         <div class="tab profile" *ngSwitchDefault>
@@ -94,27 +95,26 @@
                         No profile schema fetched yet.
                     </p>
                 </div>
-
-
             </div>
         </div>
         <div class="tab space" *ngSwitchCase="'rain'">
-
             <datawhore-rain-configs
                     [spaceOauthSettings]="spaceOauthSettings"
                     [newDimensions]="newDimensions"
                     [space]="space">
             </datawhore-rain-configs>
-
         </div>
         <div class="tab space" *ngSwitchCase="'space'">
             <datawhore-space-config
                     (onRemoveSpace)="removeSpace()"
                     (onUpdateSpace)="updateSpace($event)"
-                    (onToggleEditSpace)="toggleEditSpace()"></datawhore-space-config>
-
+                    (onToggleEditSpace)="toggleEditSpace()">
+            </datawhore-space-config>
         </div>
 
+        <div class="tab space" *ngSwitchCase="'drops'">
+            <datawhore-drops [space]="space"></datawhore-drops>
+        </div>
 
     </div>
 </section>

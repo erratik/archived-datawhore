@@ -20,13 +20,9 @@
                         <a>drops</a>
                     </li>
                 </ul>
-                <!--<pre>{{schema | json}}</pre>-->
-            </li>
-            <li (click)="setActiveTab('new-schema')">
-                <small class="is-success"><span>+</span> add schema</small>
             </li>
         </ul>
-        {{overrideRainName | json}}
+        <a class="button is-success is-outlined is-wide" (click)="setActiveTab('new-schema')"><span>Add schema</span></a>
     </aside>
 
     <div class="column" *ngIf="activeTab === 'new-schema' || !rainSchemas.length" [class.is-hidden]="activeTab !== 'new-schema'">
@@ -114,22 +110,21 @@
                     <h3 class="heading">{{schema.type}} Settings</h3>
                 </div>
                 <hr>
-                <label class="label">
-                    Rename rain type
-                </label>
+                <label class="label">Rename rain type</label>
                 <div class="control has-addons">
                     <input #overrideRainType class="input is-expanded" type="text" [(ngModel)]="overrideRainName[schema.type]">
                 </div>
                 <div class="control">
-                    <label class="label">
-                        API Fetch URL
-                    </label>
+                    <label class="label">API Fetch URL</label>
                     <div class="control has-addons">
                         <input #fetchUrl class="input is-expanded" type="text" placeholder="/v1/me/player/recently-played?limit=1" [(ngModel)]="schema.fetchUrl">
-                        <a class="button is-warning" [class.is-loading]="isFetchingSchema" (click)="writeRain($i, schema.type, true)">
+                        <!--<a class="button is-warning" [class.is-loading]="isFetchingSchema" (click)="writeRain($i, schema.type, true)">
                             <span class="icon is-small"><i class="fa fa-refresh"></i></span>
-                            <!--<span>Fetch schema</span>-->
-                        </a>
+                        </a>-->
+                    </div>
+                    <label class="label">Drop Fetch URL</label>
+                    <div class="control has-addons">
+                        <input #dropFetchUrl class="input is-expanded" type="text" placeholder="/v1/me/player/recently-played?limit=1" [(ngModel)]="schema.dropUrl">
                     </div>
                 </div>
                 <hr>
@@ -151,9 +146,7 @@
                     </label>
                     <div class="control has-addons" *ngIf="toggleOverrideSchema">
                         <input #overrideRain class="input is-expanded" type="text" placeholder="Enter object path (a.b.c)" [(ngModel)]="overrideSchemaPath">
-                        <a class="button is-success" *ngIf="overrideRain.value" (click)="updateRainSchema($i, schema.type)">
-                            Override
-                        </a>
+                        <a class="button is-success" *ngIf="overrideRain.value" (click)="updateRainSchema($i, schema.type)">Override</a>
                     </div>
                     <datawhore-rain-form
                         [rainSchemaIndex]="$i"
@@ -165,6 +158,5 @@
                 </div>
             </div>
         </div>
-        <pre class="column is-10">{{rainSchemas | json}} </pre>
     </div>
 </div>
