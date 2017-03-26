@@ -99,15 +99,21 @@ module.exports = {
         fetch: function (space, data, type = null, cb, extras) {
 
             let drops = (typeof data === 'string') ? JSON.parse(data) : data;
-            if (extras.contentPath) {
-                drops = drops[extras.contentPath];
+            const error = Object.keys(drops).filter(o => o.includes('error'));
+            if (!error) {
+
+                if (extras.contentPath) {
+                    drops = drops[extras.contentPath];
+                }
+
+                let schema = drops.map(drop => { return {type: type, content: drop}} );
+
+                Drop.writeDrops(space, schema, type, function (data) {
+                    cb(data);
+                });
+            } else {
+                cb(drops);
             }
-
-            let schema = drops.map(drop => { return {type: type, content: drop}} );
-
-            Drop.writeDrops(space, schema, type, function (data) {
-                cb(data);
-            });
         },
         get: function (space, type, cb) {
             Drop.findDrops(space, type, function (data) {

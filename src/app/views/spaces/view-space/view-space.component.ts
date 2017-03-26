@@ -61,6 +61,7 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
             window.document.title = `${this.space.name} | view space`;
 
+                console.log(this.rainService);
             // to know what's already selected and renamed
             if (this.profileSchema.propertyBucket) {
                 this.profile.createPropertyBucket(this.profileSchema.propertyBucket);

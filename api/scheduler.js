@@ -61,7 +61,7 @@ module.exports = function (app, spaces, settings) {
 
     });
 
-    var unshiftDrops = schedule.scheduleJob('* */3 * * * *', function () {
+    var unshiftDrops = schedule.scheduleJob('*/3 * * * *', function () {
 
         fetchDrops(false);
         console.log(`Added drops! (${Date.now()})`);
