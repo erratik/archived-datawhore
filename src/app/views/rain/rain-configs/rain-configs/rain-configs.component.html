@@ -144,9 +144,11 @@
                         <a class="icon is-warning" (click)="toggleOverrideSchema =! toggleOverrideSchema"><i class="fa fa-gavel"></i></a>
                         <span>Override object path to rain schema</span>
                     </label>
-                    <div class="control has-addons" *ngIf="toggleOverrideSchema">
-                        <input #overrideRain class="input is-expanded" type="text" placeholder="Enter object path (a.b.c)" [(ngModel)]="overrideSchemaPath">
-                        <a class="button is-success" *ngIf="overrideRain.value" (click)="updateRainSchema($i, schema.type)">Override</a>
+                    <div class="control" *ngIf="toggleOverrideSchema">
+                        <input #overrideRain class="input is-expanded" type="text" placeholder="Enter object path (a.b.c)" [(ngModel)]="schema.contentPath">
+                        <label class="checkbox">
+                            <input type="checkbox" [(ngModel)]="overrideSchemaPath"> Override schema on save?
+                        </label>
                     </div>
                     <datawhore-rain-form
                         [rainSchemaIndex]="$i"

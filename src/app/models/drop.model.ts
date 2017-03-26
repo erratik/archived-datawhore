@@ -5,7 +5,7 @@ export class Drop {
         public content: any,
         public id: any) {
 
-        this.content = this.sanitizeDrop();
+        // this.content = this.sanitizeDrop();
     }
 
     public sanitizeDrop(): any {

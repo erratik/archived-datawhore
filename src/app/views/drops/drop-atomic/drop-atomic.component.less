@@ -1,8 +1,15 @@
-@import "../../../../assets/styles/less/bulma-vars";
+@import "../../../../assets/styles/less/mixins";
 
+:host {
+    .border-bottom();
+    display: block;
+}
+
+figure { flex: 0 0 16px; }
 .caption {
     margin: 0 1rem;
 }
 .date {
     color: fade(@black-ter, 50%);
+        flex: 0 0 180px;
 }

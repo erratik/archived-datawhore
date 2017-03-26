@@ -1,14 +1,12 @@
 
-<div class="is-flex center">
+<div class="is-flex">
   <!--<i class="fa fa-{{drop.space}} icon is-small"></i>-->
-  <figure class="image is-16x16">
-      <img src="public/uploads/instagram/space/{{drop.space}}-icon.png">
-  </figure>
-  <span class="date">{{drop.content.date | date:'short'}}</span>
+  <!--{{drop.content.id}}-->
+  <div class="is-flex center date">
+    <figure class="image is-16x16">
+        <img src="public/uploads/instagram/space/{{drop.space}}-icon.png">
+    </figure>
+    <span class="">{{drop.content.date | date:'short'}}</span>
+  </div>
   <span class="caption">{{drop.content.caption}}</span>
 </div>
-
-<details>
-  <summary>{{drop.type}} raw</summary>
-  <pre>{{drop | json}}</pre>
-</details>

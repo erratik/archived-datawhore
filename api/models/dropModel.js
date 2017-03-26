@@ -1,9 +1,11 @@
 const mongoose = require('mongoose');
 const colors = require('colors');
 const ObjectId = require('mongodb').ObjectId;
+var _ = require('lodash');
 
 const dropSchema = new mongoose.Schema({
     type: String,
+    id: Number,
     content: {}
 });
 
@@ -14,10 +16,11 @@ const DropSchema = {
         drops: [dropSchema]
     },
     self: {
-        findDrops: function (space, type, cb) {
-            const query = { space: space};
-            this.findOne({space: space}, function (err, docs) {
+        findDrops: function (space, type = null, cb) {
+            const query = { space: space };
+            this.findOne({ space: space }, function (err, docs) {
                 if (docs) {
+                    docs.drops = type !== 'all' ? docs.drops.filter(d => d.type) : docs.drops;
                     cb(docs);
                 }
             });
@@ -41,41 +44,52 @@ const DropSchema = {
         //         }
         //     });
         // },
-        writeDrop: function (spaceName, schema, cb) {
-            const that = this;
-            const sid = new ObjectId(schema.id);
-            const squery = sid;
-            const query = schema.type === 'profile' ? { space: spaceName, 'schemas.type': schema.type } : { space: spaceName, 'schemas._id': sid };
-            const schemaQuery = schema.type === 'profile' ? { 'type': schema.type } : { '_id': sid };
+        writeDrops: function (space, drops, type, cb) {
+            const query = { space: space, 'drops.type': type };
+            var that = this;
+            const possibleTimeKeys = ['created_time', 'date', 'timestamp', 'time'];
 
+            var addSchema = function (callback) {
 
-            const addSchema = function (callback) {
-                schema.modified = Date.now();
-                // console.log(schema);
-                that.findOneAndUpdate({ space: spaceName }, { $push: { schemas: schema } }, { upsert: true, returnNewDocument: true }, function (err, updated) {
+                drops = drops.filter(drop => {
+                    Object.keys(drop.content).map(key => {
+                        if (possibleTimeKeys.includes(key) && typeof Number(drop.content[key]) === 'number') {
 
-                    that.find({ space: spaceName, 'schemas.type': schema.type }, { 'schemas.$': 1 }, (err, docs) => {
+                            const timestamp = drop.content[key];
+                            drop.content[key] = Number(drop.content[key]);
+                            if (timestamp.length === 10) {
+                                drop.content[key] = timestamp * 1000;
+                                drop.id = drop.content[key];
+                            }
+
+                        }
+                    });
+                    if (!existingDropTimestamps.includes(drop.id)) {
+                        return drop;
+                    }
+                });
+
+                that.findOneAndUpdate({ space: space }, { $push: { drops: { $each: drops } } }, { upsert: true, returnNewDocument: true }, function (err, updated) {
+
+                    that.findOne(query, (err, docs) => {
                         if (err) cb(err);
-                        // console.log('... and updated', docs[0].schemas[0]);
-                        cb(docs[0].schemas[0]);
+                        cb(docs.drops);
                     });
                 });
             };
 
-            this.findOne(query, { 'schemas.$': 1 }, function (_err, docs) {
-                if (docs) {
-                    that.update(query, { $pull: { schemas: schemaQuery } }, { multi: false }, function (error, _updated) {
-                        // console.log('pulled', _updated);
-                        if (_updated.ok) {
-                            addSchema(cb);
-                        }
+
+            let existingDropTimestamps = [];
+            that.findOne(query, function (_err, _docs) {
+                if (_docs) {
+                    existingDropTimestamps = _docs.drops.map(drop => {
+                        if (drop.id)
+                            return drop.id
                     });
                 }
-                else {
-                    // console.log(`no ${schema.type} schema found, creating`);
-                    addSchema(cb);
-                }
+                addSchema(cb);
             });
+
         }
     }
 };

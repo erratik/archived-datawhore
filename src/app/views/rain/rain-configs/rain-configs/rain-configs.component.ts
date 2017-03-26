@@ -34,7 +34,7 @@ export class RainConfigsComponent implements OnChanges, OnInit {
     public newRainFetchUrl: string;
 
     public overrideRainName: any = {};
-    public overrideSchemaPath: string;
+    public overrideSchemaPath: boolean;
 
     constructor(private spacesService: SpacesService,
                 private spaceItemService: SpaceItemService,
@@ -105,7 +105,7 @@ export class RainConfigsComponent implements OnChanges, OnInit {
         schema.type = this.overrideRainName[type] !== schema.type ? this.overrideRainName[type] : schema.type;
 
         if (this.overrideSchemaPath) {
-            schema.content = objectPath.get(this.rainService.rainSchemas[index], `content.${this.overrideSchemaPath}`);
+            schema.content = objectPath.get(this.rainService.rainSchemas[index], `content.${schema.contentPath}`);
         }
         // debugger;
         const profileSchema$ = this.rainService.updateSchema(this.space.name, schema, type).do((updatedSchema) => {
@@ -143,6 +143,7 @@ export class RainConfigsComponent implements OnChanges, OnInit {
             preSchema.modified,
             preSchema.fetchUrl,
             preSchema.dropUrl,
+            preSchema.contentPath,
             preSchema._id
         );
     }

@@ -83,7 +83,7 @@ export class SpacesService {
         }).catch(this.handleError);
     }
 
-    public spaceEndpoint(space: Space, queryData, data, endpointPath = ''): Observable<any> {
+    public spaceEndpoint(space: Space, queryData, extras = null, endpointPath = ''): Observable<any> {
 
         endpointPath = (endpointPath === '') ? 'endpoint/space' : endpointPath;
         const url = `${this.apiServer}/${endpointPath}`;
@@ -91,8 +91,8 @@ export class SpacesService {
             data: queryData,
             space: space.name
         };
-        if (data) {
-            payload['more'] = data;
+        if (extras) {
+            payload['extras'] = extras;
         }
         const bodyString = JSON.stringify(payload);
 

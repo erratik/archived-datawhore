@@ -1,12 +1,15 @@
 
 
 <div *ngIf="drops">
-  <div *ngFor="let dropGroup of drops | keys">
-    <span class="heading">{{dropGroup.key}} Drops</span>
-    <hr>
-    <div *ngFor="let drop of dropGroup.value">
-      <datawhore-drop-atomic [drop]="drop"></datawhore-drop-atomic>
+  <div *ngFor="let dropType of dropTypes">
+    <div class="header">
+      <span class="heading is-pulled-left">{{dropType}} Drops</span>
+      <a (click)="fetchNewDrops(dropType)"
+         [class.is-loading]="isLoading"
+         class="button is-info is-small is-pulled-right is-marginless"> fetch {{dropType}}</a>
     </div>
+    <hr>
+      <datawhore-drop-atomic [drop]="drop" *ngFor="let drop of drops[dropType] | orderDropBy:'date'"></datawhore-drop-atomic>
     <hr>
   </div>
 </div>

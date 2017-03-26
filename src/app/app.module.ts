@@ -38,6 +38,7 @@ import { RainConfigsComponent } from './views/rain/rain-configs/rain-configs/rai
 import { DropsComponent } from './views/drops/drops/drops.component';
 import { DropAtomicComponent } from './views/drops/drop-atomic/drop-atomic.component';
 import { KeyPipe } from './shared/pipes/key-pipe.pipe';
+import { OrderDropByPipe } from './shared/pipes/order-drop-by.pipe';
 
 const appRoutes: Routes = [
     {
@@ -91,7 +92,8 @@ const appRoutes: Routes = [
         DropsComponent,
         DropAtomicComponent,
         ValuesPipe,
-        KeyPipe
+        KeyPipe,
+        OrderDropByPipe
     ],
     providers: [
         SpacesService,

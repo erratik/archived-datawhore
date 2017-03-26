@@ -6,6 +6,7 @@ const childSchema = new mongoose.Schema({
     type: String,
     fetchUrl: String,
     dropUrl: String,
+    contentPath: String,
     modified: Number,
     content: {}
 });

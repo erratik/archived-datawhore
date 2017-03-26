@@ -17,6 +17,7 @@ const users = require('./routes/users');
 
 const app = express();
 
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -69,11 +70,26 @@ app.use('/users', users);
 
 app.use('/', routes);
 require('./strategy')(app);
+
+const Space = require('./models/spaceModel');
+const Settings = require('./models/settingModel');
+// mongoose
+mongoose.connect('mongodb://localhost/datawhore', function(err) {
+    if (err) throw err;
+    Space.getAll(function (err, spaces) {
+
+
+        Settings.findAllSettings((settings) => {
+            // console.log(o);
+            require('./scheduler')(app, spaces, settings);
+        });
+
+    });
+});
+
 app.use('/api', api);
 
 
-// mongoose
-mongoose.connect('mongodb://localhost/datawhore');
 
 
 // catch 404 and forward to error handler

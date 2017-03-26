@@ -17,6 +17,12 @@ var SettingSchema = {
                 cb(docs[0]);
             });
         },
+        findAllSettings: function (cb) {
+            this.find({}, function (err, docs) {
+                if (err) cb(err);
+                cb(docs);
+            });
+        },
         removeSettings: function (name, cb) {
             this.remove({ space: name }, cb);
         },

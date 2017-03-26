@@ -73,12 +73,7 @@ module.exports = {
                 // todo: make sure to return what's updated, not what's intended for updated
                 cb(content);
             });
-        },
-        /*get: function (space, type, cb) {
-
-            Profile.findProfile(space, (profile) => cb(profile));
-
-        }*/
+        }
     },
     rain: {
         write: function (data, content, type = null, cb) {
@@ -101,9 +96,19 @@ module.exports = {
         }
     },
     drops: {
-        // write: function (space, content, type = null, cb) {
-        //     Setting.updateSettings(content, (updatedSettings) => cb(content));
-        // },
+        fetch: function (space, data, type = null, cb, extras) {
+
+            let drops = (typeof data === 'string') ? JSON.parse(data) : data;
+            if (extras.contentPath) {
+                drops = drops[extras.contentPath];
+            }
+
+            let schema = drops.map(drop => { return {type: type, content: drop}} );
+
+            Drop.writeDrops(space, schema, type, function (data) {
+                cb(data);
+            });
+        },
         get: function (space, type, cb) {
             Drop.findDrops(space, type, function (data) {
                 cb(data);

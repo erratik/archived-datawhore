@@ -6,7 +6,6 @@ import {Observable} from 'rxjs';
 import {SpaceItemService} from '../../shared/services/space-item/space-item.service';
 import { Rain, RainDimension } from '../../models/rain.model';
 const objectPath = require('object-path');
-
 import * as _ from 'lodash';
 
 @Injectable()
@@ -59,22 +58,24 @@ export class RainService extends SpaceItemService {
     return this.http.get(`${this.apiServer}/get/drops/${space}`)
         .map((res: Response) => {
             const dropsResponse = res.json();
-            this.drops[space] = dropsResponse.drops.map(drop => {
-                // console.log(drop.type, this.rainSchemas.filter(rain => rain.type === drop.type)[0])
-                const dropProperties = this.rain.filter(rain => rain.rainType === drop.type)[0].properties;
-
-                const content = {};
-                dropProperties.forEach(prop => content[prop.friendlyName] = objectPath.get(drop, prop.schemaPath));
-                // debugger;
-                drop = new Drop(space, drop.type, content, drop._id);
-
-                return drop;
-            });
-
-
+            this.drops[space] = this.sortDrops(dropsResponse.drops, space);
             return this.drops[space];
         })
         .catch(this.handleError);
+  }
+
+  public sortDrops(drops, space): any {
+        return drops.map(drop => {
+            // console.log(drop.type, this.rainSchemas.filter(rain => rain.type === drop.type)[0])
+            const dropProperties = this.rain.filter(rain => rain.rainType === drop.type)[0].properties;
+
+            const content = {};
+            dropProperties.forEach(prop => content[prop.friendlyName] = objectPath.get(drop, prop.schemaPath));
+            // debugger;
+            drop = new Drop(space, drop.type, content, drop._id);
+
+            return drop;
+        });
   }
 
   public update(space: string, rain: any): Observable<any> {

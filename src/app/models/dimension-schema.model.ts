@@ -6,6 +6,7 @@ export class DimensionSchema {
                 public modified: number = null,
                 public fetchUrl?: string,
                 public dropUrl?: string,
+                public contentPath?: string,
                 public id?: any,
                 public propertyBucket = null) {
 
