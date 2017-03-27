@@ -22,9 +22,10 @@ export class DropsComponent implements OnInit {
 
   ngOnInit() {
 
+    this.dropTypes = this.rainService.rainSchemas.map(rain => rain.type);
+
     this.getDrops$ = this.rainService.getDrops(this.space.name).do((drops) => {
       this.drops = _.groupBy(drops, 'type');
-      this.dropTypes = Object.keys(this.drops);
     });
 
     this.getDrops$.subscribe();
@@ -42,15 +43,15 @@ export class DropsComponent implements OnInit {
       space: this.space.name
     }
 
-    const extras = {
-      instagram: {
-        min_id: _.minBy(this.drops[type], (o) => o['content']['date'])['content']['id']
-      }
-    };
+    // const extras = {
+    //   instagram: {
+    //     min_id: _.minBy(this.drops[type], (o) => o['content']['date'])['content']['id']
+    //   }
+    // };
 
-    console.log('extras', extras[this.space.name]);
+    // console.log('extras', extras[this.space.name]);
 
-    const newDrops$ = this.spacesService.spaceEndpoint(this.space, data, extras[this.space.name]);
+    const newDrops$ = this.spacesService.spaceEndpoint(this.space, data);
 
     newDrops$.subscribe((newDrops) => {
       const drops = this.rainService.sortDrops(newDrops, this.space.name);

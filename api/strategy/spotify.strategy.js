@@ -29,10 +29,10 @@ module.exports = function (app) {
         }
     });
 
-    app.get('/auth/${space}', passport.authenticate(space, {
+    app.get('/auth/spotify', passport.authenticate(space, {
         scope: ['user-read-email', 'user-read-private', 'user-read-recently-played']
     }));
-    app.get('/auth/${space}/callback', passport.authenticate(space, {
+    app.get('/auth/spotify/callback', passport.authenticate(space, {
         successRedirect: `http://datawhore.erratik.ca:4200/space/${space}`,
         failureRedirect: 'http://datawhore.erratik.ca:4200'
     }));

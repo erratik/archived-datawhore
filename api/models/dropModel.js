@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const colors = require('colors');
 const ObjectId = require('mongodb').ObjectId;
 var _ = require('lodash');
+var moment = require('moment');
 
 const dropSchema = new mongoose.Schema({
     type: String,
@@ -21,8 +22,10 @@ const DropSchema = {
             this.findOne({ space: space }, function (err, docs) {
                 if (docs) {
                     docs.drops = type !== 'all' ? docs.drops.filter(d => d.type) : docs.drops;
-                    cb(docs);
+                } else {
+                    docs = {drops: []};
                 }
+                cb(docs);
             });
         },
         findDrop: function (space, id, cb) {
@@ -47,24 +50,28 @@ const DropSchema = {
         writeDrops: function (space, drops, type, cb) {
             const query = { space: space, 'drops.type': type };
             var that = this;
-            const possibleTimeKeys = ['created_time', 'date', 'timestamp', 'time'];
+            const possibleTimestampKeys = ['created_time', 'date', 'timestamp', 'time', 'created_at', 'played_at'];
 
             var addSchema = function (callback) {
 
                 drops = drops.filter(drop => {
                     Object.keys(drop.content).map(key => {
-                        if (possibleTimeKeys.includes(key) && typeof Number(drop.content[key]) === 'number') {
+                        if (possibleTimestampKeys.includes(key)) {
 
-                            const timestamp = drop.content[key];
-                            drop.content[key] = Number(drop.content[key]);
-                            if (timestamp.length === 10) {
-                                drop.content[key] = timestamp * 1000;
-                                drop.id = drop.content[key];
-                            }
-
+                            // if () {
+                                const dateCheck = drop.content[key].length === 13 ? drop.content[key] : moment(drop.content[key]).format('x');
+                            //  }
+                                if (typeof Number(dateCheck) === 'number') {
+                                    const timestamp = drop.content[key];
+                                    drop.content[key] = dateCheck;
+                                    if (timestamp.length === 10) {
+                                        drop.content[key] = timestamp * 1000;
+                                    }
+                                    drop.id = drop.content[key];
+                                }
                         }
                     });
-                    if (!existingDropTimestamps.includes(drop.id)) {
+                    if (!existingDropTimestamps.includes(Number(drop.id))) {
                         return drop;
                     }
                 });

@@ -42,6 +42,12 @@ const SchemaSchema = {
                 }
             });
         },
+        findAllSchemas: function (cb) {
+            this.find({}, function (err, docs) {
+                if (err) cb(err);
+                cb(docs);
+            });
+        },
         removeSchema: function (space, type, cb) {
             var query = { space: space, 'schemas.type': type };
             this.update(query, { $pull: { schemas: { type: type } } }, { multi: true }, function (error, _updated) {
@@ -61,12 +67,14 @@ const SchemaSchema = {
             const addSchema = function (callback) {
                 schema.modified = Date.now();
                 // console.log(schema);
+                if (typeof schema.fetchUrl === 'object') {
+                    schema.fetchUrl = schema.fetchUrl.apiEndpointUrl;
+                }
                 that.findOneAndUpdate({ space: spaceName }, { $push: { schemas: schema } }, { upsert: true, returnNewDocument: true }, function (err, updated) {
-
-                    that.find({ space: spaceName, 'schemas.type': schema.type }, { 'schemas.$': 1 }, (err, docs) => {
+                    if (err) cb(err);
+                    that.findOne({ space: spaceName, 'schemas.type': schema.type }, { 'schemas.$': 1 }, (err, docs) => {
                         if (err) cb(err);
-                        // console.log('... and updated', docs[0].schemas[0]);
-                        cb(docs[0].schemas[0]);
+                        cb(docs.schemas[0]);
                     });
                 });
             };

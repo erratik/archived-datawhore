@@ -73,15 +73,18 @@ require('./strategy')(app);
 
 const Space = require('./models/spaceModel');
 const Settings = require('./models/settingModel');
+const Schema = require('./models/schemaModel');
 // mongoose
 mongoose.connect('mongodb://localhost/datawhore', function(err) {
     if (err) throw err;
     Space.getAll(function (err, spaces) {
 
+        Schema.findAllSchemas((schemas) => {
 
-        Settings.findAllSettings((settings) => {
-            // console.log(o);
-            require('./scheduler')(app, spaces, settings);
+            Settings.findAllSettings((settings) => {
+                // console.log(o);
+                require('./scheduler')(app, spaces, settings, schemas);
+            });
         });
 
     });

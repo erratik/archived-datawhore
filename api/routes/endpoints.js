@@ -100,7 +100,7 @@ module.exports = {
 
             let drops = (typeof data === 'string') ? JSON.parse(data) : data;
             const error = Object.keys(drops).filter(o => o.includes('error'));
-            if (!error) {
+            if (!error.length) {
 
                 if (extras.contentPath) {
                     drops = drops[extras.contentPath];

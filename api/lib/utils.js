@@ -5,6 +5,7 @@ let endpoints = require('../routes/endpoints');
 const objectPath = require('object-path');
 const OAuth = require('oauth');
 const request = require('request');
+const refresh = require('passport-oauth2-refresh');
 const https = require('https');
 const DROP_FETCH_EXTRAS = require('../constants.class').DROP_FETCH_EXTRAS;
 
@@ -56,7 +57,9 @@ module.exports = that = {
                 return arr.value;
             }
         })[0];
-        return plucked.value;
+        if (plucked) {
+            return plucked.value;
+        }
     },
     URLtoObject: (str) => {
         var obj = {};
@@ -73,8 +76,10 @@ module.exports = that = {
                 data.apiKey = that.pluck('apiKey', o.oauth);
                 data.apiSecret = that.pluck('apiSecret', o.oauth);
                 data.accessToken = that.pluck('accessToken', o.extras);
+                data.refreshToken = that.pluck('refreshToken', o.extras);
                 data.fetchUrl = data.apiEndpointUrl;
-                console.log('dahjhta', data);
+                // console.log('dahjhta', data);
+
                 let urlExtras;
                 let options;
                 if (data.apiEndpointUrl) {
@@ -106,14 +111,12 @@ module.exports = that = {
                         });
                         break;
 
-                    case 'instagram':
+                    // Access Token requests
+                    default:
 
                         urlExtras = Object.keys(extras).map(function(k) {
                             return encodeURIComponent(k) + "=" + encodeURIComponent(extras[k]);
                         }).join('&');
-
-                    // Access Token requests
-                    default:
 
                         data.apiEndpointUrl += !data.apiEndpointUrl.includes('?') ? `?erratik=datawhore` : `&v=${Date.now()}`;
                         if (urlExtras) {
@@ -126,7 +129,7 @@ module.exports = that = {
                                 'Content-Type': 'application/x-www-form-urlencoded'
                             }
                         };
-                        console.log(options);
+                        // console.log(options.uri);
 
                         const requestDataWithToken = () => request(options, (error, response, body) => {
                             if (error) {
@@ -156,14 +159,14 @@ module.exports = that = {
                                                     'label': key
                                                 };
                                             });
-                                            console.log(settings.extras);
+                                            // console.log(settings.extras);
 
                                             Setting.updateSettings(settings, () => {
                                                 data.accessToken = accessToken;
-                                                console.log('saved new token: ' + accessToken);
-                                                // fakeError = 200;
-                                                requestDataWithToken();
-                                            }
+                                                    console.log('saved new token: ' + accessToken);
+                                                    // fakeError = 200;
+                                                    requestDataWithToken();
+                                                }
                                             );
 
                                         });
@@ -190,14 +193,14 @@ module.exports = that = {
             });
         };
         let extras;
-        if (req && req.body.extras) {
-            extras = DROP_FETCH_EXTRAS(data.space, data.isFetchingPast);
+        if (req) {
+            extras = DROP_FETCH_EXTRAS(data.space, false);
             runCall(data, req, res);
         } else {
 
             Drop.findDrops(data.space, 'all', function (_data) {
                 extras = DROP_FETCH_EXTRAS(data.space, data.isFetchingPast, _data);
-                runCall(data, req, res, cb);
+                runCall(data, null, null, cb);
             });
         }
     },

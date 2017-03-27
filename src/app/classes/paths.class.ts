@@ -6,7 +6,6 @@ export class Paths {
     public static readonly SPACE_API_URL = {
         twitter: 'api.twitter.com',
         swarm: 'api.foursquare.com',
-        spotify: 'api.spotify.com',
         facebook: 'graph.facebook.com',
         tumblr: 'api.tumblr.com',
         moves: 'api.moves-app.com/api/1.1'
