@@ -50,7 +50,7 @@ const DropSchema = {
         writeDrops: function (space, drops, type, cb) {
             const query = { space: space, 'drops.type': type };
             var that = this;
-            const possibleTimestampKeys = ['created_time', 'date', 'timestamp', 'time', 'created_at', 'played_at'];
+            const possibleTimestampKeys = ['created_time', 'date', 'timestamp', 'time', 'created_at', 'played_at', 'createdAt'];
 
             var addSchema = function (callback) {
 
@@ -58,17 +58,16 @@ const DropSchema = {
                     Object.keys(drop.content).map(key => {
                         if (possibleTimestampKeys.includes(key)) {
 
-                            // if () {
-                                const dateCheck = drop.content[key].length === 13 ? drop.content[key] : moment(drop.content[key]).format('x');
-                            //  }
-                                if (typeof Number(dateCheck) === 'number') {
-                                    const timestamp = drop.content[key];
-                                    drop.content[key] = dateCheck;
-                                    if (timestamp.length === 10) {
-                                        drop.content[key] = timestamp * 1000;
-                                    }
-                                    drop.id = drop.content[key];
+                            const dateCheck = drop.content[key].length === 13 ? drop.content[key] : moment(drop.content[key]).format('x');
+
+                            if (typeof Number(dateCheck) === 'number') {
+                                const timestamp = drop.content[key];
+                                drop.content[key] = dateCheck;
+                                if (timestamp.length === 10) {
+                                    drop.content[key] = timestamp * 1000;
                                 }
+                                drop.id = drop.content[key];
+                            }
                         }
                     });
                     if (!existingDropTimestamps.includes(Number(drop.id))) {

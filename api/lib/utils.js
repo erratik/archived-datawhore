@@ -10,19 +10,20 @@ const https = require('https');
 const DROP_FETCH_EXTRAS = require('../constants.class').DROP_FETCH_EXTRAS;
 
 const makeOAuthHeaders = (data) => {
+    const v = data.space === 'twitter' ? '1.1' : '1.0';
     // helper to construct echo/oauth headers from URL
     const oauth = new OAuth.OAuth(`https://${data.apiUrl}/oauth/request_token`,
         `https://${data.apiUrl}/oauth/access_token`,
         data.apiKey,
         data.apiSecret,
-        '1.0',
+        v,
         null,
         'HMAC-SHA1');
     const orderedParams = oauth._prepareParameters(
-        data.token, // test user token
-        data.secret, // test user secret
+        data.tokenSecret, // test user token
+        data.accessToken, // test user secret
         'GET',
-        `https://${data.apiUrl}${data.apiEndpointUrl}`
+        `https://${data.apiUrl}${data.url}`
     );
     return oauth._buildAuthorizationHeaders(orderedParams);
 };
@@ -77,24 +78,33 @@ module.exports = that = {
                 data.apiSecret = that.pluck('apiSecret', o.oauth);
                 data.accessToken = that.pluck('accessToken', o.extras);
                 data.refreshToken = that.pluck('refreshToken', o.extras);
+                data.tokenSecret = that.pluck('refreshToken', o.extras);
                 data.fetchUrl = data.apiEndpointUrl;
                 // console.log('dahjhta', data);
 
                 let urlExtras;
+
+                urlExtras = Object.keys(extras).map(function(k) {
+                    return encodeURIComponent(k) + "=" + encodeURIComponent(extras[k]);
+                }).join('&');
+
                 let options;
                 if (data.apiEndpointUrl) {
+
                 switch (data.space) {
                     // OAuth Authorization requests
                     case 'tumblr':
                     case 'twitter':
+                        data.url = data.apiEndpointUrl + '?' + urlExtras;
                         options = {
                             hostname: data.apiUrl,
-                            path: data.apiEndpointUrl,
+                            path: data.apiEndpointUrl + '?' + urlExtras,
                             headers: {
                                 Authorization: makeOAuthHeaders(data)
                             }
                         };
-                        //console.log(options);
+                        console.log(options.path);
+                        console.log(options.headers);
 
                         https.get(options, function (result) {
                             let buffer = '';
@@ -114,22 +124,18 @@ module.exports = that = {
                     // Access Token requests
                     default:
 
-                        urlExtras = Object.keys(extras).map(function(k) {
-                            return encodeURIComponent(k) + "=" + encodeURIComponent(extras[k]);
-                        }).join('&');
+                        data.url = data.apiEndpointUrl;
+                        data.url += !data.url.includes('?') ? `?erratik=datawhore` : `&v=${Date.now()}`;
+                        data.url += '&' + urlExtras;
 
-                        data.apiEndpointUrl += !data.apiEndpointUrl.includes('?') ? `?erratik=datawhore` : `&v=${Date.now()}`;
-                        if (urlExtras) {
-                            data.apiEndpointUrl += '&'+urlExtras;
-                        }
                         options = {
-                            uri: `https://${data.apiUrl}${data.apiEndpointUrl}&access_token=${data.accessToken}&oauth_token=${data.accessToken}`,
+                            uri: `https://${data.apiUrl}${data.url}&access_token=${data.accessToken}&oauth_token=${data.accessToken}`,
                             method: 'GET',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded'
                             }
                         };
-                        // console.log(options.uri);
+                        console.log(options.uri);
 
                         const requestDataWithToken = () => request(options, (error, response, body) => {
                             if (error) {
@@ -162,10 +168,9 @@ module.exports = that = {
                                             // console.log(settings.extras);
 
                                             Setting.updateSettings(settings, () => {
-                                                data.accessToken = accessToken;
                                                     console.log('saved new token: ' + accessToken);
                                                     // fakeError = 200;
-                                                    requestDataWithToken();
+                                                    // requestDataWithToken();
                                                 }
                                             );
 
@@ -200,6 +205,7 @@ module.exports = that = {
 
             Drop.findDrops(data.space, 'all', function (_data) {
                 extras = DROP_FETCH_EXTRAS(data.space, data.isFetchingPast, _data);
+                if (!data.contentPath) data.contentPath = "";
                 runCall(data, null, null, cb);
             });
         }

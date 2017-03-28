@@ -63,7 +63,7 @@ module.exports = function (app, spaces, settings, schemaGroups) {
                         setTimeout(function() {
 
                             Utils.endpointSpaceCall(data, null, null, (resp) => {
-                                console.log(`${resp.length} total drops on ${namespace}`);
+                                console.log(`${resp.length} ${rainType} drops on ${namespace}`);
                                 // find out if we still get results, to implement start/end
                                 if (!resp.length) {
                                     endTime = Date.now();
@@ -83,10 +83,10 @@ module.exports = function (app, spaces, settings, schemaGroups) {
 
     });
 
-    var unshiftDrops = schedule.scheduleJob('*/3 * * * *', function () {
+    var unshiftDrops = schedule.scheduleJob('*/1 * * * *', function () {
 
         fetchDrops(false);
-        console.log(`adding new  drops! (${Date.now()})`);
+        console.log(`adding new  drops! (${new Date()})`);
 
     });
 };

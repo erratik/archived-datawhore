@@ -26,8 +26,8 @@ module.exports = function (app) {
 
     });
 
-    app.get('/auth/${space}', passport.authenticate(space));
-    app.get('/auth/${space}/callback', passport.authenticate(space, {
+    app.get('/auth/twitter', passport.authenticate(space));
+    app.get('/auth/twitter/callback', passport.authenticate(space, {
         successRedirect: `http://datawhore.erratik.ca:4200/space/${space}`,
         failureRedirect: 'http://datawhore.erratik.ca:4200'
     }));

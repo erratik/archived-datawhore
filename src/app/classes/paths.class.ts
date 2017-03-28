@@ -7,7 +7,6 @@ export class Paths {
         twitter: 'api.twitter.com',
         swarm: 'api.foursquare.com',
         facebook: 'graph.facebook.com',
-        tumblr: 'api.tumblr.com',
         moves: 'api.moves-app.com/api/1.1'
     };
 }

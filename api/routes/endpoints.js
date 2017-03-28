@@ -4,6 +4,8 @@ const Space = require('../models/spaceModel');
 const Drop = require('../models/dropModel');
 const Profile = require('../models/profileModel');
 const Rain = require('../models/rainModel');
+const objectPath = require('object-path');
+
 
 module.exports = {
     schema: {
@@ -100,12 +102,9 @@ module.exports = {
 
             let drops = (typeof data === 'string') ? JSON.parse(data) : data;
             const error = Object.keys(drops).filter(o => o.includes('error'));
-            if (!error.length) {
+            if (!error.length || drops.errors) {
 
-                if (extras.contentPath) {
-                    drops = drops[extras.contentPath];
-                }
-
+                drops = extras.contentPath ? objectPath.get(drops, extras.contentPath): drops;
                 let schema = drops.map(drop => { return {type: type, content: drop}} );
 
                 Drop.writeDrops(space, schema, type, function (data) {

@@ -7,6 +7,12 @@ module.exports = {
         let params;
 
         switch (space) {
+            case 'tumblr':
+                params = { limit: 20 };
+                if (isFetchingPast) {
+                    params.before = _.minBy(data.drops, (o) => o['id'])['content']['timestamp'];
+                }
+              break;
             case 'spotify':
                 params = { limit: 20 };
                 if (isFetchingPast) {
@@ -15,6 +21,25 @@ module.exports = {
               break;
             case 'instagram':
                 params = { count: 5 };
+                if (isFetchingPast) {
+                    params.max_id = _.minBy(data.drops, (o) => o['content']['id'])['content']['id'];
+                }
+              break;
+            case 'swarm':
+                params = {
+                    limit: 20,
+                    v: Date.now()
+                };
+                if (isFetchingPast) {
+                    params.beforeTimestamp = _.minBy(data.drops, (o) => o['content']['id'])['content']['createdAt']/1000;
+                }
+              break;
+            case 'twitter':
+                params = {
+                    count: 20,
+                    screen_name: 'erratiktart',
+
+                };
                 if (isFetchingPast) {
                     params.max_id = _.minBy(data.drops, (o) => o['content']['id'])['content']['id'];
                 }
