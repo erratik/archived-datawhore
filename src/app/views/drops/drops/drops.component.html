@@ -3,8 +3,7 @@
   <div *ngFor="let dropType of dropTypes">
     <div class="header">
       <span class="heading is-pulled-left">{{dropType}} Drops</span>
-      <a (click)="fetchNewDrops(dropType)"
-         [class.is-loading]="isLoading"
+      <a (click)="getMoreDrops(dropType)"
          class="button is-info is-small is-pulled-right is-marginless"> fetch {{dropType}}</a>
     </div>
     <hr>

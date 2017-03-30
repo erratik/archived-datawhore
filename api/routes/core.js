@@ -40,7 +40,8 @@ router
         const data = {
             space: req.params.space,
             type: req.query.type ? req.query.type : req.params.endpoint,
-            action: `${req.params.endpoint}.get`
+            action: `${req.params.endpoint}.get`,
+            query: req.query
         };
 
         getEndpoint(data, (resp) => {

@@ -17,6 +17,7 @@ export class DropsComponent implements OnInit {
   protected dropTypes;
   protected isLoading = false;
   public getDrops$: Observable<any> = new Observable<any>();
+  public moreDrops$: Observable<any> = new Observable<any>();
 
   constructor(private rainService: RainService, private spacesService: SpacesService) { }
 
@@ -24,40 +25,53 @@ export class DropsComponent implements OnInit {
 
     this.dropTypes = this.rainService.rainSchemas.map(rain => rain.type);
 
-    this.getDrops$ = this.rainService.getDrops(this.space.name).do((drops) => {
+    this.getDrops$ = this.rainService.getDrops(this.space.name, { limit: 3 }).do((drops) => {
       this.drops = _.groupBy(drops, 'type');
+      console.log(this.drops);
     });
 
     this.getDrops$.subscribe();
   }
 
-  private fetchNewDrops(type: string): any {
+  private getMoreDrops(type: string): any {
     this.isLoading = !this.isLoading;
-    const dropSchema = this.rainService.rainSchemas.filter(rain => rain.type === type)[0];
+    // debugger;
+    const after = _.minBy(this.drops[type], (o) => o['content']['date'])['content']['date'];
 
-    const data = {
-      apiEndpointUrl: dropSchema.dropUrl,
-      action: 'drops.fetch',
-      contentPath: dropSchema.contentPath,
-      type: type,
-      space: this.space.name
-    }
+    this.moreDrops$ = this.rainService.getDrops(this.space.name, { limit: 3, type: type, after: after }).do((drops) => {
+      this.drops = _.groupBy(drops, 'type');
+    });
 
-    // const extras = {
-    //   instagram: {
-    //     min_id: _.minBy(this.drops[type], (o) => o['content']['date'])['content']['id']
-    //   }
-    // };
 
-    // console.log('extras', extras[this.space.name]);
+    this.moreDrops$.subscribe((newDrops) => {
+      // debugger;
+      this.rainService.sortDrops(newDrops, this.space.name);
 
-    const newDrops$ = this.spacesService.spaceEndpoint(this.space, data);
-
-    newDrops$.subscribe((newDrops) => {
-      const drops = this.rainService.sortDrops(newDrops, this.space.name);
-      this.drops[type] = [...drops];
+      console.log(this.drops);
+      // this.drops[type] = [...drops];
       this.isLoading = !this.isLoading;
     });
   }
+  // private fetchNewDrops(type: string): any {
+  //   this.isLoading = !this.isLoading;
+  //   const dropSchema = this.rainService.rainSchemas.filter(rain => rain.type === type)[0];
+
+  //   const data = {
+  //     apiEndpointUrl: dropSchema.dropUrl,
+  //     action: 'drops.fetch',
+  //     contentPath: dropSchema.contentPath,
+  //     type: type,
+  //     space: this.space.name
+  //   }
+
+  //   const newDrops$ = this.spacesService.spaceEndpoint(this.space, data);
+
+  //   newDrops$.subscribe((newDrops) => {
+  //     const drops = this.rainService.sortDrops(newDrops, this.space.name);
+  //     this.drops[type] = [...drops];
+  //     this.isLoading = !this.isLoading;
+  //   });
+  // }
+
 
 }

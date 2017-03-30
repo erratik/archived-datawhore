@@ -3,7 +3,7 @@ export class Drop {
     constructor(public space: string,
         public type: string,
         public content: any,
-        public id: any) {
+        public timestamp: any) {
 
         // this.content = this.sanitizeDrop();
     }

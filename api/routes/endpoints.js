@@ -101,21 +101,27 @@ module.exports = {
         fetch: function (space, data, type = null, cb, extras) {
 
             let drops = (typeof data === 'string') ? JSON.parse(data) : data;
+            let dropCount = 0;
             const error = Object.keys(drops).filter(o => o.includes('error'));
-            if (!error.length || drops.errors) {
+            if (!drops.errors || error.length || !drops.error) {
 
                 drops = extras.contentPath ? objectPath.get(drops, extras.contentPath): drops;
-                let schema = drops.map(drop => { return {type: type, content: drop}} );
+                if (drops.length) {
 
-                Drop.writeDrops(space, schema, type, function (data) {
-                    cb(data);
-                });
+                    let schema = drops.map(drop => { return {type: type, content: drop}} );
+
+                    Drop.writeDrops(space, schema, type, function (data, dropCount) {
+                        cb(data, dropCount);
+                    });
+                } else {
+                    cb('');
+                }
             } else {
                 cb(drops);
             }
         },
-        get: function (space, type, cb) {
-            Drop.findDrops(space, type, function (data) {
+        get: function (space, type, cb, options) {
+            Drop.findDrops(space, options, function (data) {
                 cb(data);
             });
         }

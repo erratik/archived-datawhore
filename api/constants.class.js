@@ -2,27 +2,29 @@ const _ = require('lodash');
 const moment = require('moment');
 
 module.exports = {
-    DROP_FETCH_EXTRAS: function(space, isFetchingPast = true, data = null) {
+    DROP_FETCH_PARAMS: function(space, isFetchingPast = true, data = null) {
 
         let params;
-
+        const dropTimestamp = data.drops ? _.minBy(data.drops, (o) => o['timestamp']) : null;
+        const isTumblrFetchingPast = isFetchingPast;
+        isFetchingPast = isFetchingPast && dropTimestamp;
         switch (space) {
             case 'tumblr':
                 params = { limit: 20 };
-                if (isFetchingPast) {
-                    params.before = _.minBy(data.drops, (o) => o['id'])['content']['timestamp'];
+                if (isTumblrFetchingPast) {
+                     params.offset = data.drops.length;
                 }
               break;
             case 'spotify':
                 params = { limit: 20 };
                 if (isFetchingPast) {
-                    params.before = _.minBy(data.drops, (o) => o['id'])['content']['played_at'];
+                    params.before = dropTimestamp['timestamp'];
                 }
               break;
             case 'instagram':
                 params = { count: 5 };
                 if (isFetchingPast) {
-                    params.max_id = _.minBy(data.drops, (o) => o['content']['id'])['content']['id'];
+                    params.max_id = dropTimestamp['content']['id'];
                 }
               break;
             case 'swarm':
@@ -31,7 +33,7 @@ module.exports = {
                     v: Date.now()
                 };
                 if (isFetchingPast) {
-                    params.beforeTimestamp = _.minBy(data.drops, (o) => o['content']['id'])['content']['createdAt']/1000;
+                    params.beforeTimestamp = dropTimestamp['content']['createdAt'];
                 }
               break;
             case 'twitter':
@@ -41,7 +43,7 @@ module.exports = {
 
                 };
                 if (isFetchingPast) {
-                    params.max_id = _.minBy(data.drops, (o) => o['content']['id'])['content']['id'];
+                    params.beforeTimestamp = dropTimestamp['content']['createdAt']/1000;
                 }
               break;
             case 'dribbble':

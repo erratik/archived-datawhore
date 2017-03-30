@@ -7,7 +7,7 @@ const OAuth = require('oauth');
 const request = require('request');
 const refresh = require('passport-oauth2-refresh');
 const https = require('https');
-const DROP_FETCH_EXTRAS = require('../constants.class').DROP_FETCH_EXTRAS;
+const DROP_FETCH_PARAMS = require('../constants.class').DROP_FETCH_PARAMS;
 
 const makeOAuthHeaders = (data) => {
     const v = data.space === 'twitter' ? '1.1' : '1.0';
@@ -73,13 +73,13 @@ module.exports = that = {
         const runCall = (data, req, res, cb = null) => {
             Setting.findSettings(data.space, (o) => {
 
-                data.apiUrl = that.pluck('apiUrl', o.oauth);
-                data.apiKey = that.pluck('apiKey', o.oauth);
-                data.apiSecret = that.pluck('apiSecret', o.oauth);
-                data.accessToken = that.pluck('accessToken', o.extras);
+                data.apiUrl       = that.pluck('apiUrl', o.oauth);
+                data.apiKey       = that.pluck('apiKey', o.oauth);
+                data.apiSecret    = that.pluck('apiSecret', o.oauth);
+                data.accessToken  = that.pluck('accessToken', o.extras);
                 data.refreshToken = that.pluck('refreshToken', o.extras);
-                data.tokenSecret = that.pluck('refreshToken', o.extras);
-                data.fetchUrl = data.apiEndpointUrl;
+                data.tokenSecret  = that.pluck('refreshToken', o.extras);
+                data.fetchUrl     = data.apiEndpointUrl;
                 // console.log('dahjhta', data);
 
                 let urlExtras;
@@ -103,8 +103,8 @@ module.exports = that = {
                                 Authorization: makeOAuthHeaders(data)
                             }
                         };
-                        console.log(options.path);
-                        console.log(options.headers);
+                        // console.log(options.path);
+                        // console.log(options.headers);
 
                         https.get(options, function (result) {
                             let buffer = '';
@@ -135,7 +135,7 @@ module.exports = that = {
                                 'Content-Type': 'application/x-www-form-urlencoded'
                             }
                         };
-                        console.log(options.uri);
+                        // console.log(options.uri);
 
                         const requestDataWithToken = () => request(options, (error, response, body) => {
                             if (error) {
@@ -199,25 +199,25 @@ module.exports = that = {
         };
         let extras;
         if (req) {
-            extras = DROP_FETCH_EXTRAS(data.space, false);
+            extras = DROP_FETCH_PARAMS(data.space, false);
             runCall(data, req, res);
         } else {
 
-            Drop.findDrops(data.space, 'all', function (_data) {
-                extras = DROP_FETCH_EXTRAS(data.space, data.isFetchingPast, _data);
-                if (!data.contentPath) data.contentPath = "";
+            Drop.findDrops(data.space, 'getParams', function (_extras) {
+                extras = _extras;
+                if (!data.contentPath) data.contentPath = '';
                 runCall(data, null, null, cb);
-            });
+            }, data.isFetchingPast);
         }
     },
     // my own endpoints, read/write in mongo docs
     getEndpoint: (data, cb) => {
-        // console.log(`[getEndpoint] ${data.action} -> `, data);
+        console.log(`[getEndpoint] ${data.action} -> `, data);
         const endpointAction = objectPath.get(endpoints, data.action);
         if (typeof endpointAction === 'function') {
             return endpointAction(data.space, data.type, function (resp) {
                 cb(resp);
-            });
+            }, data.query);
         } else {
             cb({message: 'no endpoints set for ' + data.action});
         }
@@ -229,8 +229,8 @@ module.exports = that = {
         if (data.type.includes('rain') && !data.action.includes('update')) content['fetchUrl'] = data.fetchUrl;
         const extras = data;
 
-        return endpointAction(data.space, content, data.type, function (resp) {
-            cb(resp);
+        return endpointAction(data.space, content, data.type, function (resp, dropCount = 0) {
+            cb(resp, dropCount);
         }, data);
     }
 };
