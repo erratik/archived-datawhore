@@ -22,17 +22,22 @@ export class Rain {
     public createPropertyBucket(propertyBucket) {
         // find all properties on the profile and make them enabled
         // 1. needed for this dimension form to display values as enabled
+        // debugger;
         if (this.properties) {
-            this.properties.map(property => {
-                propertyBucket.filter(bucketProp => {
-                    if (bucketProp && bucketProp.content.schemaPath === property.schemaPath) {
-                        bucketProp.content.enabled = true;
-                        bucketProp.content.friendlyName = property.friendlyName;
+            this.properties.map((property, i) => {
+
+                if (propertyBucket[i]) {
+
+                    if (propertyBucket[i].content.schemaPath === property.schemaPath) {
+                        propertyBucket[i].content.enabled = true;
+                        propertyBucket[i].content.friendlyName = property.friendlyName;
                     }
-                    if (bucketProp && bucketProp.grouped) {
-                        this.createPropertyBucket(bucketProp.content.value);
+
+                    if (propertyBucket[i].grouped) {
+                        this.createPropertyBucket(propertyBucket[i].content.value);
                     }
-                })
+
+                }
 
             });
         }

@@ -14,7 +14,11 @@ export class SpaceItemService {
     }
 
     public fetchSchema(space: string, schemaType = this.type): Observable<any> {
-        return this.http.get(`${this.apiServer}/get/schema/${space}?type=${schemaType}`).map((res: Response) => res.json())
+        return this.http.get(`${this.apiServer}/get/schema/${space}?type=${schemaType}`)
+            .map((res: Response) => {
+                let resp = res.json();
+                return resp;
+            })
             .catch(this.handleError);
     }
 
@@ -32,6 +36,7 @@ export class SpaceItemService {
         const options = new RequestOptions({headers: headers}); // Create a request option
 
         return this.http.put(`${this.apiServer}/update/schema/${space}`, bodyString, options).map((res: Response) => {
+
             return res.json();
         }).catch(this.handleError);
     }

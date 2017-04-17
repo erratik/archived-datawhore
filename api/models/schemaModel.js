@@ -20,7 +20,7 @@ const SchemaSchema = {
     self: {
         findSchema: function (spaceName, schemaType, cb) {
             this.findOne({ space: spaceName }, function (err, docs) {
-                if (!docs.schemas.length) {
+                if (!docs) {
                     var schema = new Schema({
                         space: spaceName,
                         schemas: [{
@@ -28,16 +28,18 @@ const SchemaSchema = {
                             modified: Date.now()
                         }]
                     });
-                    docs.schemas.push(schema);
+                    docs = {schemas: [schema]};
                 }
                 if (!schemaType.includes('rain')) {
                     cb(docs.schemas.filter(function (schema) {
                         return schema.type === schemaType;
                     })[0]);
-                } else {
+                } else if (docs) {
                     cb(docs.schemas.filter(function (schema) {
                         const type = schema.type;
-                        return type.includes('rain');
+                        if (type) {
+                            return schema.type.includes('rain');
+                        }
                     }));
                 }
             });

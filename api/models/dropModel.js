@@ -32,7 +32,19 @@ const DropSchema = {
                 that.findOne(query, function (err, docs) {
 
                     // docs.drops = docs.drops.length ? docs.drops.slice(0, limit) : [];
-                    objectId = docs.drops[0].ownerDocument()['_id'];
+                    if (docs) {
+                        objectId = docs.drops[0].ownerDocument()['_id'];
+                    } else {
+
+                        var drop = new Drop({
+                            space: space,
+                            drops: [{
+                                type: ''
+                            }]
+                        });
+                        docs = {drops: [drop]};
+
+                    }
 
 
                     if (!cb2) {
@@ -124,10 +136,13 @@ const DropSchema = {
                 drops = drops.filter(drop => {
 
                     // this needs to be come something that can save dimensions, REAL dimensions
-                    const possibleTimestampKeys = ['created_time', 'date', 'timestamp', 'time', 'created_at', 'played_at', 'createdAt'];
+                    const possibleTimestampKeys = ['created_time', 'date', 'timestamp', 'time', 'created_at', 'played_at', 'createdAt', 'startTime', 'endTime'];
                     Object.keys(drop.content).map(key => {
                         if (possibleTimestampKeys.includes(key)) {
-
+                            if (space === 'tumblr') {
+                                console.log(drop.content[key]);
+                                // drop.content[key] = moment(drop.content[key], ).format('x')
+                            }
                             const dateCheck = drop.content[key].length === 13 ? drop.content[key] : moment(drop.content[key]).format('x');
 
                             if (typeof Number(dateCheck) === 'number') {

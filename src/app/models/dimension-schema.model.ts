@@ -10,7 +10,10 @@ export class DimensionSchema {
                 public id?: any,
                 public propertyBucket = null) {
 
-        this.propertyBucket = this.assignValues();
+
+        if (!this.type.includes('rain')) {
+            this.propertyBucket = this.assignValues();
+        }
     }
 
     public assignValues(schema = null, prefix = null) {

@@ -1,6 +1,14 @@
 import { ActivatedRoute } from '@angular/router';
 import { RainFormComponent } from '../../rain-form/rain-form.component';
-import { Component, OnInit, Input, Output, ViewChild, EventEmitter, OnChanges } from '@angular/core';
+import {
+    Component,
+    EventEmitter,
+    Input,
+    OnChanges,
+    OnInit,
+    Output,
+    ViewChild
+} from '@angular/core';
 import { Rain, RainDimension } from '../../../../models/rain.model';
 import { Space } from '../../../../models/space.model';
 import { SpacesService } from '../../../../services/spaces.service';
@@ -29,6 +37,7 @@ export class RainConfigsComponent implements OnChanges, OnInit {
     protected activeTab: string;
     protected activeSubTab = 'configs';
     protected isFetchingSchema = false;
+    protected hasSchemas = false;
 
     public newRainType: string;
     public newRainFetchUrl: string;
@@ -37,9 +46,9 @@ export class RainConfigsComponent implements OnChanges, OnInit {
     public overrideSchemaPath: boolean;
 
     constructor(private spacesService: SpacesService,
-                private spaceItemService: SpaceItemService,
-                private activatedRoute: ActivatedRoute,
-                private rainService: RainService) {}
+        private spaceItemService: SpaceItemService,
+        private activatedRoute: ActivatedRoute,
+        private rainService: RainService) { }
 
     ngOnInit() {
 
@@ -50,9 +59,17 @@ export class RainConfigsComponent implements OnChanges, OnInit {
             this.activeTab = this.rainSchemas.length ? this.rainSchemas[0].type : this.activeTab;
             this.rainSchemas = this.rainService.rainSchemas;
             this.rain = this.rainService.rain;
-            this.rainService.type = this.rainSchemas[0].type;
 
-            this.rainSchemas.forEach(rainSchema => this.overrideRainName[rainSchema.type] = rainSchema.type);
+            if (this.rainSchemas.length) {
+                this.rainService.type = this.rainSchemas[0].type;
+                this.rainService.rainSchemas = this.rainService.rainSchemas.map(rainSchema => {
+                    // rainSchema.content = JSON.parse(rainSchema.content);
+                    this.overrideRainName[rainSchema.type] = rainSchema.type;
+                    // debugger;
+                    return rainSchema;
+                });
+                console.log(this.rainSchemas);
+            }
         });
 
     }
@@ -64,13 +81,13 @@ export class RainConfigsComponent implements OnChanges, OnInit {
     private getRain(): any {
         // debugger;
         return this.rainService.getRain(this.space.name).do((rain) => {
-
+            console.log(rain);
         });
     }
 
     private getRawRain(): any {
         return this.spaceItemService.fetchSchema(this.space.name, 'rain').do((rain) => {
-            this.rainService.rainSchemas = this.rainSchemas = rain.map(rainSchema => this.toSchema(rainSchema));
+            this.rainService.rainSchemas = rain.map(rainSchema => this.toSchema(rainSchema));
         });
     }
 
@@ -89,6 +106,7 @@ export class RainConfigsComponent implements OnChanges, OnInit {
 
             this.toSchemas(updatedSchema, type);
             this.setActiveTab(updatedSchema['type']);
+            debugger;
         });
 
         schemas$.subscribe(() => {
@@ -107,12 +125,15 @@ export class RainConfigsComponent implements OnChanges, OnInit {
         if (this.overrideSchemaPath) {
             schema.content = objectPath.get(this.rainService.rainSchemas[index], `content.${schema.contentPath}`);
         }
-        // debugger;
         const profileSchema$ = this.rainService.updateSchema(this.space.name, schema, type).do((updatedSchema) => {
-            this.toSchemas(updatedSchema, type);
+            // updatedSchema.content = (updatedSchema.content.length) ? updatedSchema.content
+            // const merged = {};
+            // updatedSchema.content.forEach(d => Object.keys(d).forEach(k => {merged[k] = d[k]}));
+            // updatedSchema.content = merged;
+            return this.toSchemas(updatedSchema, type);
         });
 
-        profileSchema$.subscribe(() => {
+        profileSchema$.subscribe(updatedSchema => {
             this.isFetchingSchema = false;
             this.rainSchemas = this.rainService.rainSchemas;
             this.setActiveTab(schema.type);
@@ -129,14 +150,24 @@ export class RainConfigsComponent implements OnChanges, OnInit {
             });
         } else {
             this.rainService.rainSchemas.push(this.toSchema(updatedSchema));
+            debugger;
         }
         this.overrideRainName[updatedSchema.type] = updatedSchema.type;
+
+            debugger;
     }
 
     private toSchema(preSchema): DimensionSchema {
         this.overrideRainName[preSchema.type] = preSchema.type;
         this.overrideSchemaPath = null;
-
+        if (typeof preSchema.content === 'string') {
+            preSchema.content = JSON.parse(preSchema.content);
+            if (preSchema.content.length) {
+                const merged = {};
+                preSchema.content.forEach(d => Object.keys(d).forEach(k => {merged[k] = d[k]}));
+                preSchema.content = merged;
+            }
+        }
         return new DimensionSchema(
             preSchema.type,
             preSchema.content,

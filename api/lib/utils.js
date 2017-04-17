@@ -3,30 +3,39 @@ let Setting = require('../models/settingModel');
 let Drop = require('../models/dropModel');
 let endpoints = require('../routes/endpoints');
 const objectPath = require('object-path');
+const moment = require('moment');
 const OAuth = require('oauth');
 const request = require('request');
 const refresh = require('passport-oauth2-refresh');
 const https = require('https');
 const DROP_FETCH_PARAMS = require('../constants.class').DROP_FETCH_PARAMS;
 
-const makeOAuthHeaders = (data) => {
-    const v = data.space === 'twitter' ? '1.1' : '1.0';
+const makeOAuthHeaders = (data, v) => {
+    // v =  ? '1.1' : '1.0';
     // helper to construct echo/oauth headers from URL
+    // console.log(data);
     const oauth = new OAuth.OAuth(`https://${data.apiUrl}/oauth/request_token`,
         `https://${data.apiUrl}/oauth/access_token`,
         data.apiKey,
         data.apiSecret,
-        v,
+        '1.0',
         null,
         'HMAC-SHA1');
+
+    if (data.space === 'twitter') {
+        oauth._clientOptions.requestTokenHttpMethod = 'GET';
+        oauth._clientOptions.accessTokenHttpMethod = 'GET';
+    }
+
     const orderedParams = oauth._prepareParameters(
-        data.tokenSecret, // test user token
         data.accessToken, // test user secret
+        data.tokenSecret, // test user token
         'GET',
         `https://${data.apiUrl}${data.url}`
     );
     return oauth._buildAuthorizationHeaders(orderedParams);
 };
+
 
 module.exports = that = {
     savePassport: function (space, settings, extras, profile, done) {
@@ -78,33 +87,37 @@ module.exports = that = {
                 data.apiSecret    = that.pluck('apiSecret', o.oauth);
                 data.accessToken  = that.pluck('accessToken', o.extras);
                 data.refreshToken = that.pluck('refreshToken', o.extras);
-                data.tokenSecret  = that.pluck('refreshToken', o.extras);
+                data.tokenSecret  = that.pluck('tokenSecret', o.extras);
                 data.fetchUrl     = data.apiEndpointUrl;
                 // console.log('dahjhta', data);
 
                 let urlExtras;
+                if (extras) {
 
-                urlExtras = Object.keys(extras).map(function(k) {
-                    return encodeURIComponent(k) + "=" + encodeURIComponent(extras[k]);
-                }).join('&');
+                    urlExtras = Object.keys(extras).map(function(k) {
+                        return encodeURIComponent(k) + "=" + encodeURIComponent(extras[k]);
+                    }).join('&');
+                }
 
                 let options;
                 if (data.apiEndpointUrl) {
 
                 switch (data.space) {
-                    // OAuth Authorization requests
+                    // OAuth Authorization requestsendpo
                     case 'tumblr':
                     case 'twitter':
-                        data.url = data.apiEndpointUrl + '?' + urlExtras;
+                    case 'facebook':
+                        urlExtras = urlExtras ? '?' + urlExtras : '?access_token='+data.accessToken
+                        data.url = data.apiEndpointUrl + urlExtras + '&access_token='+data.accessToken;
                         options = {
                             hostname: data.apiUrl,
-                            path: data.apiEndpointUrl + '?' + urlExtras,
+                            path: data.url,
                             headers: {
                                 Authorization: makeOAuthHeaders(data)
                             }
                         };
-                        // console.log(options.path);
-                        // console.log(options.headers);
+                        console.log(options.path);
+                        console.log(options.headers);
 
                         https.get(options, function (result) {
                             let buffer = '';
@@ -120,7 +133,12 @@ module.exports = that = {
                             }));
                         });
                         break;
-
+                    case 'goodreads':
+                        urlExtras += '&key=' + data.accessToken;
+                    case 'moves':
+                        if (data.action === 'drops.fetch') {
+                            data.apiEndpointUrl += extras.date;
+                        }
                     // Access Token requests
                     default:
 
@@ -135,7 +153,8 @@ module.exports = that = {
                                 'Content-Type': 'application/x-www-form-urlencoded'
                             }
                         };
-                        // console.log(options.uri);
+                        console.log(options.uri);
+                        console.log('');
 
                         const requestDataWithToken = () => request(options, (error, response, body) => {
                             if (error) {
@@ -216,6 +235,13 @@ module.exports = that = {
         const endpointAction = objectPath.get(endpoints, data.action);
         if (typeof endpointAction === 'function') {
             return endpointAction(data.space, data.type, function (resp) {
+                if (resp.length && data.type.includes('rain')) {
+                    resp = resp.map(schema => {
+                        schema.content = JSON.stringify(schema.content);
+                        return schema;
+                    });
+                }
+                console.log(resp);
                 cb(resp);
             }, data.query);
         } else {

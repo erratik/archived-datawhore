@@ -1,6 +1,6 @@
 import { SpacesService } from '../../../services/spaces.service';
 import { RainService } from '../../../services/rain/rain.service';
-import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { DimensionFormComponent } from '../../../shared/component/dimensions/dimensions-form/dimensions-form.component';
 import { ProfileService } from '../../../services/profile/profile.service';
 import { DimensionSchema } from '../../../models/dimension-schema.model';
@@ -25,7 +25,15 @@ export class RainFormComponent extends DimensionFormComponent implements OnInit 
     }
 
     ngOnInit() {
-        this.model = this.rainService.rainSchemas[this.rainSchemaIndex].propertyBucket;
+        this.rainService.rainSchemas[this.rainSchemaIndex].propertyBucket = this.rainService.rainSchemas[this.rainSchemaIndex].assignValues();
+
+        const type = this.rainService.rainSchemas[this.rainSchemaIndex].type;
+
+        const matchedRain = this.rainService.rain.filter(rain => rain.rainType === type)[0];
+        matchedRain.createPropertyBucket(this.rainService.rainSchemas[this.rainSchemaIndex].propertyBucket);
+
+       this.model = this.rainService.rainSchemas[this.rainSchemaIndex].propertyBucket;
+
     }
 
     protected saveRain(index): void {

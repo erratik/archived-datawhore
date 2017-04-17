@@ -32,7 +32,9 @@
     "ng2-file-upload": "^1.2.0",
     "ngx-clipboard": "^3.0.5",
     "object-path": "^0.11.3",
+    "passport-goodreads": "^1.0.0",
     "passport-oauth2-refresh": "^1.0.0",
+    "passport-pinterest": "^1.0.0",
     "rxjs": "^5.0.1",
     "ts-helpers": "^1.1.1",
     "zone.js": "^0.7.2"

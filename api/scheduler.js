@@ -10,6 +10,7 @@ const Drop = require('./models/dropModel');
 
 let namespaces = [];
 
+let dropRanEmpties = 0;
 let dropCountLastRun = 0;
 let totalOldDropsAdded = 0;
 let pastDropRuntimes = 0;
@@ -18,8 +19,12 @@ let oldDropsAdded = {};
 
 module.exports = function (app, spaces, settings, schemaGroups) {
 
+    console.log(``);
+    console.log('👄 👄 👄 ----------- CUM DUMPTRUCK RUNNING ------------- 👄 👄 👄');
+    console.log(``);
+
     let startTime = new Date(Date.now() + 5000);
-    let endTime = new Date(Date.now() + 60000);
+    let endTime = new Date(Date.now() + 60000 * 5);;
 
     let schemas = {};
 
@@ -39,9 +44,6 @@ module.exports = function (app, spaces, settings, schemaGroups) {
     const fetchDrops = (isFetchingPast = true) => {
 
         let n = 0;
-        console.log(``);
-        console.log('👄 👄 👄 ----------- CUM DUMPTRUCK RUNNING ------------- 👄 👄 👄');
-        console.log(``);
         namespaces.forEach(namespace => {
 
 
@@ -67,7 +69,6 @@ module.exports = function (app, spaces, settings, schemaGroups) {
                     }
 
 
-
                     setTimeout(function () {
 
                         // console.log(`fetching drops for ${rainType} on ${namespace}...`);
@@ -89,42 +90,62 @@ module.exports = function (app, spaces, settings, schemaGroups) {
         });
     };
 
-    var shiftDrops = schedule.scheduleJob('*/1 * * * *', function () {
-
+    const shiftDrops = schedule.scheduleJob('*/1 * * * *', function () {
         fetchDrops();
-        console.log(`💧 💧 💧 shifting older drops to the bottom until... (📅 ${endTime})`);
-
+        console.log(`💧 💧 💧 shifting older drops to the bottom until... 📅 ${endTime}`);
+        console.log(``);
     });
 
-    var unshiftDrops = schedule.scheduleJob('*/30 * * * *', function () {
-
+    const unshiftDrops = schedule.scheduleJob('*/5 * * * *', function () {
         fetchDrops(false);
-        console.log(`🔥 🔥 🔥 🔥 adding new  drops! 💧 💧 💧 (📅 ${new Date()})`);
-
+        // console.log(`💦 adding new  drops! 📅 ${new Date()}`);
     });
+
 
     const dropCallback = (isFetchingPast, dropCount, space) => {
-        if (isFetchingPast) {
-            oldDropsAdded[space] += dropCount;
-            Object.keys(oldDropsAdded).forEach(o => totalOldDropsAdded += oldDropsAdded[o]);
-            console.log(`💦 drops bukkake\'d on ${space}: ${dropCount} | 💧 total drops added: ${totalOldDropsAdded}`);
 
-            if (pastDropRuntimes === namespaces.length) {
-                pastDropRuntimes = 0;
-                dropCountLastRun = totalOldDropsAdded;
-                if (!totalOldDropsAdded && !dropCountLastRun) {
-                    console.log('stop fetching drops now! @ ' + new Date());
+            if (isFetchingPast) {
+                oldDropsAdded[space] += dropCount;
+                Object.keys(oldDropsAdded).forEach(o => totalOldDropsAdded += oldDropsAdded[o]);
+
+                if (pastDropRuntimes === namespaces.length) {
+                    pastDropRuntimes = 0;
+                    dropCountLastRun = totalOldDropsAdded;
+                    if (!totalOldDropsAdded && !dropCountLastRun) {
+                        if (dropRanEmpties === 3) {
+                            console.log(``);
+                            console.log('💀 💀 💀 -------------->  KILLED CUM DUMPTRUCK @ 📅 ' + new Date());
+                            console.log(``);
+                            shiftDrops.cancel();
+                            return;
+                        }
+                        dropRanEmpties++;
+                    }
+                    totalOldDropsAdded = 0;
+                    console.log('🌙 🌙 🌙 ----------- CUM DUMPTRUCK GOING TO SLEEP ------------- 🌙 🌙 🌙');
+                } else {
+                messageTotal(dropCount, space, totalOldDropsAdded);
+
+                    pastDropRuntimes++;
+                    console.log('pastDropRuntimes has run', pastDropRuntimes, 'times');
+                    console.log(``);
                 }
-                totalOldDropsAdded = 0;
-                console.log('🌙 🌙 🌙 ----------- CUM DUMPTRUCK GOING TO SLEEP ------------- 🌙 🌙 🌙');
+
+
             } else {
-                pastDropRuntimes++;
+                messageTotal(dropCount, space, totalOldDropsAdded);
             }
+    }
 
-            console.log('pastDropRuntimes has run', pastDropRuntimes, 'times');
-            console.log(``);
+    function messageTotal(dropCount, space, total) {
 
+        if (dropCount) {
+            console.log(`| ${space} | 💧 ${dropCount}`);
+            console.log(`----------------------------`);
+        } else if (totalOldDropsAdded) {
+            console.log(`💦 total drops added: ${total}`);
         }
-    };
+    }
+
 
 };

@@ -18,6 +18,14 @@ const users = require('./routes/users');
 const app = express();
 
 
+//  app.configure(function () {
+
+//     // if (env === 'production') {
+//     // }
+
+//     // other configurations etc for express go here...
+// });
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');

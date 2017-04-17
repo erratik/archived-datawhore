@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
+console.log(router);
+
+
 const multer = require('multer');
 const fs = require('fs');
 const mkdirp = require('mkdirp');
@@ -12,7 +15,6 @@ const Schema = require('../models/schemaModel');
 const Utils = require('../lib/utils'),
       postEndpoint = Utils.postEndpoint,
       getEndpoint = Utils.getEndpoint;
-
 
 router
     .get('/spaces', function (req, res) {
@@ -37,17 +39,18 @@ router
 router
     .get('/get/:endpoint/:space', (req, res) => {
 
-        const data = {
-            space: req.params.space,
-            type: req.query.type ? req.query.type : req.params.endpoint,
-            action: `${req.params.endpoint}.get`,
-            query: req.query
-        };
+            const data = {
+                space: req.params.space,
+                type: req.query.type ? req.query.type : req.params.endpoint,
+                action: `${req.params.endpoint}.get`,
+                query: req.query
+            };
 
-        getEndpoint(data, (resp) => {
-            // console.log(`[endpoints.${data.action} response]`, resp);
-            res.status(200).send(resp);
-        })
+            getEndpoint(data, (resp) => {
+                // console.log(`[endpoints.${data.action} response]`, resp);
+                res.status(200).send(resp);
+            })
+
     })
     .put('/update/:endpoint/:space', (req, res) => {
 

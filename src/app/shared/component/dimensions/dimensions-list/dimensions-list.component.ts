@@ -1,4 +1,6 @@
 import {Component, OnInit, Input} from '@angular/core';
+import * as _ from 'lodash';
+
 
 @Component({
     selector: 'datawhore-dim-list',
@@ -8,11 +10,21 @@ import {Component, OnInit, Input} from '@angular/core';
 export class DimensionListComponent implements OnInit {
 
     @Input() protected model;
+    public _ = _;
 
     constructor() {
     }
 
     ngOnInit() {
+    }
+
+    protected mergeArrays(val): any {
+
+        if (typeof val === 'object' && val.length) {
+            console.log(_.assign.apply(_, val));
+        } else {
+            // return console.log(val);
+        }
     }
 
 }

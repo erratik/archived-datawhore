@@ -1,7 +1,7 @@
 import { SpacesService } from '../../../services/spaces.service';
 import { RainService } from '../../../services/rain/rain.service';
 import { Space } from '../../../models/space.model';
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import * as _ from 'lodash';
 
@@ -10,7 +10,7 @@ import * as _ from 'lodash';
   templateUrl: './drops.component.html',
   styleUrls: ['./drops.component.less']
 })
-export class DropsComponent implements OnInit {
+export class DropsComponent implements OnInit, OnDestroy {
 
   @Input() public space: Space;
   protected drops;
@@ -18,19 +18,35 @@ export class DropsComponent implements OnInit {
   protected isLoading = false;
   public getDrops$: Observable<any> = new Observable<any>();
   public moreDrops$: Observable<any> = new Observable<any>();
+  protected activeTab;
 
   constructor(private rainService: RainService, private spacesService: SpacesService) { }
+
+  ngOnDestroy() {
+    this.rainService.drops[this.space.name] = null;
+  }
 
   ngOnInit() {
 
     this.dropTypes = this.rainService.rainSchemas.map(rain => rain.type);
+    this.getSomeDrops();
 
-    this.getDrops$ = this.rainService.getDrops(this.space.name, { limit: 3 }).do((drops) => {
+  }
+
+  private getSomeDrops(dropType = null): any {
+
+    const options = { limit: 3 };
+    if (dropType) {
+      options['type'] = dropType || Object.keys(this.drops)[0];
+    }
+
+    this.getDrops$ = this.rainService.getDrops(this.space.name, options).do((drops) => {
       this.drops = _.groupBy(drops, 'type');
-      console.log(this.drops);
+      this.activeTab =  dropType || Object.keys(this.drops)[0];
     });
 
     this.getDrops$.subscribe();
+
   }
 
   private getMoreDrops(type: string): any {
@@ -52,6 +68,13 @@ export class DropsComponent implements OnInit {
       this.isLoading = !this.isLoading;
     });
   }
+
+  public setActiveTab(dropType: string): void {
+    this.activeTab = dropType;
+    this.getSomeDrops(dropType);
+    // this.activatedRoute.params['tab'] = this.activeTab;
+  }
+
   // private fetchNewDrops(type: string): any {
   //   this.isLoading = !this.isLoading;
   //   const dropSchema = this.rainService.rainSchemas.filter(rain => rain.type === type)[0];

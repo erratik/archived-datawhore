@@ -1,19 +1,32 @@
-
-
+<aside class="menu column is-2">
+  <p class="menu-label">
+    Drop Types
+  </p>
+  <ul class="menu-list">
+    <li *ngFor="let dropType of dropTypes">
+      <a (click)="setActiveTab(dropType)" [class.is-active]="activeTab === dropType">
+          {{dropType}}
+      </a>
+    </li>
+  </ul>
+</aside>
+<div [ngSwitch]="activeTab" class="tab column is-10">
   <div *ngFor="let dropType of dropTypes">
-    <div class="header">
-      <span class="heading is-pulled-left">{{dropType}} Drops</span>
-      <a (click)="getMoreDrops(dropType)"
-         class="button is-info is-small is-pulled-right is-marginless"> fetch {{dropType}}</a>
-    </div>
-    <hr>
-    <div  *ngIf="drops">
-      <datawhore-drop-atomic [drop]="drop" *ngFor="let drop of drops[dropType] | orderDropBy:'date'"></datawhore-drop-atomic>
-    </div>
+    <div *ngSwitchCase="dropType">
+      <div class="header">
+        <span class="heading is-pulled-left">{{dropType}} Drops</span>
+        <a (click)="getMoreDrops(dropType)" class="button is-info is-small is-pulled-right is-marginless"> fetch {{dropType}}</a>
+      </div>
+      <hr>
+      <div *ngIf="drops">
+        <datawhore-drop-atomic [drop]="drop" *ngFor="let drop of drops[dropType] | orderDropBy:'date'"></datawhore-drop-atomic>
+      </div>
 
-    <div *ngIf="!drops">
-      No <strong>{{dropType}}</strong> drops yet.
+      <div *ngIf="!drops">
+        No <strong>{{dropType}}</strong> drops yet.
+      </div>
+      <hr>
     </div>
-    <hr>
   </div>
 
+</div>

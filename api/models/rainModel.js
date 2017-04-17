@@ -14,6 +14,13 @@ var RainSchema = {
     self: {
         findBySpace: function (space, cb) {
             return this.findOne({ space: space }, function (err, rain) {
+
+                if (!rain) {
+                    rain = {
+                        space: space,
+                        dimensions: [{}]
+                    };
+                }
                 cb(rain);
             });
         },
@@ -26,10 +33,14 @@ var RainSchema = {
             let existingDims = [];
             var addSchema = function (callback) {
 
-                that.findOneAndUpdate({ space: space }, {  dimensions: dimensions.concat(existingDims) }, { upsert: true, returnNewDocument: true }, function (err, updated) {
+                that.findOneAndUpdate({ space: space }, { dimensions: dimensions.concat(existingDims) }, { upsert: true, returnNewDocument: true }, function (err, updated) {
                     that.find(query, { 'dimensions.$': 1 }, (err, docs) => {
                         if (err) cb(err);
-                        updated.dimensions = docs[0].dimensions;
+                        if (updated) {
+                            updated.dimensions = docs[0].dimensions;
+                        } else {
+                            updated = {space: space, dimensions: []};
+                        }
                         cb(updated);
                     });
                 });
@@ -37,7 +48,7 @@ var RainSchema = {
 
             this.findOne({ space: space }, function (errata, dimList) {
 
-                existingDims = dimList.dimensions.filter(dim => dim.type !== dimType);
+                existingDims = dimList ? dimList.dimensions.filter(dim => dim.type !== dimType) : existingDims;
 
                 that.find(query, { 'dimensions.$': 1 }, function (_err, _docs) {
                     if (_docs.length) {
@@ -52,7 +63,7 @@ var RainSchema = {
                         addSchema(cb);
                     }
                 });
-             });
+            });
 
         }
     }

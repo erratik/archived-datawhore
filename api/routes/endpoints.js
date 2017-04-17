@@ -5,6 +5,7 @@ const Drop = require('../models/dropModel');
 const Profile = require('../models/profileModel');
 const Rain = require('../models/rainModel');
 const objectPath = require('object-path');
+const moment = require('moment');
 
 
 module.exports = {
@@ -41,6 +42,7 @@ module.exports = {
 
             Schema.writeSchema(space, schema, (updatedSchema) => {
                 console.log('[schema.write callback]', updatedSchema);
+
                 cb(updatedSchema);
             });
 
@@ -106,13 +108,28 @@ module.exports = {
             if (!drops.errors || error.length || !drops.error) {
 
                 drops = extras.contentPath ? objectPath.get(drops, extras.contentPath): drops;
-                if (drops.length) {
-
+                if (drops && drops.length) {
                     let schema = drops.map(drop => { return {type: type, content: drop}} );
 
                     Drop.writeDrops(space, schema, type, function (data, dropCount) {
                         cb(data, dropCount);
                     });
+               } else if (space === 'moves') {
+                    if (JSON.parse(data).error) {
+                        cb(JSON.parse(data));
+                        return;
+                    }
+                    let schema = [{
+                        type: type,
+                        content: {
+                            timestamp: moment(JSON.parse(data)[0].date).format('x')
+                        }
+                    }];
+
+                    Drop.writeDrops(space, schema, type, function (data, dropCount) {
+                        cb(data, dropCount);
+                    });
+
                 } else {
                     cb('');
                 }

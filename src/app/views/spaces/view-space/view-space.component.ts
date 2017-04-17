@@ -27,6 +27,7 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
     public profile: Profile;
     public profileSchema: DimensionSchema;
     protected isFetchingSchema = false;
+    protected hasDrops = false;
     protected overrideSchemaPath: string = null;
     protected activeTab = 'rain';
     @ViewChild(SpaceItemComponent) protected profileComponent;

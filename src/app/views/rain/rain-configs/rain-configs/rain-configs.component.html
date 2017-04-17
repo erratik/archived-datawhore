@@ -4,13 +4,14 @@
         <p class="menu-label">
             Rain Schemas
         </p>
+
         <ul class="menu-list">
             <li *ngFor="let schema of rainSchemas">
-                <a (click)="setActiveTab(schema.type)" [class.is-active]="activeTab === schema.type">
+                <a (click)="setActiveTab(schema.type)" [class.is-active]="activeTab === schema?.type">
                     {{schema.type}}
                 </a>
                 <ul>
-                    <li (click)="setActiveTab(schema.type); activeSubTab = 'configs'" [class.is-bold]="activeTab === schema.type && activeSubTab === 'configs'">
+                    <li (click)="setActiveTab(schema?.type); activeSubTab = 'configs'" [class.is-bold]="activeTab === schema?.type && activeSubTab === 'configs'">
                         <a>config</a>
                     </li>
                     <li (click)="activeSubTab = 'structure'" [class.is-bold]="activeSubTab === 'structure'">
@@ -70,7 +71,7 @@
         </div>
 
     </div>
-    <div class="column is-10" *ngFor="let schema of rainSchemas; let $i = index;" [class.is-hidden]="activeTab !== schema.type">
+    <div class="column is-10" *ngFor="let schema of rainSchemas; let $i = index;" [class.is-hidden]="activeTab !== schema?.type">
         <div class="column columns" *ngIf="activeSubTab === 'structure'">
             <div class="column is-half" *ngIf="rain[$i]?.properties">
                 <div class="header">
@@ -102,7 +103,7 @@
 
             </div>
         </div>
-        <div class="column columns" *ngSwitchCase="schema.type" [class.is-hidden]="activeSubTab !== '' && activeSubTab !== 'configs'">
+        <div class="column columns" *ngSwitchCase="schema?.type" [class.is-hidden]="activeSubTab !== '' && activeSubTab !== 'configs'">
 
             <div class="column is-half">
 
@@ -150,6 +151,7 @@
                             <input type="checkbox" [(ngModel)]="overrideSchemaPath"> Override schema on save?
                         </label>
                     </div>
+
                     <datawhore-rain-form
                         [rainSchemaIndex]="$i"
                         [dimType]="schema.type"
@@ -160,5 +162,6 @@
                 </div>
             </div>
         </div>
+
     </div>
 </div>

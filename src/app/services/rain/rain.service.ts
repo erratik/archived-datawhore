@@ -21,36 +21,27 @@ export class RainService extends SpaceItemService {
         super(http);
     }
 
-    public getRain(space: string): Observable<any> {
+    public getRain(space: string): Observable<Rain[]> {
         return this.http.get(`${this.apiServer}/get/rain/${space}`)
             .map((res: Response) => {
                 const rain = res.json();
-                const types = _.uniq(rain.dimensions.map(dim => dim.type));
-                this.rain = [];
-                types.forEach((type: string, i: number) => {
-                    if (this.rainSchemas.filter(s => s.type === type).length) {
+                const types =  Array.from( new Set(rain.dimensions.map(dim => dim.type) ) );
 
-                        this.rain.push(new Rain(
+                // this.rain = [];
+                types.map(type => {
+                    this.rain = this.rainSchemas.map(schema => new Rain(
                             space,
                             rain.dimensions.filter(dims => {
                                 if (dims.type === type) {
                                     return new RainDimension(dims.friendlyName, dims.schemaPath, dims.type)
                                 }
-                            }
-                            ),
-                            type,
+                            }),
+                            schema.type,
                             rain.modified
                         ));
-
-                        this.rain.forEach(r => {
-                            if (r.rainType === type) {
-                                r.createPropertyBucket(this.rainSchemas.filter(s => s.type === type)[0].propertyBucket);
-                            }
-                        });
-                    }
                 });
 
-                this.rain = _.uniq(this.rain);
+                return this.rain;
             })
             .catch(this.handleError);
     }
