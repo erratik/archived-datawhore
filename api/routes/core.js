@@ -1,9 +1,6 @@
 const express = require('express');
 const router = express.Router();
 
-console.log(router);
-
-
 const multer = require('multer');
 const fs = require('fs');
 const mkdirp = require('mkdirp');

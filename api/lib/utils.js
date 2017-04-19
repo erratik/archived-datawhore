@@ -116,8 +116,8 @@ module.exports = that = {
                                 Authorization: makeOAuthHeaders(data)
                             }
                         };
-                        console.log(options.path);
-                        console.log(options.headers);
+                        // console.log(options.path);
+                        // console.log(options.headers);
 
                         https.get(options, function (result) {
                             let buffer = '';
@@ -153,8 +153,8 @@ module.exports = that = {
                                 'Content-Type': 'application/x-www-form-urlencoded'
                             }
                         };
-                        console.log(options.uri);
-                        console.log('');
+                        // console.log(options.uri);
+                        // console.log('');
 
                         const requestDataWithToken = () => request(options, (error, response, body) => {
                             if (error) {
