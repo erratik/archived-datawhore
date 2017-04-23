@@ -1,8 +1,8 @@
 // dependencies
+const env = require('node-env-file');
 const express = require('express');
 const path = require('path');
-const colors = require('colors');
-// const favicon = require('serve-favicon');
+
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
@@ -16,6 +16,10 @@ const api = require('./routes/core');
 const users = require('./routes/users');
 
 const app = express();
+
+if (app.get('env') === 'development') {
+    env(__dirname + '/.env');
+}
 
 
 //  app.configure(function () {
@@ -82,26 +86,15 @@ require('./strategy')(app);
 const Space = require('./models/spaceModel');
 const Settings = require('./models/settingModel');
 const Schema = require('./models/schemaModel');
+
+const mongoURI = (app.get('env') === 'development') ? process.env.MONGODB_LOCAL_URI : process.env.MONGODB_URI;
 // mongoose
-mongoose.connect('mongodb://localhost/datawhore', function(err) {
+mongoose.connect(mongoURI, function(err) {
     if (err) throw err;
-    Space.getAll(function (err, spaces) {
-
-        Schema.findAllSchemas((schemas) => {
-
-            Settings.findAllSettings((settings) => {
-                // console.log(o);
-                require('./scheduler')(app, spaces, settings, schemas);
-            });
-        });
-
-    });
+    Space.getAll((err, spaces) => Schema.findAllSchemas((schemas) => Settings.findAllSettings((settings) => require('./scheduler')(app, spaces, settings, schemas))));
 });
 
 app.use('/api', api);
-
-
-
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

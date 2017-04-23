@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const colors = require('colors');
+
 const ObjectId = require('mongodb').ObjectId;
 var _ = require('lodash');
 var moment = require('moment');
@@ -133,17 +133,17 @@ const DropSchema = {
 
             var addSchema = function (callback) {
 
-                drops = drops.filter(drop => {
+                drops = drops.filter((drop, i) => {
 
                     // this needs to be come something that can save dimensions, REAL dimensions
                     const possibleTimestampKeys = ['created_time', 'date', 'timestamp', 'time', 'created_at', 'played_at', 'createdAt', 'startTime', 'endTime'];
                     Object.keys(drop.content).map(key => {
                         if (possibleTimestampKeys.includes(key)) {
-                            if (space === 'tumblr') {
-                                console.log(drop.content[key]);
-                                // drop.content[key] = moment(drop.content[key], ).format('x')
+                            if (!i) {
+                                console.log(`[dropModel][${space}] original timestamp format: ${drop.content[key]}`);
                             }
-                            const dateCheck = drop.content[key].length === 13 ? drop.content[key] : moment(drop.content[key]).format('x');
+                            const dateCheck = drop.content[key].length === 13 ? drop.content[key] : moment(drop.content[key], ['X', 'ddd MMM DDD HH:mm:ss ZZ YYYY' ]).format('x');
+
 
                             if (typeof Number(dateCheck) === 'number') {
                                 const timestamp = drop.content[key];
@@ -169,8 +169,8 @@ const DropSchema = {
                         // cb(drops);
                         that.findOne(query, (err, docs) => {
                             if (err) cb(err);
-                            console.log(space, '=>', existingDropTimestamps.length, drops.length);
-                            console.log(`${drops.length} ${type} drops on ${space}`);
+                            console.log('[dropModel] ', space, '=>', existingDropTimestamps.length, drops.length);
+                            console.log(`[dropModel] ${drops.length} ${type} drops on ${space}`);
                             cb(drops, drops.length);
                         });
                     });

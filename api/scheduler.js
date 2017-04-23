@@ -70,14 +70,23 @@ module.exports = function (app, spaces, settings, schemaGroups) {
             Utils.endpointSpaceCall(data, null, null, (resp) => {
               // find out if we still get results, to implement start/end
               let dropCount = resp.length;
-              dropCountLastRun += dropCount;
 
-              messageTotal(dropCount, namespace, dropCountLastRun);
+              dropCountLastRun += dropCount;
 
               if (!dropCount) {
                 dropCallback(isFetchingPast, 0, namespace);
                 return;
+              } else if (dropCountLastRun <= dropCountLastRun - dropCount) {
+
+                console.log(``);
+                console.log('💀 💀 💀 -------------->  KILLED CUM DUMPTRUCK @ 📅 ' + new Date());
+                console.log(``);
+                shiftDrops.cancel();
+                return;
               }
+
+
+              messageTotal(dropCount, namespace, dropCountLastRun);
 
               dropCallback(isFetchingPast, dropCount, namespace);
 
@@ -108,15 +117,7 @@ module.exports = function (app, spaces, settings, schemaGroups) {
     if (isFetchingPast) {
 
       if (pastDropRuntimes === dropsToFetch) {
-
-        //             console.log(``);
-        //             console.log('💀 💀 💀 -------------->  KILLED CUM DUMPTRUCK @ 📅 ' + new Date());
-        //             console.log(``);
-        //             shiftDrops.cancel();
-        //             return;
-
         pastDropRuntimes = 0;
-
 
       } else {
 
@@ -135,10 +136,11 @@ module.exports = function (app, spaces, settings, schemaGroups) {
       console.log(`| ${space} | 💧 ${dropCount}`);
       console.log(`----------------------------`);
 
-    } else if (total) {
+    } else if (total)  {
       console.log(`💦 total drops added: ${total - dropCount}`);
-    }
+    } 
   }
 
 
 };
+

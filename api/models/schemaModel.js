@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const colors = require('colors');
 const ObjectId = require('mongodb').ObjectId;
 
 const childSchema = new mongoose.Schema({
@@ -68,7 +67,6 @@ const SchemaSchema = {
 
             const addSchema = function (callback) {
                 schema.modified = Date.now();
-                // console.log(schema);
                 if (typeof schema.fetchUrl === 'object') {
                     schema.fetchUrl = schema.fetchUrl.apiEndpointUrl;
                 }
@@ -84,7 +82,6 @@ const SchemaSchema = {
             this.findOne(query, { 'schemas.$': 1 }, function (_err, docs) {
                 if (docs) {
                     that.update(query, { $pull: { schemas: schemaQuery } }, { multi: false }, function (error, _updated) {
-                        // console.log('pulled', _updated);
                         if (_updated.ok) {
                             addSchema(cb);
                         }

@@ -44,7 +44,6 @@ router
             };
 
             getEndpoint(data, (resp) => {
-                // console.log(`[endpoints.${data.action} response]`, resp);
                 res.status(200).send(resp);
             })
 

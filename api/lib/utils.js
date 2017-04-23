@@ -11,9 +11,7 @@ const https = require('https');
 const DROP_FETCH_PARAMS = require('../constants.class').DROP_FETCH_PARAMS;
 
 const makeOAuthHeaders = (data, v) => {
-    // v =  ? '1.1' : '1.0';
     // helper to construct echo/oauth headers from URL
-    // console.log(data);
     const oauth = new OAuth.OAuth(`https://${data.apiUrl}/oauth/request_token`,
         `https://${data.apiUrl}/oauth/access_token`,
         data.apiKey,
