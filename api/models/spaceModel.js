@@ -1,10 +1,10 @@
 var mongoose = require('mongoose');
-var Setting = require('./settingModel');
-var Profile = require('./profileModel');
+
 var SpaceSchema = {
     schema: {
         name: String,
         modified: Number,
+        lastModified: { type: Date },
         avatar: String,
         description: String,
         username: String,
@@ -20,17 +20,20 @@ var SpaceSchema = {
             return this.find({ name: name }, cb);
         },
         removeSpace: function (name, cb) {
+            var Setting = require('./settingModel');
+            var Profile = require('./profileModel');
             Setting.removeSettings(name, function () { });
             Profile.removeProfile(name, function () { });
             this.remove({ name: name }, cb);
         },
         updateSpace: function (space, update, cb) {
             update.modified = Date.now();
-            this.findOneAndUpdate({ name: space }, update, { upsert: true, returnNewDocument: true }, function (err, updated) {
-                cb(updated);
-            });
+            update.$currentDate = { lastModified: true};
+            
+            this.findOneAndUpdate({ name: space }, update, { upsert: true, returnNewDocument: true }, (err, updated) => cb(updated));
         }
-    }
+    },
+    
 };
 var Space = require('./createModel')(mongoose, 'Space', SpaceSchema);
 module.exports = Space;

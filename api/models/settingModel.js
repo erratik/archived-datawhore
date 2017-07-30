@@ -1,33 +1,40 @@
 var mongoose = require('mongoose');
 var Space = require('./spaceModel');
+
+const environment = process.env.HOME === '/Users/erratik' ? 'development' : 'production';
+const datawhoreConfig = require('../datawhore-config')(environment);
+const API_URL = require('../lib/constants/urls')(datawhoreConfig).DATAWHORE[environment].API_URL;
+
 var SettingSchema = {
     schema: {
         space: String,
         modified: Number,
+        lastModified: { type: Date },
         connected: Boolean,
         oauth: [],
         extras: []
     },
     self: {
-        findSettings: function (spaceName, cb) {
-            this.find({ space: spaceName }, function (err, docs) {
-                if (!docs.length) {
-                    docs = [{ space: spaceName, modified: Date.now() }];
+        findSettings: function(spaceName, cb) {
+            this.find({ space: spaceName }, function(err, docs) {
+                if (!docs) {
+                    docs = [{ space: spaceName, modified: Date.now(), $currentDate : { lastModified: true} }];
                 }
                 cb(docs[0]);
             });
         },
-        findAllSettings: function (cb) {
-            this.find({}, function (err, docs) {
+        findAllSettings: function(cb) {
+            this.find({}, function(err, docs) {
                 if (err) cb(err);
                 cb(docs);
             });
         },
-        removeSettings: function (name, cb) {
+        removeSettings: function(name, cb) {
             this.remove({ space: name }, cb);
         },
-        updateSettings: function (update, cb) {
-            var query = { space: update.name || update.space }, opts = { multi: false, upsert: true };
+        updateSettings: function(update, cb) {
+            var query = { space: update.name || update.space },
+                opts = { multi: false, upsert: true };
             delete update._id;
             update.space = update.name;
             update.modified = Date.now();
@@ -36,7 +43,7 @@ var SettingSchema = {
             let extrasKeys = [];
 
             if (update.oauth.extras) {
-                update.extras = update.oauth.extras.map(function (settings) {
+                update.extras = update.oauth.extras.map(function(settings) {
                     settings.type = 'oauth';
                     if (settings.label === 'access_token') {
                         update.connected = true;
@@ -52,7 +59,7 @@ var SettingSchema = {
                 update.extras.push({
                     type: 'oauth',
                     label: 'authorizationUrl',
-                    value: `http://datawhore.erratik.ca:10010/auth/${query.space}`
+                    value: `${API_URL}/auth/${query.space}`
                 })
             }
 
@@ -62,7 +69,9 @@ var SettingSchema = {
                 delete update.oauth;
             }
 
-            this.findOneAndUpdate(query, update, { upsert: true, returnNewDocument: true }, (err, updated) => cb(updated));
+            update.$currentDate = { lastModified: true};
+            
+            this.findOneAndUpdate(query, update, { upsert: true, returnNewDocument: true }, (err, updated) => Space.updateSpace(query.space, {}, () => cb(updated)));
         }
     }
 };

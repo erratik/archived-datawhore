@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const ObjectId = require('mongodb').ObjectId;
 var _ = require('lodash');
 var moment = require('moment');
-const DROP_FETCH_PARAMS = require('../constants.class').DROP_FETCH_PARAMS;
+const FetchingService = require('../services/fetch-params.service');
 
 const dropSchema = new mongoose.Schema({
     type: String,
@@ -98,7 +98,7 @@ const DropSchema = {
                     if (!docs) {
                         docs = [{ drops: [] }];
                     }
-                    cb(DROP_FETCH_PARAMS(space, isFetchingPast, docs));
+                    cb(FetchingService.compose(space, isFetchingPast, docs));
                 });
 
             } else {
@@ -131,29 +131,42 @@ const DropSchema = {
             const query = { space: space, 'drops.type': type };
             var that = this;
 
+            let dateFormat = null;
+            switch (space) {
+                case 'swarm':
+                case 'instagram':
+                    dateFormat = 'X';
+                    break;
+                case 'twitter':
+                    dateFormat = 'ddd MMM DD hh:mm:ss Z YYYY';
+                    break;
+                case 'spotify':
+                case 'dribbble':
+                    dateFormat = moment.defaultFormat;
+                    break;
+                case 'tumblr':
+                    dateFormat = 'YYYY-MM-DD hh:mm:ss GMT';
+                    break;
+                case 'facebook':
+                case 'moves':
+                    dateFormat = moment.ISO_8601 + 'Z';
+                    break;
+                default:
+
+
+            }
+
             var addSchema = function (callback) {
 
                 drops = drops.filter((drop, i) => {
 
                     // this needs to be come something that can save dimensions, REAL dimensions
                     const possibleTimestampKeys = ['created_time', 'date', 'timestamp', 'time', 'created_at', 'played_at', 'createdAt', 'startTime', 'endTime'];
+
                     Object.keys(drop.content).map(key => {
                         if (possibleTimestampKeys.includes(key)) {
-                            if (!i) {
-                                console.log(`[dropModel][${space}] original timestamp format: ${drop.content[key]}`);
-                            }
-                            const dateCheck = drop.content[key].length === 13 ? drop.content[key] : moment(drop.content[key], ['X', 'ddd MMM DDD HH:mm:ss ZZ YYYY' ]).format('x');
-
-
-                            if (typeof Number(dateCheck) === 'number') {
-                                const timestamp = drop.content[key];
-                                drop.content[key] = dateCheck;
-                                if (timestamp.length === 10) {
-                                    drop.content[key] = timestamp * 1000;
-                                }
-                                drop.timestamp = drop.timestamp ? Number(drop.timestamp) : Number(drop.content[key]);
-                                // console.log(`timestamp for this ${space} drop is: ${drop.timestamp}`);
-                            }
+                            drop.timestamp = dateFormat ? moment(drop.content[key], dateFormat).format('x') : moment.unix(drop.content[key]).format('X');
+                            drop.timestamp = (key !== 'timestamp') ? Number(drop.timestamp) : Number(moment(drop.content[key], 'X').format('x'));
                         }
                     });
 
@@ -162,22 +175,38 @@ const DropSchema = {
                     }
                 });
 
-                if (drops && drops.length) {
+                if (drops.length > 0) {
 
                     that.findOneAndUpdate({ space: space }, { $push: { drops: { $each: drops } } }, { upsert: true, returnNewDocument: true }, function (err, updated) {
-                        // console.log(existingDropTimestamps);
-                        // cb(drops);
-                        that.findOne(query, (err, docs) => {
-                            if (err) cb(err);
-                            console.log('[dropModel] ', space, '=>', existingDropTimestamps.length, drops.length);
-                            console.log(`[dropModel] ${drops.length} ${type} drops on ${space}`);
-                            cb(drops, drops.length);
-                        });
+                        if (updated) {
+                            const lastDrop = _.max(updated.drops, function(o) { return o.timestamp; });
+                            const lastDropAdded = _.min(drops, function(o) { return o.timestamp; });
+                            // console.log(lastDropAdded);
+                            if (!!lastDropAdded) {
+                                console.log(space, '=>', lastDrop.timestamp, lastDropAdded.timestamp);
+                                query['drops.timestamp'] =  { $gt: lastDrop.timestamp};
+                                that.findOne(query, { 'drops.$': 1 } , (err, docs) => {
+                                    if (err) cb(err);
+                                    if (docs) {
+                                        console.log(lastDropAdded);
+
+                                        console.log('[dropModel] ', space, '=>', docs.drops.length);
+                                        console.log(`[dropModel] ${drops.length} ${type} drops on ${space}`);
+
+                                        cb(docs.drops, docs.drops.length);
+                                    }
+                                });
+                            }
+
+                        } else {
+                                    cb([], 0);
+
+                        }
                     });
-                } else {
-                    cb([]);
                 }
+
             };
+
 
 
             let existingDropTimestamps = [];

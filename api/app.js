@@ -16,11 +16,17 @@ const api = require('./routes/core');
 const users = require('./routes/users');
 
 const app = express();
+const environment = app.get('env');
+const datawhoreConfig = require('./datawhore-config')(environment);
 
-if (app.get('env') === 'development') {
+if (environment === 'development') {
     env(__dirname + '/.env');
 }
 
+app.set('constants', require('./lib/constants/urls')(datawhoreConfig));
+
+console.log(app.get('constants'));
+const DATAWHORE = app.get('constants').DATAWHORE[environment];
 
 //  app.configure(function () {
 
@@ -38,10 +44,10 @@ app.set('view engine', 'jade');
 
 
 // Add headers
-app.use(function (req, res, next) {
+app.use(function(req, res, next) {
 
     // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', 'http://datawhore.erratik.ca:4200');
+    res.setHeader('Access-Control-Allow-Origin', DATAWHORE.CLIENT_URL);
 
     // Request methods you wish to allow
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');

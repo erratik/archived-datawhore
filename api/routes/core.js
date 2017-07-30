@@ -9,9 +9,9 @@ const Space = require('../models/spaceModel');
 const Setting = require('../models/settingModel');
 const Schema = require('../models/schemaModel');
 
-const Utils = require('../lib/utils'),
-      postEndpoint = Utils.postEndpoint,
-      getEndpoint = Utils.getEndpoint;
+const NamespaceService = require('../services/namespace.service');
+const postEndpoint = NamespaceService.postEndpoint;
+const getEndpoint = NamespaceService.getEndpoint;
 
 router
     .get('/spaces', function (req, res) {
@@ -36,16 +36,16 @@ router
 router
     .get('/get/:endpoint/:space', (req, res) => {
 
-            const data = {
-                space: req.params.space,
-                type: req.query.type ? req.query.type : req.params.endpoint,
-                action: `${req.params.endpoint}.get`,
-                query: req.query
-            };
+        const data = {
+            space: req.params.space,
+            type: req.query.type ? req.query.type : req.params.endpoint,
+            action: `${req.params.endpoint}.get`,
+            query: req.query
+        };
 
-            getEndpoint(data, (resp) => {
-                res.status(200).send(resp);
-            })
+        getEndpoint(data, (resp) => {
+            res.status(200).send(resp);
+        });
 
     })
     .put('/update/:endpoint/:space', (req, res) => {
@@ -64,8 +64,7 @@ router
 // SPACES: ENDPOINTS TO GET DATA FROM SPACES (TWITTER, INSTAGRAM, ETC)
 router.post('/endpoint/space', function (req, res) {
     let data = req.body.data;
-    Utils.endpointSpaceCall(data, req, res);
-
+    NamespaceService.endpointSpaceCall(data, req, res);
 });
 
 // UPLOADS

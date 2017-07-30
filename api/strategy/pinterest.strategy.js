@@ -1,13 +1,6 @@
-const space = 'pinterest';
-const Utils = require('../lib/utils');
-const Setting = require('../models/settingModel');
-const passport = require('passport')
-    , PinterestStrategy = require('passport-pinterest').Strategy;
+const PinterestStrategy = require('passport-pinterest').Strategy;
 
-passport.serializeUser((user, done) => done(null, user));
-passport.deserializeUser((user, done) => done(null, user));
-
-module.exports = function (app) {
+module.exports = function (app, space, passport, refresh, savePassport, Setting, API_URL, CLIENT_URL) {
 
     Setting.findSettings(space, (settings) => {
         if (settings.oauth) {
@@ -18,7 +11,7 @@ module.exports = function (app) {
                     scope: ['read_public', 'read_relationships'],
                     state: true
                 },
-                (accessToken, refreshToken, profile, done) => Utils.savePassport(space, settings, {
+                (accessToken, refreshToken, profile, done) => savePassport(space, settings, {
                     accessToken: accessToken,
                     refreshToken: refreshToken
                 }, profile, done)
@@ -37,8 +30,8 @@ module.exports = function (app) {
     //     app.use(forceSsl);
 
     app.get('/auth/pinterest/callback', passport.authenticate(space, {
-        successRedirect: `http://datawhore.erratik.ca:4200/space/${space}`,
-        failureRedirect: 'http://datawhore.erratik.ca:4200'
+        successRedirect: `${CLIENT_URL}/space/${space}`,
+        failureRedirect: CLIENT_URL
     }));
 
 };
