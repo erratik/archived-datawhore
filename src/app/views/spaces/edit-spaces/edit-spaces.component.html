@@ -4,7 +4,7 @@
 
             <div class="column">
                 <datawhore-add-space (addedSpace)="onAddedSpace($event)"></datawhore-add-space>
-
+                
                 <article class="media" *ngFor="let space of spaces">
                     <figure class="media-left">
                         <p class="image is-32x32">
@@ -30,7 +30,10 @@
                                 <small>Last modified: {{space.modified | date:'medium'}}</small>
                             </div>
 
-                            <span class="tag is-dark is-pulled-right" *ngFor="let rainType of space.rainSchemas">{{rainType}}</span>
+                            <div class="tags has-addons is-pulled-right" *ngFor="let schema of space.rainSchemas">
+                                <span class="tag is-dark">{{(schema.dropCount?schema.dropCount:0)}}</span>
+                                <span class="tag">{{schema.type}}</span>
+                            </div>
                             <!--<pre>{{space|json}}</pre>-->
                         </div>
                     </div>

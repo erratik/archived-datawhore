@@ -1,12 +1,122 @@
+<div [ngSwitch]="drop.space">
+    <div class="is-flex" *ngSwitchDefault>
+        <!--<i class="fa fa-{{drop.space}} icon is-small"></i>-->
+        <!--{{drop.content.date }}-->
+        <div class="is-flex center date">
+            <figure class="image is-16x16">
+                <img src="public/uploads/{{drop.space}}/space/{{drop.space}}-icon.png">
+            </figure>
+            <span class="">{{drop.timestamp | date:'short'}}</span>
+        </div>
+        <span class="caption">{{drop.content.caption}}</span>
 
-<div class="is-flex">
-  <!--<i class="fa fa-{{drop.space}} icon is-small"></i>-->
-  <!--{{drop.content.date }}-->
-  <div class="is-flex center date">
+    </div>
+
+    <div class="is-flex" *ngSwitchCase="'spotify'">
+        <!--<i class="fa fa-{{drop.space}} icon is-small"></i>-->
+        <!--{{drop.content.date }}-->
+
+
+        <div class="is-flex center date">
+            
+            <figure class="image is-16x16">
+                <img src="public/uploads/{{drop.space}}/space/{{drop.space}}-icon.png">
+            </figure>
+            
+        </div>
+
+        <span class="caption">{{drop.content.track_name}} - {{drop.content.track_artists[0].name}} {{ drop.content.duration_ms | amDuration:'milliseconds' }}</span>
+        <cite>{{drop.content.album_name}}</cite>
+        <div>
+            <audio controls>
+                <source src="{{drop.content.track_preview_url}}" type="audio/ogg">Your browser does not support the audio element.
+            </audio>
+        </div>
+        <span class="">{{drop.timestamp | date:'short'}}</span>
+    </div>
+
+
+    <div class="is-flex" *ngSwitchCase="'instagram'">
+        <!--<i class="fa fa-{{drop.space}} icon is-small"></i>-->
+        <!--{{drop.content.date }}-->
+
+<article class="media">
+  <figure class="media-left">
+    <p class="image is-128x128">
+      <img src="{{drop.content.images.thumbnail.url}}">
+    </p>
+  </figure>
+  <div class="media-content">
+    <div class="content">
+      <p><small>{{drop.date | date:'short'}}</small>
+        <!--<strong>John Smith</strong> <small>@johnsmith</small> -->
+        <br>{{drop.content.caption }}      
+        </p>
+    </div>
+    <nav class="level is-mobile">
+      <div class="level-left">
+        <span class="level-item">
+          <span class="icon is-small"><i class="fa fa-comments"></i></span>
+          <small>{{drop.content.count_comments}}</small>
+        </span>
+        <span class="level-item">
+          <span class="icon is-small"><i class="fa fa-heart"></i></span>
+          <small>{{drop.content.count_likes}}</small>
+        </span>
+        <span class="level-item" ng-if="drop.content.location_name">
+          <span class="icon is-small"><i class="fa fa-map-marker"></i></span>
+          <small>{{drop.content.location_name}}</small>
+        </span>
+      </div>
+    </nav>
+  </div>
+  <div class="media-right">
     <figure class="image is-16x16">
         <img src="public/uploads/{{drop.space}}/space/{{drop.space}}-icon.png">
     </figure>
-    <span class="">{{drop.content.date | date:'short'}}</span>
   </div>
-  <span class="caption">{{drop.content.caption}}</span>
+</article>
+
+<article class="media">
+  <figure class="media-left">
+    <p class="image is-128x128">
+      <img src="{{drop.content.images.thumbnail.url}}">
+    </p>
+  </figure>
+  <div class="media-content">
+    <div class="content">
+      <p><small>{{drop.date | date:'short'}}</small>
+        <!--<strong>John Smith</strong> <small>@johnsmith</small> -->
+        <br>{{drop.content.caption }}      
+        </p>
+    </div>
+    <nav class="level is-mobile">
+      <div class="level-left">
+        <span class="level-item">
+          <span class="icon is-small"><i class="fa fa-comments"></i></span>
+          <small>{{drop.content.count_comments}}</small>
+        </span>
+        <span class="level-item">
+          <span class="icon is-small"><i class="fa fa-heart"></i></span>
+          <small>{{drop.content.count_likes}}</small>
+        </span>
+        <span class="level-item" ng-if="drop.content.location_name">
+          <span class="icon is-small"><i class="fa fa-map-marker"></i></span>
+          <small>{{drop.content.location_name}}</small>
+        </span>
+      </div>
+    </nav>
+  </div>
+  <div class="media-right">
+    <figure class="image is-16x16">
+        <img src="public/uploads/{{drop.space}}/space/{{drop.space}}-icon.png">
+    </figure>
+  </div>
+</article>
+
 </div>
+    <details>
+        <summary>drop raw content</summary>
+        <pre>{{drop.content | json}}</pre>
+    </details>
+<!--<p *ngSwitchCase="true">-->

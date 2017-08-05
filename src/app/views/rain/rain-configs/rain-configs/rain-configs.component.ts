@@ -63,32 +63,36 @@ export class RainConfigsComponent implements OnChanges, OnInit {
             if (this.rainSchemas.length) {
                 this.rainService.type = this.rainSchemas[0].type;
                 this.rainService.rainSchemas = this.rainService.rainSchemas.map(rainSchema => {
-                    // rainSchema.content = JSON.parse(rainSchema.content);
                     this.overrideRainName[rainSchema.type] = rainSchema.type;
-                    // debugger;
                     return rainSchema;
                 });
-                console.log(this.rainSchemas);
+                // console.log(this.rainSchemas);
             }
         });
 
     }
 
     ngOnChanges() {
-        this.getActiveTab();
+        // this.getActiveTab();
     }
 
     private getRain(): any {
         // debugger;
         return this.rainService.getRain(this.space.name).do((rain) => {
-            console.log(rain);
+            // console.log(rain);
         });
     }
 
     private getRawRain(): any {
         return this.spaceItemService.fetchSchema(this.space.name, 'rain').do((rain) => {
             this.rainService.rainSchemas = rain.map(rainSchema => this.toSchema(rainSchema));
+            this.getActiveTab();
+            this.activeSubTab = 'config';
         });
+    }
+
+    protected getSchemaByType(schemaType): any {
+        return this.rainSchemas.filter(({type}) => type === schemaType)[0];
     }
 
     protected writeRain(index: number, type: any = 'rain'): any {
@@ -106,7 +110,6 @@ export class RainConfigsComponent implements OnChanges, OnInit {
 
             this.toSchemas(updatedSchema, type);
             this.setActiveTab(updatedSchema['type']);
-            debugger;
         });
 
         schemas$.subscribe(() => {
@@ -124,12 +127,9 @@ export class RainConfigsComponent implements OnChanges, OnInit {
 
         if (this.overrideSchemaPath) {
             schema.content = objectPath.get(this.rainService.rainSchemas[index], `content.${schema.contentPath}`);
+            // debugger;
         }
         const profileSchema$ = this.rainService.updateSchema(this.space.name, schema, type).do((updatedSchema) => {
-            // updatedSchema.content = (updatedSchema.content.length) ? updatedSchema.content
-            // const merged = {};
-            // updatedSchema.content.forEach(d => Object.keys(d).forEach(k => {merged[k] = d[k]}));
-            // updatedSchema.content = merged;
             return this.toSchemas(updatedSchema, type);
         });
 
@@ -150,11 +150,9 @@ export class RainConfigsComponent implements OnChanges, OnInit {
             });
         } else {
             this.rainService.rainSchemas.push(this.toSchema(updatedSchema));
-            debugger;
+            // debugger;
         }
         this.overrideRainName[updatedSchema.type] = updatedSchema.type;
-
-            debugger;
     }
 
     private toSchema(preSchema): DimensionSchema {
@@ -195,11 +193,13 @@ export class RainConfigsComponent implements OnChanges, OnInit {
 
     public setActiveTab(tabName: string): void {
         this.activeTab = this.rainService.type = tabName;
-        this.activeSubTab = '';
+        this.activeSubTab = 'config';
+        // debugger;
     }
 
     protected getActiveTab(): any {
-        const activeTab = this.rainSchemas.length ? this.rainSchemas[0].type : 'new-schema';
+        // debugger;
+        const activeTab = this.rainService.rainSchemas.length ? this.rainService.rainSchemas[0].type : 'new-schema';
         // this.activatedRoute.params['tab'] = activeTab;
         return this.activeTab = activeTab;
 
@@ -207,8 +207,17 @@ export class RainConfigsComponent implements OnChanges, OnInit {
 
     protected getRainProperties(rainType: string): any {
         const schema = this.rainService.rain.filter(r => r.rainType === rainType)[0];
-        if (schema) {
-            return this.rainService.rain.filter(r => r.rainType === rainType)[0].properties;
-        }
+        // if (schema) {
+        //     return this.rainService.rain.filter(r => r.rainType === rainType)[0].properties;
+        // }
+        return schema ? schema.properties : [];
+    }
+
+    protected hasOverridePath(schema): boolean {
+        // const schema = this.rainService.rain.filter(r => r.rainType === rainType)[0];
+        // // if (schema) {
+        // //     return this.rainService.rain.filter(r => r.rainType === rainType)[0].properties;
+        // // }
+        return !!schema.contentPath;
     }
 }

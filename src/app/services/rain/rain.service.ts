@@ -24,67 +24,51 @@ export class RainService extends SpaceItemService {
     public getRain(space: string): Observable<Rain[]> {
         return this.http.get(`${this.apiServer}/get/rain/${space}`)
             .map((res: Response) => {
-                const rain = res.json();
-                const types =  Array.from( new Set(rain.dimensions.map(dim => dim.type) ) );
-
-                // this.rain = [];
-                types.map(type => {
-                    this.rain = this.rainSchemas.map(schema => new Rain(
-                            space,
-                            rain.dimensions.filter(dims => {
-                                if (dims.type === type) {
-                                    return new RainDimension(dims.friendlyName, dims.schemaPath, dims.type)
-                                }
-                            }),
-                            schema.type,
-                            rain.modified
-                        ));
-                });
-
+                const rainResponse = res.json();
+                const types =  _.groupBy(rainResponse.dimensions, 'type');
+                this.rain = this.rainSchemas.map(schema => new Rain(
+                    space,
+                    types[schema.type].map((dims: RainDimension) => new RainDimension(dims.friendlyName, dims.schemaPath, dims.type)).filter(({type}) => schema.type === type),
+                    schema.type,
+                    rainResponse.modified
+                ));
                 return this.rain;
             })
             .catch(this.handleError);
     }
 
     public getDrops(space: string, queryObj = null): Observable<any> {
-
         queryObj = queryObj ? '?' + Object.keys(queryObj).map((k) => encodeURIComponent(k) + '=' + encodeURIComponent(queryObj[k])).join('&') : '';
-
+        const rainService = this;
         return this.http.get(`${this.apiServer}/get/drops/${space}${queryObj}`)
             .map((res: Response) => {
                 const dropsResponse = res.json();
-                if (!this.drops[space]) {
-                    this.drops[space] = [...this.sortDrops(dropsResponse.drops, space)];
-                    debugger;
-                } else {
-                    this.sortDrops(dropsResponse.drops, space).forEach(drop => this.drops[space].push(drop));
-                    // co
-                    // this.drops[space];
-                    debugger;
-
-                }
-
-                this.drops[space] = _.sortBy(this.drops[space], (o) => {
-                    debugger;
-                    return Number(o['content']['date']);
-                });
-                return this.drops[space];
+                    if (!rainService.drops[space]) {
+                        rainService.drops[space] = [...dropsResponse.drops];
+                    }
+                    const spaceDrops = rainService.drops[space];
+                    const sortedDrops = rainService.sortDrops(space, rainService.type);
+                    rainService.drops[space] = !!rainService.drops && rainService.drops.length ? spaceDrops.push(sortedDrops) : sortedDrops;
+                console.log(rainService.drops);
+                // debugger;
+                // rainService.drops[space] = _.sortBy(this.drops[space], (o) => {
+                //     return Number(o['content']['date']);
+                // });
+                return rainService.drops[space];
             })
             .catch(this.handleError);
     }
 
-    public sortDrops(drops, space): any {
-        return drops.map(drop => {
-            // console.log(this.rain);
-            const dropProperties = this.rain.filter(rain => rain.rainType === drop.type)[0].properties;
+    public sortDrops(space, type): any {
+        return this.drops[space].map(drop => {
+            const dropProperties = this.rain.filter(rain => rain.rainType === type)[0].properties;
 
             const content = {};
             dropProperties.forEach(prop => content[prop.friendlyName] = objectPath.get(drop, prop.schemaPath));
-            // debugger;
-            drop = new Drop(space, drop.type, content, drop.timestamp);
 
-            return drop;
+            return new Drop(space, drop.type, content, drop.timestamp);
         });
+
     }
 
     public update(space: string, rain: any): Observable<any> {

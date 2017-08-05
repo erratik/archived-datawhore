@@ -62,22 +62,19 @@
                     </div>
 
                     <div class="example" [class.is-hidden]="!profile?.properties">
-                        <datawhore-space-item [properties]="profile.properties" [type]="'profile'"
-                                              [space]="space"
-                                              (linkingToSpace)="updateSpace($event)"></datawhore-space-item>
+
+                        <datawhore-space-item [properties]="profile.properties" [type]="'profile'" [space]="space" [schema]="profileSchema" (linkingToSpace)="updateSpace($event)"></datawhore-space-item>
                     </div>
                 </div>
                 <div class="column is-half">
                     <div class="header">
                         <h3 class="is-pulled-left heading">Profile Schema</h3>
                     </div>
+                    <!-- {{}} -->
                     <div *ngIf="profileSchema?.propertyBucket">
 
                         <div [class.is-loading]="isFetchingSchema">
-                            <datawhore-profile-form [model]="profileSchema"
-                                                    [dimType]="'profile'" [space]="space"
-                                                    (onProfileSchema)="profileSchema = $event"
-                                                    (onNewDimensions)="newDimensions($event)"></datawhore-profile-form>
+                            <datawhore-profile-form [model]="profileSchema" [dimType]="'profile'" [space]="space" (onProfileSchema)="profileSchema = $event" (onNewDimensions)="newDimensions($event)"></datawhore-profile-form>
                             <hr>
                             <article class="message is-warning">
                                 <div class="message-body is-inline-flex">
@@ -98,18 +95,10 @@
             </div>
         </div>
         <div class="tab space" *ngSwitchCase="'rain'">
-            <datawhore-rain-configs
-                    [spaceOauthSettings]="spaceOauthSettings"
-                    [newDimensions]="newDimensions"
-                    [space]="space">
-            </datawhore-rain-configs>
+            <datawhore-rain-configs [spaceOauthSettings]="spaceOauthSettings" [newDimensions]="newDimensions" [space]="space"></datawhore-rain-configs>
         </div>
         <div class="tab space" *ngSwitchCase="'space'">
-            <datawhore-space-config
-                    (onRemoveSpace)="removeSpace()"
-                    (onUpdateSpace)="updateSpace($event)"
-                    (onToggleEditSpace)="toggleEditSpace()">
-            </datawhore-space-config>
+            <datawhore-space-config (onRemoveSpace)="removeSpace()" (onUpdateSpace)="updateSpace($event)" (onToggleEditSpace)="toggleEditSpace()"></datawhore-space-config>
         </div>
 
         <div class="tab space" *ngSwitchCase="'drops'">

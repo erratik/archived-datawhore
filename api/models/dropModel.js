@@ -108,6 +108,31 @@ const DropSchema = {
             }
 
         },
+        findAll: function (options, cb) {
+            
+            const query = options;
+
+            this.find(query,function (err, docs) {
+                if (err) cb(err);
+                cb(docs[0]);
+            });
+        },
+        countByTypes: function (spaceName, cb) {
+            this.aggregate(
+                { $match: { space: spaceName }},
+                { $unwind: "$drops" },
+                { $unwind: "$drops.type" },
+                { $project: {_id: '$_id', type: '$drops.type'} },
+                { $group: {_id: '$type', count: {'$sum': 1}}},
+                { $group: {
+                        _id: spaceName, 
+                        types: {$push: {type: '$_id', count: '$count'}}
+                    }
+                }, (err, docs) => {
+                    const types = docs.length ? docs[0].types : [];
+                    cb(types);
+                });
+        },
         findDrop: function (space, id, cb) {
 
             const dropid = new ObjectId(id);

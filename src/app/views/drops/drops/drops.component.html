@@ -11,7 +11,9 @@
   </ul>
 </aside>
 <div [ngSwitch]="activeTab" class="tab column is-10">
+
   <div *ngFor="let dropType of dropTypes">
+    
     <div *ngSwitchCase="dropType">
       <div class="header">
         <span class="heading is-pulled-left">{{dropType}} Drops</span>
@@ -19,7 +21,7 @@
       </div>
       <hr>
       <div *ngIf="drops">
-        <datawhore-drop-atomic [drop]="drop" *ngFor="let drop of drops[dropType] | orderDropBy:'date'"></datawhore-drop-atomic>
+        <datawhore-drop-atomic [drop]="drop" *ngFor="let drop of drops[dropType] | orderDropBy:['timestamp']"></datawhore-drop-atomic>
       </div>
 
       <div *ngIf="!drops">

@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const ObjectId = require('mongodb').ObjectId;
+var Drop = require('./dropModel');
+var _ = require('lodash');
 
 const childSchema = new mongoose.Schema({
     type: String,
@@ -7,6 +9,7 @@ const childSchema = new mongoose.Schema({
     dropUrl: String,
     contentPath: String,
     modified: Number,
+    dropCount: Number,
     content: {}
 });
 
@@ -33,15 +36,22 @@ const SchemaSchema = {
                     cb(docs.schemas.filter(function (schema) {
                         return schema.type === schemaType;
                     })[0]);
-                } else if (docs) {
-                    cb(docs.schemas.filter(function (schema) {
-                        const type = schema.type;
-                        if (type) {
-                            return schema.type.includes('rain');
-                        }
-                    }));
+                } else if (docs) { 
+                    
+                        let schemas = docs.schemas.filter(schema => !!schema.type && schema.type.includes('rain'));
+                        
+                            Drop.countByTypes(spaceName, (types) => {
+                                
+                                schemas = schemas.map(schema => {
+                                    schema.dropCount =  types.filter(c => c.type === schema.type)[0].count;
+                                
+                                    return schema;
+                                });
+                                cb(schemas);
+                            });
+                            
                 }
-            });
+             });
         },
         findAllSchemas: function (cb) {
             this.find({}, function (err, docs) {

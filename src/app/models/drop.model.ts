@@ -16,6 +16,7 @@ export class Drop {
                     // check for seconds timestamps, convert to ms
                     if (this.content[prop].length === 10) {
                         this.content[prop] = this.content[prop] * 1000;
+                        this.timestamp = this.content[prop] * 1000;
                     }
                   break;
 

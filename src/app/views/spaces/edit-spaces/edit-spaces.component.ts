@@ -30,7 +30,12 @@ export class EditSpacesComponent implements OnInit {
             .switchMap((spaces) => {
                 spaces.forEach(space => {
                     const detailedSpaceInfo$ = this.spaceItemService.fetchSchema(space.name, 'rain')
-                        .do((rainSchemas) => space.rainSchemas = rainSchemas.map(s => s.type))
+                        .do((rainSchemas) => {
+                            // debugger; 
+                            space.rainSchemas = rainSchemas.map(({type, dropCount}) => {return {type, dropCount}})
+                            // space.rainSchemas = rainSchemas.map((s) => {return {type: s.type, dropCount: s.dropCount}})
+                            // debugger;
+                        })
                         .switchMap(() => this.oauthService.getOauthSettings(space.name));
 
                     detailedSpaceInfo$.subscribe(settings => {

@@ -7,10 +7,8 @@ import * as _ from 'lodash';
 })
 export class OrderDropByPipe implements PipeTransform {
 
-  transform( array: any, field: string): any {
-    // console.log(array, orderPath);
-
-    return _.orderBy(array, (arr) => arr['content'][field], 'desc');
+  transform( array: any, fields: any, orders: any = ['desc']): any {
+    return _.orderBy(array, fields, orders);
   }
 
 }

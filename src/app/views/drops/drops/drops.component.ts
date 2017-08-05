@@ -15,34 +15,41 @@ export class DropsComponent implements OnInit, OnDestroy {
   @Input() public space: Space;
   protected drops;
   protected dropTypes;
+  protected rainSchemas;
   protected isLoading = false;
   public getDrops$: Observable<any> = new Observable<any>();
   public moreDrops$: Observable<any> = new Observable<any>();
   protected activeTab;
+      public model;
+
 
   constructor(private rainService: RainService, private spacesService: SpacesService) { }
 
   ngOnDestroy() {
-    this.rainService.drops[this.space.name] = null;
+    this.rainService.drops[this.space.name] = this.drops = null;
   }
 
   ngOnInit() {
 
-    this.dropTypes = this.rainService.rainSchemas.map(rain => rain.type);
-    this.getSomeDrops();
+    this.dropTypes = this.rainService.rainSchemas.map((rain, i) => rain.type);
+
+    this.getSomeDrops(this.dropTypes[0]);
 
   }
 
   private getSomeDrops(dropType = null): any {
-
-    const options = { limit: 3 };
+    
+    const options = { limit: 3, after: Date.now() };
     if (dropType) {
-      options['type'] = dropType || Object.keys(this.drops)[0];
+      options['type'] = dropType;
     }
 
     this.getDrops$ = this.rainService.getDrops(this.space.name, options).do((drops) => {
       this.drops = _.groupBy(drops, 'type');
-      this.activeTab =  dropType || Object.keys(this.drops)[0];
+      this.activeTab =  dropType;
+
+      // console.log(this.drops);
+      // debugger;
     });
 
     this.getDrops$.subscribe();
@@ -52,7 +59,7 @@ export class DropsComponent implements OnInit, OnDestroy {
   private getMoreDrops(type: string): any {
     this.isLoading = !this.isLoading;
     // debugger;
-    const after = _.minBy(this.drops[type], (o) => o['content']['date'])['content']['date'];
+    const after = _.minBy(this.drops[type], (o) => o['timestamp'])['timestamp'];
 
     this.moreDrops$ = this.rainService.getDrops(this.space.name, { limit: 3, type: type, after: after }).do((drops) => {
       this.drops = _.groupBy(drops, 'type');
@@ -60,41 +67,19 @@ export class DropsComponent implements OnInit, OnDestroy {
 
 
     this.moreDrops$.subscribe((newDrops) => {
-      // debugger;
-      this.rainService.sortDrops(newDrops, this.space.name);
 
       console.log(this.drops);
-      // this.drops[type] = [...drops];
+      
       this.isLoading = !this.isLoading;
     });
   }
 
   public setActiveTab(dropType: string): void {
-    this.activeTab = dropType;
+    this.activeTab = this.rainService.type = dropType;
+    this.rainService.drops[this.space.name] = null;
     this.getSomeDrops(dropType);
-    // this.activatedRoute.params['tab'] = this.activeTab;
+
   }
-
-  // private fetchNewDrops(type: string): any {
-  //   this.isLoading = !this.isLoading;
-  //   const dropSchema = this.rainService.rainSchemas.filter(rain => rain.type === type)[0];
-
-  //   const data = {
-  //     apiEndpointUrl: dropSchema.dropUrl,
-  //     action: 'drops.fetch',
-  //     contentPath: dropSchema.contentPath,
-  //     type: type,
-  //     space: this.space.name
-  //   }
-
-  //   const newDrops$ = this.spacesService.spaceEndpoint(this.space, data);
-
-  //   newDrops$.subscribe((newDrops) => {
-  //     const drops = this.rainService.sortDrops(newDrops, this.space.name);
-  //     this.drops[type] = [...drops];
-  //     this.isLoading = !this.isLoading;
-  //   });
-  // }
 
 
 }

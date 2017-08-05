@@ -16,7 +16,7 @@ const objectPath = require('object-path');
 })
 export class SpaceItemComponent implements OnInit, OnDestroy {
 
-    protected schema: any;
+    @Input() public schema: any;
     @Input() public properties: any[];
     @Input() public space: Space;
     @Input() public type: string;
@@ -29,19 +29,21 @@ export class SpaceItemComponent implements OnInit, OnDestroy {
                 public spacesService: SpacesService) {}
 
     ngOnInit() {
-        this.type = this.type.includes('.') ? this.type.split('.')[0] : this.type;
 
-       this.itemSchema$ = this[`${this.type}Service`].fetchSchema(this.space.name).do((rawSchema) => {
-            this.schema = rawSchema.length ? rawSchema[0] : rawSchema;
+       const schemaServiceName = this.type.includes('.') ? this.type.split('.')[0] : JSON.parse(JSON.stringify(this.type));
+       this.itemSchema$ = this.obsRx = this[`${schemaServiceName}Service`].fetchSchema(this.space.name).do((rawSchema) => {
+
             if (this.type === 'profile' && this.properties) {
-                console.log(this.properties);
+                // console.log(this.properties);
                 this.profileService.findSpaceLinks(this.properties, this.space);
-            } else if (this.type !== 'profile' && this.rainService.type.includes('rain')) {
-                this.properties = this.rainService.rain.filter(rain => rain.rainType === this.rainService.type)[0].properties;
-            }
-        });
+            } else if (this.type.includes('rain')) {
 
-        this.obsRx = this.itemSchema$.subscribe();
+                // debugger;
+                // console.log(this.schema);
+
+                this.properties = this.rainService.rain.filter(rain => rain.rainType === this.type)[0].properties;
+            }
+        }).subscribe();
     }
 
     ngOnDestroy() {

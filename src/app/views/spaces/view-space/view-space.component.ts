@@ -44,9 +44,8 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
     ngOnInit() {
         const spaceConfig$ = this.retrieveSpace$
             .switchMap(() => this.getProfile())
-            .mergeMap(() => this.getRawProfile())
-            .do((profileSchema) => {
-                this.profileSchema = new DimensionSchema(profileSchema['type'], profileSchema['content'], profileSchema['modified']);
+            .mergeMap((profileRes) => this.getRawProfile(profileRes))
+            .do((propertyBucket) => {
                 if (!this.space.oauth.connected) {
                     this.activeTab = 'space';
                 } else if (!this.rainService.rainSchemas.length) {
@@ -62,23 +61,20 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
             window.document.title = `${this.space.name} | view space`;
 
-                console.log(this.rainService);
-            // to know what's already selected and renamed
-            if (this.profileSchema.propertyBucket) {
-                this.profile.createPropertyBucket(this.profileSchema.propertyBucket);
-            }
         });
     }
 
     private getProfile(): any {
-        return this.profileService.getProfile(this.space.name).do((profile) => {
-            this.profile = new Profile(profile.space, profile.profile, profile.modified);
+        return this.profileService.getProfile(this.space.name).do((profileRes) => {
+            this.profile = new Profile(profileRes.space, profileRes.profile, profileRes.modified);
+            return profileRes;
         });
     }
 
-    private getRawProfile(): any {
+    private getRawProfile(profileRes): any {
         return this.profileService.fetchSchema(this.space.name).do((profileSchema) => {
             this.profileSchema = new DimensionSchema(profileSchema['type'], profileSchema['content'], profileSchema.modified);
+            this.profileSchema.propertyBucket = this.profileSchema.assignValues(profileRes.profile);
         });
     }
 
@@ -96,8 +92,6 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
     public setActiveTab(tabName: string): void {
         this.activeTab = tabName;
-
-        // this.activatedRoute.params['tab'] = this.activeTab;
     }
 
 }

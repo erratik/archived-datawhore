@@ -8,15 +8,12 @@ export class DimensionSchema {
                 public dropUrl?: string,
                 public contentPath?: string,
                 public id?: any,
+                public dropCount?: string,
                 public propertyBucket = null) {
 
-
-        if (!this.type.includes('rain')) {
-            this.propertyBucket = this.assignValues();
-        }
     }
 
-    public assignValues(schema = null, prefix = null) {
+    public assignValues(rainProperties = null, schema = null, prefix = null) {
         if (!schema) {
             schema = this.content || [];
             prefix = 'content';
@@ -27,10 +24,10 @@ export class DimensionSchema {
             const path = prefix + '.' + keyName;
             // todo: get the friendly names that already exist before rewriting them!
             const friendlyName = path.replace('.', '_').replace(prefix + '_', '');
-
+            // debugger;
             const obj = {
                 content: {
-                    enabled: false,
+                    enabled: !!(rainProperties && rainProperties.filter(({schemaPath}) => schemaPath === path).length),
                     label: keyName,
                     value: schema[keyName],
                     friendlyName: friendlyName,
@@ -40,7 +37,7 @@ export class DimensionSchema {
             };
 
             if (obj.grouped && obj.content['value'] !== null) {
-                obj.content['value'] = this.assignValues(obj.content['value'], path);
+                obj.content['value'] = this.assignValues(rainProperties, obj.content['value'], path);
             }
 
             if (schema[keyName] !== null) {

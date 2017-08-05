@@ -25,21 +25,20 @@ export class RainFormComponent extends DimensionFormComponent implements OnInit 
     }
 
     ngOnInit() {
-        this.rainService.rainSchemas[this.rainSchemaIndex].propertyBucket = this.rainService.rainSchemas[this.rainSchemaIndex].assignValues();
+        const rainSchema = this.rainService.rainSchemas[this.rainSchemaIndex];
+        const rain = this.rainService.rain.filter(({rainType}) => rainType === rainSchema.type)[0];
+        console.log(rain);
+        rainSchema.propertyBucket = rainSchema.assignValues(rain.properties);
 
-        const type = this.rainService.rainSchemas[this.rainSchemaIndex].type;
+        this.model = rainSchema.propertyBucket;
 
-        const matchedRain = this.rainService.rain.filter(rain => rain.rainType === type)[0];
-        matchedRain.createPropertyBucket(this.rainService.rainSchemas[this.rainSchemaIndex].propertyBucket);
-
-       this.model = this.rainService.rainSchemas[this.rainSchemaIndex].propertyBucket;
+        console.log(rainSchema);
 
     }
 
     protected saveRain(index): void {
         this.saveDimensions(this.model, index);
     }
-
 
 }
 

@@ -7,18 +7,15 @@
 
         <ul class="menu-list">
             <li *ngFor="let schema of rainSchemas">
-                <a (click)="setActiveTab(schema.type)" [class.is-active]="activeTab === schema?.type">
-                    {{schema.type}}
+                <a (click)="setActiveTab(schema?.type)" [class.is-active]="activeTab === schema?.type">
+                     {{schema?.type}} 
                 </a>
                 <ul>
-                    <li (click)="setActiveTab(schema?.type); activeSubTab = 'configs'" [class.is-bold]="activeTab === schema?.type && activeSubTab === 'configs'">
+                    <li (click)="activeSubTab = 'config'" [class.is-bold]="activeTab === schema?.type && activeSubTab === 'config'">
                         <a>config</a>
                     </li>
                     <li (click)="activeSubTab = 'structure'" [class.is-bold]="activeSubTab === 'structure'">
                         <a>structure</a>
-                    </li>
-                    <li (click)="activeSubTab = 'drops'" [class.is-bold]="activeSubTab === 'drops'">
-                        <a>drops</a>
                     </li>
                 </ul>
             </li>
@@ -32,8 +29,7 @@
         </div>
         <p>
             With social networks that only send one type of post, the default should be "<em>rain</em>".
-            <br>Whereas some networks have additional types of streams, i.e. <strong>facebook</strong> drops, would be <em> posts</em>
-            by default. But since it has other types of streams: <em>likes</em>,
+            <br>Whereas some networks have additional types of streams, i.e. <strong>facebook</strong> drops, would be <em> posts</em> by default. But since it has other types of streams: <em>likes</em>,
             <em>links</em>, etc.
             <br>Some networks <em>only</em> send different types, like <strong>tumblr</strong>, that sends things like <em>audio</em>,
             <em>text</em>, <em>photo</em>, etc.
@@ -78,8 +74,8 @@
                     <h3 class="is-pulled-left heading">{{schema.type}} Example</h3>
                 </div>
                 <hr>
-                <div class="example" *ngIf="getRainProperties(schema.type)">
-                    <datawhore-space-item [type]="schema.type" [space]="space"></datawhore-space-item>
+                <div class="example">
+                    <datawhore-space-item [type]="activeTab" [space]="space" [schema]="getSchemaByType(schema.type)"></datawhore-space-item>
                 </div>
             </div>
             <div class="column is-half">
@@ -87,23 +83,23 @@
                     <h3 class="is-pulled-left heading">{{schema.type}} Structure</h3>
                 </div>
                 <hr>
-                <div *ngIf="!getRainProperties(schema.type)">
-                    No <strong>{{schema.type}}</strong> configuration yet.
+                <div *ngIf="!getRainProperties(schema?.type)">
+                    No <strong>{{schema?.type}}</strong> configuration yet.
                 </div>
                 <div class="structure">
                     <ul>
-                        <li *ngFor="let property of getRainProperties(schema.type)">
+                        <li *ngFor="let property of getRainProperties(schema?.type)">
                             {{property.friendlyName}} ⇢ <cite>{{property.schemaPath}}</cite>
                         </li>
                     </ul>
-                    <p *ngIf="!getRainProperties(schema.type)">
-                        No <strong>{{schema.type}}</strong> properties yet
+                    <p *ngIf="!getRainProperties(schema?.type)">
+                        No <strong>{{schema?.type}}</strong> properties yet
                     </p>
                 </div>
 
             </div>
         </div>
-        <div class="column columns" *ngSwitchCase="schema?.type" [class.is-hidden]="activeSubTab !== '' && activeSubTab !== 'configs'">
+        <div class="column columns" *ngSwitchCase="schema?.type" [class.is-hidden]="activeSubTab !== 'config'">
 
             <div class="column is-half">
 
@@ -127,6 +123,29 @@
                     <div class="control has-addons">
                         <input #dropFetchUrl class="input is-expanded" type="text" placeholder="/v1/me/player/recently-played?limit=1" [(ngModel)]="schema.dropUrl">
                     </div>
+
+                    <div class="override-schema" [ngSwitch]="hasOverridePath(schema)">
+                    <!-- <div class="override-schema" *ngIf="overrideSchemaPath == ''"> -->
+                        <hr>
+                        <div *ngSwitchCase="false">
+
+                            <label class="label is-inline-flex">
+                                <a class="icon is-warning" (click)="toggleOverrideSchema =! toggleOverrideSchema"><i class="fa fa-gavel"></i></a>
+                                <span>Override object path to rain schema</span>
+                            </label>
+                            <div class="control" *ngIf="toggleOverrideSchema">
+                                
+                                <input #overrideRain class="input is-expanded" type="text" placeholder="Enter object path (a.b.c)" [(ngModel)]="schema.contentPath">
+                                <label class="checkbox">
+                                    <input type="checkbox" [(ngModel)]="overrideSchemaPath"> Override schema on save?
+                                </label>
+                            </div>
+                        </div>
+                        <div *ngSwitchDefault class="is-inline-flex">
+                            <label class="label">Schema Path</label>
+                             {{schema.contentPath}}
+                        </div>
+                    </div>
                 </div>
                 <hr>
                 <a class="button is-success" (click)="updateRainSchema($i, schema.type)">Update</a>
@@ -141,23 +160,8 @@
                 <hr>
                 <div class="configure-rain">
 
-                    <label class="label is-inline-flex">
-                        <a class="icon is-warning" (click)="toggleOverrideSchema =! toggleOverrideSchema"><i class="fa fa-gavel"></i></a>
-                        <span>Override object path to rain schema</span>
-                    </label>
-                    <div class="control" *ngIf="toggleOverrideSchema">
-                        <input #overrideRain class="input is-expanded" type="text" placeholder="Enter object path (a.b.c)" [(ngModel)]="schema.contentPath">
-                        <label class="checkbox">
-                            <input type="checkbox" [(ngModel)]="overrideSchemaPath"> Override schema on save?
-                        </label>
-                    </div>
 
-                    <datawhore-rain-form
-                        [rainSchemaIndex]="$i"
-                        [dimType]="schema.type"
-                        [space]="space"
-                        (onRainSchema)="updateRainSchema($event)"
-                        (onNewDimensions)="newDimensions($event, schema.type)">
+                    <datawhore-rain-form [rainSchemaIndex]="$i" [dimType]="schema.type" [space]="space" (onRainSchema)="updateRainSchema($event)" (onNewDimensions)="newDimensions($event, schema.type)">
                     </datawhore-rain-form>
                 </div>
             </div>

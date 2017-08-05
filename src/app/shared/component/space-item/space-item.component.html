@@ -1,11 +1,9 @@
-
 <table class="is-small">
     <tr *ngFor="let property of properties">
-        <td *ngIf="type === 'profile'"><a
-                class="fa icon is-small is-grey fa-{{isItemLinked(property) ? 'link is-success' : 'unlink'}}"
-               *ngIf="property.linkableToSpace && property.friendlyName !== 'name'"
-               (click)="linkItemToSpace(property)"></a></td>
-        <td>{{property.friendlyName}} </td>
-        <td>{{property.schemaPath | schemaValue:schema}}</td>
+        <td *ngIf="type === 'profile'">
+            <a class="fa icon is-small is-grey fa-{{isItemLinked(property) ? 'link is-success' : 'unlink'}}" *ngIf="property.linkableToSpace && property.friendlyName !== 'name'" (click)="linkItemToSpace(property)"></a>
+        </td>
+        <td>{{property.friendlyName}}</td>
+        <td>{{property.schemaPath | schemaValue:schema}} </td>
     </tr>
-</table>
+</table> 
