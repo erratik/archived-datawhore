@@ -20,7 +20,7 @@ export class DropsComponent implements OnInit, OnDestroy {
   public getDrops$: Observable<any> = new Observable<any>();
   public moreDrops$: Observable<any> = new Observable<any>();
   protected activeTab;
-      public model;
+  public model;
 
 
   constructor(private rainService: RainService, private spacesService: SpacesService) { }
@@ -30,7 +30,7 @@ export class DropsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-
+    console.log(this.rainService.rainSchemas);
     this.dropTypes = this.rainService.rainSchemas.map((rain, i) => rain.type);
 
     this.getSomeDrops(this.dropTypes[0]);

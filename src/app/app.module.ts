@@ -39,6 +39,7 @@ import { DropsComponent } from './views/drops/drops/drops.component';
 import { DropAtomicComponent } from './views/drops/drop-atomic/drop-atomic.component';
 import { KeyPipe } from './shared/pipes/key-pipe.pipe';
 import { OrderDropByPipe } from './shared/pipes/order-drop-by.pipe';
+import { ImageFigureComponent } from './shared/directives/image-figure/image-figure.component';
 
 const appRoutes: Routes = [
     {
@@ -93,7 +94,8 @@ const appRoutes: Routes = [
         DropAtomicComponent,
         ValuesPipe,
         KeyPipe,
-        OrderDropByPipe
+        OrderDropByPipe,
+        ImageFigureComponent
     ],
     providers: [
         SpacesService,

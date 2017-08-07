@@ -5,11 +5,20 @@
     display: block;
 }
 
-figure { flex: 0 0 16px; }
+figure { 
+    flex: 0 0 16px; 
+
+}
 .caption {
     margin: 0 1rem;
 }
 .date {
     color: fade(@black-ter, 50%);
-        flex: 0 0 180px;
+    flex: 0 0 180px;
+    margin-right: 3rem;
+}
+
+
+:host /deep/ .image.is-circle {
+    top: 3px;
 }

@@ -21,7 +21,7 @@
       </div>
       <hr>
       <div *ngIf="drops">
-        <datawhore-drop-atomic [drop]="drop" *ngFor="let drop of drops[dropType] | orderDropBy:['timestamp']"></datawhore-drop-atomic>
+         <datawhore-drop-atomic [type]="dropType" [drop]="drop" *ngFor="let drop of drops[dropType] | orderDropBy:['timestamp']"></datawhore-drop-atomic> 
       </div>
 
       <div *ngIf="!drops">

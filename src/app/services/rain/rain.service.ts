@@ -43,27 +43,22 @@ export class RainService extends SpaceItemService {
         return this.http.get(`${this.apiServer}/get/drops/${space}${queryObj}`)
             .map((res: Response) => {
                 const dropsResponse = res.json();
-                    if (!rainService.drops[space]) {
-                        rainService.drops[space] = [...dropsResponse.drops];
-                    }
-                    const spaceDrops = rainService.drops[space];
-                    const sortedDrops = rainService.sortDrops(space, rainService.type);
-                    rainService.drops[space] = !!rainService.drops && rainService.drops.length ? spaceDrops.push(sortedDrops) : sortedDrops;
-                console.log(rainService.drops);
-                // debugger;
-                // rainService.drops[space] = _.sortBy(this.drops[space], (o) => {
-                //     return Number(o['content']['date']);
-                // });
+                if (!rainService.drops[space]) {
+                    rainService.drops[space] = [];
+                }
+                rainService.drops[space] = rainService.drops[space].concat(rainService.sortDrops(space, rainService.type, dropsResponse.drops));
                 return rainService.drops[space];
             })
             .catch(this.handleError);
     }
 
-    public sortDrops(space, type): any {
-        return this.drops[space].map(drop => {
-            const dropProperties = this.rain.filter(rain => rain.rainType === type)[0].properties;
-
+    public sortDrops(space, type, drops = null): any {
+        if (!drops) {
+            drops = this.drops[space];
+        }
+        return drops.map(drop => {
             const content = {};
+            const dropProperties = this.rain.filter(rain => rain.rainType === type)[0].properties;
             dropProperties.forEach(prop => content[prop.friendlyName] = objectPath.get(drop, prop.schemaPath));
 
             return new Drop(space, drop.type, content, drop.timestamp);

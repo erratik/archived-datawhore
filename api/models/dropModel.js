@@ -174,6 +174,7 @@ const DropSchema = {
                     break;
                 case 'facebook':
                 case 'moves':
+                
                     dateFormat = moment.ISO_8601 + 'Z';
                     break;
                 default:

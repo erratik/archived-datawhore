@@ -11,10 +11,13 @@ export class DropAtomicComponent implements OnInit, OnDestroy {
 
 
   @Input() public drop: Drop;
+  @Input() public type: string;
+  protected spaceIconImage: string;
 
   constructor(private spaceItemService: SpaceItemService) {}
 
   ngOnInit() {
+    this.spaceIconImage = `public/uploads/${this.drop.space}/space/${this.drop.space}-icon.png`;
   }
 
   ngOnDestroy() {

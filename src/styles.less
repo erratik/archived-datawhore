@@ -86,23 +86,20 @@ figure {
   width: 100%;
 }
 
+// custom flex classes
 .is-flex {
   align-items: flex-start;
   &.center {
     align-items: center;
   }
+  .is-filling {
+      flex: 1 1 auto;
+  }
 }
 
-.section {
-  padding: 3rem 1.5rem 0;
-}
-
-.columns {
-  flex-wrap: wrap;
-}
-
-.is-inline-flex {
-  align-items: center;
+.is-flex-inline {
+    display: flex;
+    align-items: center;
 }
 
 .is-flex-vertical {
@@ -118,6 +115,14 @@ figure {
       word-wrap: break-word;
     }
   }
+}
+
+.section {
+  padding: 3rem 1.5rem 0;
+}
+
+.columns {
+  flex-wrap: wrap;
 }
 
 .item {
@@ -149,6 +154,16 @@ table {
       &:last-child {
         word-break: break-all;
       }
+    }
+  }
+}
+
+
+.breadcrumbs {
+  li:not(:last-child) {
+    &:after{
+      content: "/";
+      margin-right: 0.3rem;
     }
   }
 }

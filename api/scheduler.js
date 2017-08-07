@@ -100,8 +100,8 @@ module.exports = function(app, spaces, settings, schemaGroups) {
         });
     };
 
-    const shiftDrops = schedule.scheduleJob('*/1 * * * *', function() {
-        // const shiftDrops = schedule.scheduleJob('*/5 * * * *', function() {
+    // const shiftDrops = schedule.scheduleJob('*/1 * * * *', function() {
+        const shiftDrops = schedule.scheduleJob('*/5 * * * *', function() {
         fetchDrops();
         console.log(`💧 💧 💧 shifting older drops to the bottom until... 📅 ${endTime}`);
         console.log(``);
