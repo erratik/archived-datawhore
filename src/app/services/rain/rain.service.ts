@@ -26,9 +26,11 @@ export class RainService extends SpaceItemService {
             .map((res: Response) => {
                 const rainResponse = res.json();
                 const types =  _.groupBy(rainResponse.dimensions, 'type');
+                
+                
                 this.rain = this.rainSchemas.map(schema => new Rain(
                     space,
-                    types[schema.type].map((dims: RainDimension) => new RainDimension(dims.friendlyName, dims.schemaPath, dims.type)).filter(({type}) => schema.type === type),
+                    !!types[schema.type] ? types[schema.type].map((dims: RainDimension) => new RainDimension(dims.friendlyName, dims.schemaPath, dims.type)).filter(({type}) => schema.type === type) : [],
                     schema.type,
                     rainResponse.modified
                 ));
@@ -43,10 +45,11 @@ export class RainService extends SpaceItemService {
         return this.http.get(`${this.apiServer}/get/drops/${space}${queryObj}`)
             .map((res: Response) => {
                 const dropsResponse = res.json();
+                // debugger;
                 if (!rainService.drops[space]) {
                     rainService.drops[space] = [];
                 }
-                rainService.drops[space] = rainService.drops[space].concat(rainService.sortDrops(space, rainService.type, dropsResponse.drops));
+                rainService.drops[space] = rainService.drops[space].concat(rainService.sortDrops(space, rainService.type, dropsResponse));
                 return rainService.drops[space];
             })
             .catch(this.handleError);
@@ -60,10 +63,26 @@ export class RainService extends SpaceItemService {
             const content = {};
             const dropProperties = this.rain.filter(rain => rain.rainType === type)[0].properties;
             dropProperties.forEach(prop => content[prop.friendlyName] = objectPath.get(drop, prop.schemaPath));
-
-            return new Drop(space, drop.type, content, drop.timestamp);
+            debugger;
+            return new Drop(drop._id, space, drop.type, content, drop.timestamp);
         });
 
+    }
+
+
+    public deleteDrops(drops: [Drop], space): any {
+        // const bodyString = JSON.stringify(drops.map(drop => drop.id));
+
+        const headers = new Headers({'Content-Type': 'application/json'}); // ... Set content type to JSON
+        const options = new RequestOptions({
+            headers: headers,
+            body: drops.map(drop => drop.id),
+        }); // Create a request option
+
+        // return this.http.put(`${this.apiServer}/update/schema/${space}`).map((res: Response) => {
+        return this.http.delete(`${this.apiServer}/delete/drops/${space}`, options)
+            .map((res: Response) => res.json())
+            .catch(this.handleError);
     }
 
     public update(space: string, rain: any): Observable<any> {
@@ -79,5 +98,7 @@ export class RainService extends SpaceItemService {
             return res.json();
         }).catch(this.handleError);
     }
+
+
 
 }

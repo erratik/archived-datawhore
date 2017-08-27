@@ -20,35 +20,33 @@ const SchemaSchema = {
         schemas: [childSchema]
     },
     self: {
-        findSchema: function (spaceName, schemaType, cb) {
-            this.findOne({ space: spaceName }, function (err, docs) {
+        findSchema: function (params, cb) {
+            this.findOne({ space: params.space }, function (err, docs) {
                 if (!docs) {
                     var schema = new Schema({
-                        space: spaceName,
+                        space: params.space,
                         schemas: [{
-                            type: schemaType,
+                            type: params.type,
                             modified: Date.now()
                         }]
                     });
                     docs = {schemas: [schema]};
                 }
-                if (!schemaType.includes('rain')) {
+                if (!params.type.includes('rain')) {
                     cb(docs.schemas.filter(function (schema) {
-                        return schema.type === schemaType;
+                        return schema.type === params.type;
                     })[0]);
                 } else if (docs) { 
                     
-                        let schemas = docs.schemas.filter(schema => !!schema.type && schema.type.includes('rain'));
-                        
-                            Drop.countByTypes(spaceName, (types) => {
-                                
-                                schemas = schemas.map(schema => {
-                                    schema.dropCount =  types.filter(c => c.type === schema.type)[0].count;
-                                
-                                    return schema;
-                                });
-                                cb(schemas);
-                            });
+                    let schemas = docs.schemas.filter(schema => !!schema.type && schema.type.includes('rain'));
+                    
+                    Drop.countByTypes(params.space, (types) => {
+                        schemas = schemas.map(schema => {
+                            schema.dropCount =  types.filter(c => c.type === schema.type)[0] ? types.filter(c => c.type === schema.type)[0].count : 0;
+                            return schema;
+                        });
+                        cb(schemas);
+                    });
                             
                 }
              });

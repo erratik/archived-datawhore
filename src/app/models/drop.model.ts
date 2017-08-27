@@ -1,6 +1,8 @@
 
 export class Drop {
-    constructor(public space: string,
+    constructor(
+        public id: string,
+        public space: string,
         public type: string,
         public content: any,
         public timestamp: any) {

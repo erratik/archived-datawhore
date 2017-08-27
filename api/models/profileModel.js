@@ -10,10 +10,10 @@ var ProfileSchema = {
         profile: [dimensionSchema]
     },
     self: {
-        findProfile: function (spaceName, cb) {
-            this.find({ space: spaceName }, function (err, docs) {
+        findProfile: function (params, cb) {
+            this.find({ space: params.space }, function (err, docs) {
                 if (!docs.length) {
-                    docs = [{ space: spaceName, modified: Date.now() }];
+                    docs = [{ space: params.space, modified: Date.now() }];
                 }
                 cb(docs[0]);
             });

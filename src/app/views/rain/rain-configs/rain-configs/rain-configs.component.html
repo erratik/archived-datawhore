@@ -75,7 +75,7 @@
                 </div>
                 <hr>
                 <div class="example">
-                    <datawhore-space-item [type]="activeTab" [space]="space" [schema]="getSchemaByType(schema.type)"></datawhore-space-item>
+                    <datawhore-space-item [type]="activeTab" [space]="space" [schema]="getSchemaByType(schema?.type)"></datawhore-space-item>
                 </div>
             </div>
             <div class="column is-half">
@@ -135,7 +135,7 @@
                             </label>
                             <div class="control" *ngIf="toggleOverrideSchema">
                                 
-                                <input #overrideRain class="input is-expanded" type="text" placeholder="Enter object path (a.b.c)" [(ngModel)]="schema.contentPath">
+                                <input #overrideRain class="input is-expanded" type="text" placeholder="Enter object path (a.b.c)" [(ngModel)]="schema.newContentPath">
                                 <label class="checkbox">
                                     <input type="checkbox" [(ngModel)]="overrideSchemaPath"> Override schema on save?
                                 </label>

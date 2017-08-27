@@ -14,11 +14,24 @@
   <div class="is-flex" *ngSwitchCase="'moves'">
     <!--<i class="fa fa-{{drop.space}} icon is-small"></i>-->
     <!--{{drop.content.date }}-->
-    <div class="is-flex center date">
+    <div class="is-flex">
       <datawhore-image-figure [size]="16" [src]="spaceIconImage"></datawhore-image-figure>
-      <span class="">{{drop.timestamp | date:'short'}}</span>
     </div>
-    <span class="caption">{{drop.content.caption}}</span>
+    <div class="content is-filling">
+      Activities for {{drop.timestamp | amDateFormat:'dddd, MMMM Do YYYY'}}
+      <ul>
+        <li *ngFor="let ac of drop.content.activities">
+          <!-- <span class="icon">
+            <i class="fa fa-home"></i>
+          </span> -->
+          was <b>{{ac.activity}}</b> during <b>{{ac.duration | amDuration:'seconds'}}</b> over <em>{{ac.distance}}</em> meters
+        </li>
+      </ul>
+    </div>  
+    <div class="is-flex">
+      <!-- <span class="">{{drop.timestamp | date:'short'}}</span> -->
+      <a class="delete is-small" (click)="deleteDrop()"></a>
+    </div>
 
   </div>
 

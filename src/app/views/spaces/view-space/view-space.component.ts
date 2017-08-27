@@ -44,16 +44,14 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
     ngOnInit() {
         const spaceConfig$ = this.retrieveSpace$
             .switchMap(() => this.getProfile())
-            .mergeMap((profileRes) => this.getRawProfile(profileRes))
-            .do((propertyBucket) => {
+            .mergeMap(profileRes => this.getRawProfile(profileRes))
+            .switchMap(() => this.activatedRoute.params)
+            .do((params) => {
                 if (!this.space.oauth.connected) {
                     this.activeTab = 'space';
-                } else if (!this.rainService.rainSchemas.length) {
-                    this.activeTab = 'profile';
                 }
-                if (this.profile.properties) {
-                    this.activeTab = 'rain';
-                }
+                console.log(params);
+                this.activeTab = params['tab'];
             });
 
 

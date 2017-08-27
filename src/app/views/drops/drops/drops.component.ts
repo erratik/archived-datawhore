@@ -19,6 +19,7 @@ export class DropsComponent implements OnInit, OnDestroy {
   protected isLoading = false;
   public getDrops$: Observable<any> = new Observable<any>();
   public moreDrops$: Observable<any> = new Observable<any>();
+  public deleteDrops$: Observable<any> = new Observable<any>();
   protected activeTab;
   public model;
 
@@ -30,15 +31,13 @@ export class DropsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    console.log(this.rainService.rainSchemas);
     this.dropTypes = this.rainService.rainSchemas.map((rain, i) => rain.type);
-
     this.getSomeDrops(this.dropTypes[0]);
 
   }
 
   private getSomeDrops(dropType = null): any {
-    
+
     const options = { limit: 3, after: Date.now() };
     if (dropType) {
       options['type'] = dropType;
@@ -47,9 +46,7 @@ export class DropsComponent implements OnInit, OnDestroy {
     this.getDrops$ = this.rainService.getDrops(this.space.name, options).do((drops) => {
       this.drops = _.groupBy(drops, 'type');
       this.activeTab =  dropType;
-
-      // console.log(this.drops);
-      // debugger;
+      debugger;
     });
 
     this.getDrops$.subscribe();
@@ -58,7 +55,6 @@ export class DropsComponent implements OnInit, OnDestroy {
 
   private getMoreDrops(type: string): any {
     this.isLoading = !this.isLoading;
-    // debugger;
     const after = _.minBy(this.drops[type], (o) => o['timestamp'])['timestamp'];
 
     this.moreDrops$ = this.rainService.getDrops(this.space.name, { limit: 3, type: type, after: after }).do((drops) => {
@@ -67,9 +63,6 @@ export class DropsComponent implements OnInit, OnDestroy {
 
 
     this.moreDrops$.subscribe((newDrops) => {
-
-      console.log(this.drops);
-      
       this.isLoading = !this.isLoading;
     });
   }
@@ -79,6 +72,19 @@ export class DropsComponent implements OnInit, OnDestroy {
     this.rainService.drops[this.space.name] = null;
     this.getSomeDrops(dropType);
 
+  }
+
+  protected deleteDrop(drop): any {
+
+    this.deleteDrops$ = this.rainService.deleteDrops([drop], this.space.name).do((drops) => {
+      // this.drops = _.groupBy(drops, 'type');
+      console.log(drops)
+    debugger;
+    });
+
+    this.deleteDrops$.subscribe((newDrops) => {
+      this.isLoading = !this.isLoading;
+    });
   }
 
 

@@ -59,6 +59,20 @@ router
         postEndpoint(data, req.body.data, (resp) => {
             res.json(resp);
         })
+    })
+    .delete('/delete/:endpoint/:space', (req, res) => {
+
+        const data = {
+            space: req.params.space,
+            type: req.params.endpoint,
+            action: `${req.params.endpoint}.delete`
+        };
+
+        const dropIds = req.body;
+        
+        postEndpoint(data, dropIds, (resp) => {
+            res.json(resp);
+        })
     });
 
 // SPACES: ENDPOINTS TO GET DATA FROM SPACES (TWITTER, INSTAGRAM, ETC)
