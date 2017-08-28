@@ -22,12 +22,9 @@
       <hr>
       <div *ngIf="drops">
          <datawhore-drop-atomic [type]="dropType" [drop]="drop" *ngFor="let drop of drops[dropType] | orderDropBy:['timestamp']" (onRemove)="deleteDrop($event)"></datawhore-drop-atomic> 
-      </div>
+        </div>
 
-      <div *ngIf="!drops.length">
-        No <strong>{{dropType}}</strong> drops yet.
-      </div>
-      <hr>
+         <p *ngIf="!drops">No <strong>{{dropType}}</strong> drops yet.</pdiv>
     </div>
   </div>
 

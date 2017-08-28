@@ -1,6 +1,6 @@
 
 const Setting = require('../models/settingModel');
-const EndpointService = require('../services/endpoint.service');
+const EndpointController = require('../controllers/endpoint.controller');
 const passport = require('passport');
 const refresh = require('passport-oauth2-refresh');
 
@@ -13,7 +13,7 @@ module.exports = function (app) {
 
     const savePassport = (space, settings, extras, profile, done) => {
 
-        EndpointService.schema.write(space, profile, 'profile', function(schema) {
+        EndpointController.schema.write({space, type: 'profile'}, profile, function(schema) {
             console.log('connect profile saving', profile);
 
             settings.extras = Object.keys(extras).map(key => {

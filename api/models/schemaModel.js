@@ -65,25 +65,42 @@ const SchemaSchema = {
                 }
             });
         },
-        writeSchema: function (spaceName, schema, cb) {
+        // updateSchema: function (options, schema, cb) {
+
+        //     const that = this;
+        //     this.findOneAndUpdate(
+        //         { space: options.space, 'schemas.type': options.type },      
+        //         { $addToSet: { schemas: schema }  } , 
+        //         { upsert: true, returnNewDocument: true }, function (err, updated) {
+        //         if (err) cb(err);
+        //             debugger;
+        //     });
+
+        // },
+        writeSchema: function (options, schema, cb) {
             const that = this;
             const sid = new ObjectId(schema.id);
-            const squery = sid;
-            const query = schema.type === 'profile' ? { space: spaceName, 'schemas.type': schema.type } : { space: spaceName, 'schemas._id': sid };
-            const schemaQuery = schema.type === 'profile' ? { 'type': schema.type } : { '_id': sid };
+            const query = options.type === 'profile' ? { space: options.space, 'schemas.type': options.type } : { space: options.space, 'schemas._id': sid };
+            const schemaQuery = options.type === 'profile' ? { 'type': options.type } : { '_id': sid };
 
 
             const addSchema = function (callback) {
                 schema.modified = Date.now();
-                if (typeof schema.fetchUrl === 'object') {
+                if (!!schema.fetchUrl) {
                     schema.fetchUrl = schema.fetchUrl.apiEndpointUrl;
                 }
-                that.findOneAndUpdate({ space: spaceName }, { $push: { schemas: schema } }, { upsert: true, returnNewDocument: true }, function (err, updated) {
-                    if (err) cb(err);
-                    that.findOne({ space: spaceName, 'schemas.type': schema.type }, { 'schemas.$': 1 }, (err, docs) => {
-                        if (err) cb(err);
-                        cb(docs.schemas[0]);
-                    });
+                that.findOneAndUpdate({ space: options.space }, { $push: { schemas: schema } }, { upsert: true, returnNewDocument: true }, function (err, updated) {
+                    if (err) {
+                        cb(err);
+                    } else {
+                        that.findOne({ space: options.space, 'schemas.type': options.type }, { 'schemas.$': 1 }, (err, docs) => {
+                            if (err) {
+                                cb(err);
+                            } else {
+                                cb(docs.schemas[0]);
+                            }
+                        });
+                    }
                 });
             };
 

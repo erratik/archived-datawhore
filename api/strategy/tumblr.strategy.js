@@ -19,8 +19,8 @@ module.exports = function (app, space, passport, refresh, savePassport, Setting,
 
     });
 
-    app.get('/auth/${space}', passport.authenticate(space));
-    app.get('/auth/${space}/callback', passport.authenticate(space, {
+    app.get('/auth/tumblr', passport.authenticate('tumblr'));
+    app.get('/auth/tumblr/callback', passport.authenticate(space, {
         successRedirect: `${CLIENT_URL}/space/${space}`,
         failureRedirect: CLIENT_URL
     }));

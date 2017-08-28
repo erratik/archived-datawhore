@@ -38,7 +38,7 @@ export class DropsComponent implements OnInit, OnDestroy {
 
   private getSomeDrops(dropType = null): any {
 
-    const options = { limit: 3, after: Date.now() };
+    const options = { limit: 10, after: Date.now() };
     if (dropType) {
       options['type'] = dropType;
     }
@@ -46,7 +46,6 @@ export class DropsComponent implements OnInit, OnDestroy {
     this.getDrops$ = this.rainService.getDrops(this.space.name, options).do((drops) => {
       this.drops = _.groupBy(drops, 'type');
       this.activeTab =  dropType;
-      debugger;
     });
 
     this.getDrops$.subscribe();

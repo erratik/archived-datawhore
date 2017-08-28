@@ -18,12 +18,6 @@ const DropSchema = {
         space: String,  
         drops: [dropSchema]
     },
-    getSpaceId: (spaceName) => {
-        this.find({ space: spaceName}, function (err, docs) {
-            if (err) cb(err);
-            return docs;
-        });
-    },
     self: {
         getSpaceDrops: function (params, cb) {
         
@@ -35,10 +29,9 @@ const DropSchema = {
 
                     const dropDocId = result._id;
                     // debugger;
-                    let dropQuery = {}, limit;
-                    if (!!params.query && !!params.query.after) {
-                        dropQuery = {'drops.timestamp': { $lt: Number(params.query.after) }};
-                    }
+                    
+                    const dropQuery = (!!params.query && !!params.query.after) ? {'drops.timestamp': { $lt: Number(params.query.after) }} : {'drops.timestamp': { $lt: Date.now() }} ;
+                    
                     
                     let aggregation = {
                         base: [
@@ -66,13 +59,13 @@ const DropSchema = {
                         ]
                     };
 
-                    if (!!params.query && !!params.query.limit) {
-                        aggregation.base.splice(4, 0, { $limit: Number(params.query.limit)} );
-                    }
 
                     const options = !!params.type ? aggregation.getType : aggregation.getAll;
                     const query = aggregation.base.concat(options);
 
+                    if (!!params.query && !!params.query.limit) {
+                        query.splice(4, 0, { $limit: Number(params.query.limit)} );
+                    }
                     that.aggregate(query).exec(function (err, docs) {
                         if (err) cb(err);
                         if (!!docs) {
@@ -86,125 +79,11 @@ const DropSchema = {
                             cb(drops);
                         }
                     });
-                } else {
-                    cb([]);
                 }
 
             });
             
         },
-        // findDropSpace: (query, cb, cb2) => {
-        //     this.model('drops').findOne(query, function (err, docs) {
-
-        //         // docs.drops = docs.drops.length ? docs.drops.slice(0, limit) : [];
-        //         if (docs) {
-        //             objectId = docs.drops[0].ownerDocument()['_id'];
-        //         } else {
-
-        //             var drop = new Drop({
-        //                 space: space,
-        //                 drops: [{
-        //                     type: ''
-        //                 }]
-        //             });
-        //             docs = {drops: [drop]};
-
-        //         }
-
-
-        //         if (!cb2) {
-        //             cb(prepareDrops(options, docs));
-        //         } else {
-
-        //             cb2(docs, cb);
-        //         }
-        //     });
-        // },
-        // prepareDrops: (options, docs) => {
-        //     if (docs) {
-        //         docs.space = space;
-
-        //         docs.drops = options.type ? docs.drops.filter(d => d.type === options.type) : docs.drops;
-        //         docs.drops = _.sortBy(docs.drops, ['timestamp']).reverse();
-        //         docs.drops = docs.drops.slice(0, limit);
-        //     } else {
-        //         docs = [{ drops: [] }];
-        //     }
-        //     return docs;
-        // },
-        // findDrops: function (space, options, cb, isFetchingPast) {
-        //     const that = this;
-
-        //     const limit = options.limit ? options.limit : 5;
-        //     const after = options.after ? options.after : Date.now();
-
-        //     let query = { space: space };
-        //     let subQuery = {};
-        //     let objectId;
-
-            
-
-        //     if (options.type) {
-        //         // filtering by type
-        //         query['drops.type'] = options.type;
-        //         this.findOne(query, { 'drops.$': 1 }, function (err, docs) {
-        //             // docs = docs[0];
-        //             if (options.after) {
-        //                 // query['drops.timestamp'] = { $lt: Number(options.after) };
-        //                 findDropSpace(query, cb, (docs, cb) => {
-        //                     that.aggregate({ $match: { _id: objectId }},
-        //                     { $unwind: '$drops'},
-        //                     { $match: {'drops.timestamp': { $lt: Number(options.after) }}},
-        //                     { $group: {_id: '$_id', drops: {$push: '$drops'}}}, (err, docs) => {
-
-        //                         cb(prepareDrops(options, docs[0]));
-        //                     });
-        //                 });
-
-        //             } else {
-        //                 cb(prepareDrops(options, docs));
-        //             }
-
-        //         });
-
-
-        //     } else {
-
-        //         findDropSpace(query, cb);
-
-        //     }
-
-        // },
-        // fetchParams: function (options, isFetchingPast, cb) {
-
-        //     // this.findOne(query, function (err, docs) {
-        //     //     if (!docs) {
-        //     //         docs = [{ drops: [] }];
-        //     //     }
-        //     //     return FetchingService.compose(query., isFetchingPast, docs);
-        //     // });
-
-        //     // this.findDropSpace(options, cb, (docs, cb) => {
-        //         // this.aggregate({ $match: { type: options.type }},
-        //         // { $unwind: '$drops'},
-        //         // { $match: {'drops.timestamp': { $lt: Number(options.after) }}},
-        //         // { $group: {_id: '$_id', drops: {$push: '$drops'}}}, (err, docs) => {
-
-        //         //     cb(prepareDrops(options, docs[0]));
-        //         // });
-
-        //         this.aggregate({ $match: { space: options.space }},
-        //         { $unwind: '$drops'},
-        //         { $match: {'drops.timestamp': { $lt: Date.now() }, 'drops.type': options.type  }},
-        //         { $group: {_id: '$_id', drops: {$push: '$drops'}}}, (err, docs) => {
-        //             if (err) cb(err);
-        //             const drops = !!docs[0] ? docs[0].drops : [];
-        //             console.log(`[fetchParams] ${drops.length} ${options.type} drops in ${options.space}`);
-        //             cb(drops);
-        //         });
-        //     // });
-
-        // },
         findAll: function (options, cb) {
             
             const query = options;
@@ -244,11 +123,11 @@ const DropSchema = {
         removeDrops: function (space, dropIds, cb) {
             var query = { space: space};
             const drops = dropIds.map(drop => ObjectId(drop));
-            this.update(query, { $pull: { 'drops': {$in: drops}  } }, { multi: true }, function (error, _updated) {
-                if (_updated.ok) {
-                    cb('');
-                }
-            });
+            // this.update(query, { $pull: { 'drops': {$in: drops}  } }, { multi: true }, function (error, _updated) {
+            //     if (_updated.ok) {
+            //         cb('');
+            //     }
+            // });
         },
         writeDrops: function (space, drops, type, cb) {
             const query = { space: space, 'drops.type': type };

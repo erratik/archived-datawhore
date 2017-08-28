@@ -35,7 +35,7 @@ module.exports = function (app, spaces, settings, schemaGroups) {
     });
 
     schemaGroups = schemaGroups.map(s => s.schemas.filter(o => {
-        if (o.type.includes('rain')) {
+        if (!!o.type && o.type.includes('rain')) {
             schemas[s.space].push(o);
             return o;
         }
@@ -92,11 +92,11 @@ module.exports = function (app, spaces, settings, schemaGroups) {
         
         Drop.getSpaceDrops(options, (drops) => {
             const urlParams = FetchingService.composeParams(options, drops);
-            if (options.isFetchingPast) {
-                console.log('🔄 [initFetch] FETCHING PAST');
-            } else {
-                console.log('🔄 [initFetch] FETCHING FUTURE');
-            }
+            // if (options.isFetchingPast) {
+            //     console.log('🔄 [initFetch] FETCHING PAST');
+            // } else {
+            //     console.log('🔄 [initFetch] FETCHING FUTURE');
+            // }
             // console.log('🔄 [initFetch -> getSpaceDrops]', options.space, options.type, urlParams);
             // debugger;
             options.urlParams = urlParams;
@@ -132,7 +132,7 @@ module.exports = function (app, spaces, settings, schemaGroups) {
     
     const dropCallback = (options, dropCount, cbOptions) => {
 
-        console.log(`🔄 [namespace service] fetching for ${options.type} on ${options.space}`);
+        // console.log(`🔄 [namespace service] fetching for ${options.type} on ${options.space}`);
 
         if (options.isFetchingPast) {
 
@@ -150,7 +150,7 @@ module.exports = function (app, spaces, settings, schemaGroups) {
 
         messageTotal(dropCount, options.space, dropCountLastRun);
         if (cbOptions) {
-            console.log(`🔄 [namespace service] running ${cbOptions.type} on ${cbOptions.space} next`);
+            // console.log(`🔄 [namespace service] running ${cbOptions.type} on ${cbOptions.space} next`);
             initFetch(cbOptions);
         }
 

@@ -31,8 +31,8 @@ export class ProfileFormComponent extends DimensionFormComponent implements OnIn
 
     protected saveRawProfile(schema): any {
 
-        schema = objectPath.get(this.model, `content.${schema}`);
-        const profileSchema$ = this.profileService.updateSchema(this.space.name, schema).do((profileSchema) => {
+        this.model = objectPath.get(this.model, `content.${schema}`);
+        const profileSchema$ = this.profileService.updateSchema(this.space.name, this.model).do((profileSchema) => {
             this.onProfileSchema.emit(new DimensionSchema(profileSchema['type'], profileSchema['content'], profileSchema.modified));
         });
 
