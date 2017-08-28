@@ -7,7 +7,7 @@ const objectPath = require('object-path');
 export class SchemaValuePipe implements PipeTransform {
 
   transform(value: any, schema): any {
-    schema.content = typeof schema.content === 'string' ? JSON.parse(schema.content) : schema.content;
+    schema.content = !!schema.content && typeof schema.content === 'string' ? JSON.parse(schema.content) : schema.content;
     const resolvedVal = objectPath.get(schema, value);
     return typeof resolvedVal === 'object' ? JSON.stringify(resolvedVal) : resolvedVal;
   }

@@ -1,3 +1,4 @@
+import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { RainFormComponent } from '../../rain-form/rain-form.component';
 import {
@@ -28,16 +29,17 @@ const objectPath = require('object-path');
 export class RainConfigsComponent implements OnChanges, OnInit {
 
     public rainSchemas: any[] = [];
-    protected rain: Rain[] = [];
-    @Input() protected newDimensions: () => {};
-    @Input() protected spaceOauthSettings;
-    @Input() protected space: Space;
-    @ViewChild(RainFormComponent) protected rainForm: RainFormComponent;
+    public rain: Rain[] = [];
+    @Input() public newDimensions: () => {};
+    @Input() public spaceOauthSettings;
+    @Input() public space: Space;
+    @ViewChild(RainFormComponent) public rainForm: RainFormComponent;
+    public getRainSchemas$ = new Observable<any>();
 
-    protected activeTab: string;
-    protected activeSubTab = 'configs';
-    protected isFetchingSchema = false;
-    protected hasSchemas = false;
+    public activeTab: string;
+    public activeSubTab = 'configs';
+    public isFetchingSchema = false;
+    public hasSchemas = false;
 
     public newRainType: string;
     public newRainFetchUrl: string;
@@ -46,17 +48,17 @@ export class RainConfigsComponent implements OnChanges, OnInit {
     public overrideSchemaPath: boolean;
     public newContentPath: string;
 
-    constructor(private spacesService: SpacesService,
-        private spaceItemService: SpaceItemService,
-        private activatedRoute: ActivatedRoute,
-        private rainService: RainService) { }
+    constructor(public spacesService: SpacesService,
+        public spaceItemService: SpaceItemService,
+        public activatedRoute: ActivatedRoute,
+        public rainService: RainService) { }
 
     ngOnInit() {
 
-        const getRainSchemas$ = this.getRawRain()
+        this.getRainSchemas$ = this.getRawRain()
             .switchMap(() => this.getRain());
 
-        getRainSchemas$.subscribe(() => {
+        this.getRainSchemas$.subscribe(() => {
             this.activeTab = this.rainSchemas.length ? this.rainSchemas[0].type : this.activeTab;
             this.rainSchemas = this.rainService.rainSchemas;
             this.rain = this.rainService.rain;
@@ -77,14 +79,14 @@ export class RainConfigsComponent implements OnChanges, OnInit {
         // this.getActiveTab();
     }
 
-    private getRain(): any {
+    public getRain(): any {
         // debugger;
         return this.rainService.getRain(this.space.name).do((rain) => {
             // console.log(rain);
         });
     }
 
-    private getRawRain(): any {
+    public getRawRain(): any {
         return this.spaceItemService.fetchSchema(this.space.name, 'rain').do((rain) => {
             this.rainService.rainSchemas = rain.map(rainSchema => this.toSchema(rainSchema));
             this.getActiveTab();
@@ -92,11 +94,11 @@ export class RainConfigsComponent implements OnChanges, OnInit {
         });
     }
 
-    protected getSchemaByType(schemaType): any {
+    public getSchemaByType(schemaType): any {
         return this.rainSchemas.filter(({type}) => type === schemaType)[0];
     }
 
-    protected writeRain(index: number, type: any = 'rain'): any {
+    public writeRain(index: number, type: any = 'rain'): any {
 
         this.isFetchingSchema = true;
 
@@ -119,7 +121,7 @@ export class RainConfigsComponent implements OnChanges, OnInit {
 
     }
 
-    protected updateRainSchema(index: number, type: string): any {
+    public updateRainSchema(index: number, type: string): any {
 
         this.isFetchingSchema = true;
 
@@ -141,7 +143,7 @@ export class RainConfigsComponent implements OnChanges, OnInit {
         });
     }
 
-    private toSchemas(updatedSchema: any, overrideRainName: string): void {
+    public toSchemas(updatedSchema: any, overrideRainName: string): void {
         if (_.some(this.rainService.rainSchemas, { type: updatedSchema.type })) {
             this.rainService.rainSchemas = this.rainService.rainSchemas.map(s => {
                 if (s.type === updatedSchema.type) {
@@ -156,7 +158,7 @@ export class RainConfigsComponent implements OnChanges, OnInit {
         this.overrideRainName[updatedSchema.type] = updatedSchema.type;
     }
 
-    private toSchema(preSchema): DimensionSchema {
+    public toSchema(preSchema): DimensionSchema {
         this.overrideRainName[preSchema.type] = preSchema.type;
         this.overrideSchemaPath = null;
         if (typeof preSchema.content === 'string') {
@@ -198,7 +200,7 @@ export class RainConfigsComponent implements OnChanges, OnInit {
         // debugger;
     }
 
-    protected getActiveTab(): any {
+    public getActiveTab(): any {
         // debugger;
         const activeTab = this.rainService.rainSchemas.length ? this.rainService.rainSchemas[0].type : 'new-schema';
         // this.activatedRoute.params['tab'] = activeTab;
@@ -206,7 +208,7 @@ export class RainConfigsComponent implements OnChanges, OnInit {
 
     }
 
-    protected getRainProperties(rainType: string): any {
+    public getRainProperties(rainType: string): any {
         const schema = this.rainService.rain.filter(r => r.rainType === rainType)[0];
         // if (schema) {
         //     return this.rainService.rain.filter(r => r.rainType === rainType)[0].properties;
@@ -214,7 +216,7 @@ export class RainConfigsComponent implements OnChanges, OnInit {
         return schema ? schema.properties : [];
     }
 
-    protected hasOverridePath(schema): boolean {
+    public hasOverridePath(schema): boolean {
         // const schema = this.rainService.rain.filter(r => r.rainType === rainType)[0];
         // // if (schema) {
         // //     return this.rainService.rain.filter(r => r.rainType === rainType)[0].properties;

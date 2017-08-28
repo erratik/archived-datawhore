@@ -24,10 +24,11 @@ export class DimensionSchema {
             const path = prefix + '.' + keyName;
             // todo: get the friendly names that already exist before rewriting them!
             const friendlyName = path.replace('.', '_').replace(prefix + '_', '');
-            // debugger;
+            
+            const matchedDimension = rainProperties.filter(({schemaPath}) => schemaPath === path);
             const obj = {
                 content: {
-                    enabled: !!(rainProperties && rainProperties.filter(({schemaPath}) => schemaPath === path).length),
+                    enabled: !!(rainProperties && matchedDimension.length),
                     label: keyName,
                     value: schema[keyName],
                     friendlyName: friendlyName,
@@ -35,6 +36,11 @@ export class DimensionSchema {
                 },
                 grouped: typeof schema[keyName] === 'object'
             };
+
+            if (!!matchedDimension.length) {
+                obj.content['id'] = matchedDimension[0].id;
+                obj.content['friendlyName'] = matchedDimension[0].friendlyName;
+            }
 
             if (obj.grouped && obj.content['value'] !== null) {
                 obj.content['value'] = this.assignValues(rainProperties, obj.content['value'], path);

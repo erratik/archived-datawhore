@@ -11,11 +11,14 @@ var ProfileSchema = {
     },
     self: {
         findProfile: function (params, cb) {
-            this.find({ space: params.space }, function (err, docs) {
-                if (!docs.length) {
-                    docs = [{ space: params.space, modified: Date.now() }];
-                }
-                cb(docs[0]);
+            const query = !!params.space ? { space: params.space } : {};
+            if (typeof params === 'string') {
+                query.space = params.space = params;
+            } 
+            
+            this.find(query, function (err, docs) {
+                docs = docs.length ? docs[0] : [];
+                cb(docs);
             });
         },
         writeProfile: function (spaceName, profileBucket, cb) {

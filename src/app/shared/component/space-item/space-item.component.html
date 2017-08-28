@@ -1,4 +1,4 @@
-<table class="is-small">
+<table class="is-small" *ngIf="schema">
     <tr *ngFor="let property of properties">
         <td *ngIf="type === 'profile'">
             <a class="fa icon is-small is-grey fa-{{isItemLinked(property) ? 'link is-success' : 'unlink'}}" *ngIf="property.linkableToSpace && property.friendlyName !== 'name'" (click)="linkItemToSpace(property)"></a>

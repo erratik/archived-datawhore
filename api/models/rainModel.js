@@ -1,5 +1,7 @@
 var mongoose = require('mongoose');
+const ObjectId = require('mongodb').ObjectId;
 var _ = require('lodash');
+
 var dimensionSchema = new mongoose.Schema({
     type: String,
     friendlyName: String,
@@ -24,29 +26,37 @@ var RainSchema = {
                 cb(rain);
             });
         },
-        updateRain: function (space, dimensions, rainType, cb) {
+        updateRain: function (options, dimensions, cb) {
 
-            const dimType = rainType;
-            const query = { space: space, 'dimensions.type': dimType };
+            const dimType = options.type;
+            const query = { space: options.space, 'dimensions.type': dimType };
 
-            var that = this;
-            let existingDims = [];
-            var addSchema = function (callback) {
+                var that = this;
+                let existingDims = [];
+                var addSchema = function (callback) {
+                    // dimensions = dimensions.map(dim => {
+                    //     dim._id = new ObjectId(dim.id);
+                    //     return dim;
+                    // });
 
-                that.findOneAndUpdate({ space: space }, { dimensions: dimensions.concat(existingDims) }, { upsert: true, returnNewDocument: true }, function (err, updated) {
-                    that.find(query, { 'dimensions.$': 1 }, (err, docs) => {
-                        if (err) cb(err);
-                        if (updated) {
-                            updated.dimensions = docs[0].dimensions;
-                        } else {
-                            updated = {space: space, dimensions: []};
-                        }
-                        cb(updated);
+                    that.findOneAndUpdate(
+                        { space: options.space}, 
+                        { $addToSet: {dimensions: { $each: dimensions.concat(existingDims) } } }, 
+                        { upsert: true, returnNewDocument: true, multi: true },  function (err, updated) {
+                            that.find(query, { 'dimensions.$': 1 }, (err, docs) => {
+                                if (err) cb(err);
+                                if (updated) {
+                                    updated.dimensions = docs[0].dimensions;
+                                } else {
+                                    updated = {space: options.space, dimensions: []};
+                                }
+                                cb(updated);
+                            });
+                            
                     });
-                });
-            };
+                };
 
-            this.findOne({ space: space }, function (errata, dimList) {
+            this.findOne({ space: options.space }, function (errata, dimList) {
 
                 existingDims = dimList ? dimList.dimensions.filter(dim => dim.type !== dimType) : existingDims;
 
@@ -64,6 +74,7 @@ var RainSchema = {
                     }
                 });
             });
+
 
         }
     }

@@ -1,3 +1,4 @@
+import { SpaceOauthSettings } from '../../../models/space-settings.model';
 
 import { SpaceItemComponent } from '../../../shared/component/space-item/space-item.component';
 import {Component, OnInit, ViewChild} from '@angular/core';
@@ -13,6 +14,7 @@ import {Profile} from '../../../models/profile.model';
 import {Rain, RainDimension} from '../../../models/rain.model';
 import {SpaceItemService} from '../../../shared/services/space-item/space-item.service';
 import {RainService} from '../../../services/rain/rain.service';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'datawhore-view-space',
@@ -20,61 +22,56 @@ import {RainService} from '../../../services/rain/rain.service';
     styleUrls: ['view-space.component.less']
 })
 
-export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
+export class SpaceViewComponent implements OnInit {
 
     public space: Space;
-    public rain: Array<Rain> = [];
-    public profile: Profile;
-    public profileSchema: DimensionSchema;
-    protected isFetchingSchema = false;
-    protected hasDrops = false;
-    protected overrideSchemaPath: string = null;
+    // public rain: Array<Rain> = [];
+    // public profile: Profile;
+    // public profileSchema: DimensionSchema;
+    // protected isFetchingSchema = false;
+    // protected hasDrops = false;
+    // protected overrideSchemaPath: string = null;
     protected activeTab = 'rain';
-    @ViewChild(SpaceItemComponent) protected profileComponent;
+    protected params = null;
+    public retrieveSpace$: Observable<any> = new Observable<any>();
 
-    constructor(spacesService: SpacesService,
-                oauthService: OauthSettingsService,
-                spaceItemService: SpaceItemService,
-                profileService: ProfileService,
-                rainService: RainService,
-                activatedRoute: ActivatedRoute) {
-        super(spacesService, oauthService, spaceItemService, profileService, rainService, activatedRoute);
+    // @ViewChild(SpaceItemComponent) protected profileComponent;
+
+    constructor(private spacesService: SpacesService,
+                private oauthService: OauthSettingsService,
+                private activatedRoute: ActivatedRoute) {
     }
 
     ngOnInit() {
-        const spaceConfig$ = this.retrieveSpace$
-            .switchMap(() => this.getProfile())
-            .mergeMap(profileRes => this.getRawProfile(profileRes))
-            .switchMap(() => this.activatedRoute.params)
-            .do((params) => {
-                if (!this.space.oauth.connected) {
-                    this.activeTab = 'space';
-                }
-                console.log(params);
-                this.activeTab = params['tab'];
-            });
+
+        this.retrieveSpace$ = this.activatedRoute.params.do(params => {
+            this.params = params;
+            return params;
+        })
+        .mergeMap(params => this.spacesService.getSpace(params['space']))
+        .do(space => {
+            this.space = space;
+            return space;
+        })
+        .switchMap(space => this.oauthService.getOauthSettings(space.name))
+        .do(oauth => {
+            // this.space = this.params['space'];
+                this.space.oauth = oauth;
+                // if (!this.space.oauth.connected) {
+                //     this.activeTab = 'space';
+                // }
+                console.log(this.params);
+                this.activeTab = this.params['tab'];
+        });
 
 
-        spaceConfig$.subscribe(() => {
+        this.retrieveSpace$.subscribe(() => {
 
             window.document.title = `${this.space.name} | view space`;
 
         });
     }
 
-    private getProfile(): any {
-        return this.profileService.getProfile(this.space.name).do((profileRes) => {
-            this.profile = new Profile(profileRes.space, profileRes.profile, profileRes.modified);
-            return profileRes;
-        });
-    }
-
-    private getRawProfile(profileRes): any {
-        return this.profileService.fetchSchema(this.space.name).do((profileSchema) => {
-            this.profileSchema = new DimensionSchema(profileSchema['type'], profileSchema['content'], profileSchema.modified);
-            this.profileSchema.propertyBucket = this.profileSchema.assignValues(profileRes.profile);
-        });
-    }
 
     protected updateSpace(space: Space = this.space): void {
         this.spacesService.updateSpace(space).subscribe();
@@ -90,6 +87,7 @@ export class SpaceViewComponent extends SpaceConfigComponent implements OnInit {
 
     public setActiveTab(tabName: string): void {
         this.activeTab = tabName;
+        this.activatedRoute.params['tab'] = tabName;
     }
 
 }

@@ -26,11 +26,11 @@ var SpaceSchema = {
             Profile.removeProfile(name, function () { });
             this.remove({ name: name }, cb);
         },
-        updateSpace: function (space, update, cb) {
+        updateSpace: function (params, update, cb) {
             update.modified = Date.now();
             update.$currentDate = { lastModified: true};
             
-            this.findOneAndUpdate({ name: space }, update, { upsert: true, returnNewDocument: true }, (err, updated) => cb(updated));
+            this.findOneAndUpdate({ name: params.space }, update, { upsert: true, returnNewDocument: true }, (err, updated) => cb(updated));
         }
     },
     

@@ -28,6 +28,7 @@ export class RainFormComponent extends DimensionFormComponent implements OnInit 
         const rainSchema = this.rainService.rainSchemas[this.rainSchemaIndex];
         const rain = this.rainService.rain.filter(({rainType}) => rainType === rainSchema.type)[0];
         console.log(rain);
+        debugger;
         rainSchema.propertyBucket = rainSchema.assignValues(rain.properties);
 
         this.model = rainSchema.propertyBucket;

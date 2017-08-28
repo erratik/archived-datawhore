@@ -26,14 +26,14 @@ export class RainService extends SpaceItemService {
             .map((res: Response) => {
                 const rainResponse = res.json();
                 const types =  _.groupBy(rainResponse.dimensions, 'type');
-                
-                
+
                 this.rain = this.rainSchemas.map(schema => new Rain(
                     space,
-                    !!types[schema.type] ? types[schema.type].map((dims: RainDimension) => new RainDimension(dims.friendlyName, dims.schemaPath, dims.type)).filter(({type}) => schema.type === type) : [],
+                    !!types[schema.type] ? types[schema.type].map((dims: RainDimension) => new RainDimension(dims.friendlyName, dims.schemaPath, dims.type, dims['_id'])).filter(({type}) => schema.type === type) : [],
                     schema.type,
                     rainResponse.modified
                 ));
+                // debugger;
                 return this.rain;
             })
             .catch(this.handleError);
@@ -49,13 +49,13 @@ export class RainService extends SpaceItemService {
                 if (!rainService.drops[space]) {
                     rainService.drops[space] = [];
                 }
-                rainService.drops[space] = rainService.drops[space].concat(rainService.sortDrops(space, rainService.type, dropsResponse));
+                rainService.drops[space] = rainService.drops[space].concat(rainService.enrichDrops(space, rainService.type, dropsResponse));
                 return rainService.drops[space];
             })
             .catch(this.handleError);
     }
 
-    public sortDrops(space, type, drops = null): any {
+    private enrichDrops(space, type, drops = null): any {
         if (!drops) {
             drops = this.drops[space];
         }
@@ -63,7 +63,6 @@ export class RainService extends SpaceItemService {
             const content = {};
             const dropProperties = this.rain.filter(rain => rain.rainType === type)[0].properties;
             dropProperties.forEach(prop => content[prop.friendlyName] = objectPath.get(drop, prop.schemaPath));
-            debugger;
             return new Drop(drop._id, space, drop.type, content, drop.timestamp);
         });
 

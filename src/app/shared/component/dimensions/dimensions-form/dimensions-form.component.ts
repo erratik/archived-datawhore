@@ -1,7 +1,8 @@
+
 import {Component, Input, EventEmitter, Output} from '@angular/core';
 import {Space} from '../../../../models/space.model';
 import {Dimension} from '../../../../models/profile.model';
-import {RainDimension} from '../../../../models/rain.model';
+import { Rain, RainDimension } from '../../../../models/rain.model';
 import {ProfileService} from '../../../../services/profile/profile.service';
 import {RainService} from '../../../../services/rain/rain.service';
 import {SpacesService} from '../../../../services/spaces.service';
@@ -15,7 +16,8 @@ import * as _ from 'lodash';
 export class DimensionFormComponent {
 
     public initialModel: string;
-    public dims: Dimension[] = [];
+    public dims: Dimension[] = []; // temp
+    public rain: Rain[];
     @Input() public space: Space;
     @Input() public model: any;
     @Input() public dimType: string;
@@ -23,7 +25,9 @@ export class DimensionFormComponent {
 
     constructor(public profileService?: ProfileService,
                 public rainService?: RainService,
-                public spacesService?: SpacesService) {}
+                public spacesService?: SpacesService) {
+                this.rain  = this.rainService.rain.filter(({rainType}) => rainType ===  this.rainService.type);
+    }
 
     public haveDimsChanged(): boolean {
         return JSON.stringify(this.model) !== this.initialModel;
@@ -35,9 +39,10 @@ export class DimensionFormComponent {
         const dimSubType = this.rainService.type;
         this.dimType = this.dimType.includes('.') ? this.dimType.split('.')[0] : this.dimType;
 
+                debugger;
         const dimensions$ = this[`${this.dimType}Service`].update(this.space.name, this.prepareDimensions(dimSubType), propertyBucket).do((dims) => {
             if (this.dimType === 'rain') {
-                this.dims = dims.map(dim => new RainDimension(dim.friendlyName, dim.schemaPath, dim.type));
+                this.dims = dims.map(dim => new RainDimension(dim.friendlyName, dim.schemaPath, dim.type, dims._id));
             } else {
                 this.dims = dims.map(dim => new Dimension(dim.friendlyName, dim.schemaPath, dim.type));
             }
@@ -73,12 +78,13 @@ export class DimensionFormComponent {
             });
             return this.dims;
         };
-
         return groupEnabled(propertyBucket).map(dims => {
+        debugger;
             return {
                 friendlyName: dims.friendlyName,
                 schemaPath: dims.schemaPath,
-                type: type
+                type: type,
+                id: dims['id']
             };
         });
 

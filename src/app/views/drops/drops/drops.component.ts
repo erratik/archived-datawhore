@@ -1,3 +1,6 @@
+import { ActivatedRoute } from '@angular/router';
+import { RainConfigsComponent } from '../../rain/rain-configs/rain-configs/rain-configs.component';
+import { SpaceItemService } from '../../../shared/services/space-item/space-item.service';
 import { SpacesService } from '../../../services/spaces.service';
 import { RainService } from '../../../services/rain/rain.service';
 import { Space } from '../../../models/space.model';
@@ -10,31 +13,71 @@ import * as _ from 'lodash';
   templateUrl: './drops.component.html',
   styleUrls: ['./drops.component.less']
 })
-export class DropsComponent implements OnInit, OnDestroy {
+export class DropsComponent extends RainConfigsComponent implements OnInit, OnDestroy {
 
   @Input() public space: Space;
-  protected drops;
-  protected dropTypes;
-  protected rainSchemas;
-  protected isLoading = false;
+  public drops;
+  public dropTypes;
+  // public rainSchemas;
+  public rain;
+  public isLoading = false;
   public getDrops$: Observable<any> = new Observable<any>();
   public moreDrops$: Observable<any> = new Observable<any>();
   public deleteDrops$: Observable<any> = new Observable<any>();
-  protected activeTab;
+  public activeTab;
   public model;
 
+  public overrideRainName: any = {};
 
-  constructor(private rainService: RainService, private spacesService: SpacesService) { }
+  constructor(spacesService: SpacesService,
+  spaceItemService: SpaceItemService,
+    activatedRoute: ActivatedRoute,
+    rainService: RainService) {
+      super(spacesService, spaceItemService, activatedRoute, rainService);
+  }
 
   ngOnDestroy() {
     this.rainService.drops[this.space.name] = this.drops = null;
   }
 
   ngOnInit() {
-    this.dropTypes = this.rainService.rainSchemas.map((rain, i) => rain.type);
-    this.getSomeDrops(this.dropTypes[0]);
 
+    this.getRainSchemas$ = this.getRawRain()
+    .switchMap(() => this.getRain());
+
+    this.getRainSchemas$.subscribe(() => {
+        this.activeTab = this.rainSchemas.length ? this.rainSchemas[0].type : this.activeTab;
+        this.rainSchemas = this.rainService.rainSchemas;
+        this.rain = this.rainService.rain;
+
+        if (this.rainSchemas.length) {
+            this.rainService.type = this.rainSchemas[0].type;
+            this.rainService.rainSchemas = this.rainService.rainSchemas.map(rainSchema => {
+                this.overrideRainName[rainSchema.type] = rainSchema.type;
+                return rainSchema;
+            });
+            this.dropTypes = this.rainService.rainSchemas.map((rain, i) => rain.type);
+            this.getSomeDrops(this.dropTypes[0]);
+            // console.log(this.rainSchemas);
+        }
+    });
   }
+
+
+//   private getRain(): any {
+//     // debugger;
+//     return this.rainService.getRain(this.space.name).do((rain) => {
+//         // console.log(rain);
+//     });
+// }
+
+//   private getRawRain(): any {
+//       return this.spaceItemService.fetchSchema(this.space.name, 'rain').do((rain) => {
+//           this.rainService.rainSchemas = rain.map(rainSchema => this.toSchema(rainSchema));
+//           // this.getActiveTab();
+//           // this.activeSubTab = 'config';
+//       });
+//   }
 
   private getSomeDrops(dropType = null): any {
 

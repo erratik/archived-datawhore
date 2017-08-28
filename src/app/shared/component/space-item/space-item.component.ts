@@ -56,6 +56,7 @@ export class SpaceItemComponent implements OnInit, OnDestroy {
     }
 
     protected isItemLinked(property): boolean {
+        debugger;
         return this.space[property.friendlyName] === objectPath.get(this.schema, property.schemaPath);
     }
 }

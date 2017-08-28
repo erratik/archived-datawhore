@@ -1,0 +1,50 @@
+<div class="columns">
+  <div class="column is-half" *ngIf="profile">
+
+    <div class="header">
+      <h3 class="is-pulled-left heading">Profile Structure & Example</h3>
+    </div>
+    <hr>
+    <div class="structure">
+      <ul>
+        <li *ngFor="let property of profile.properties">
+          {{property.friendlyName}} ⇢ <cite>{{property.schemaPath}}</cite>
+        </li>
+      </ul>
+      <p *ngIf="!profile.properties">
+        No profile properties yet
+      </p>
+    </div>
+
+    <div class="example" [class.is-hidden]="!profile.properties">
+      <datawhore-space-item [properties]="profile.properties" [type]="'profile'" [space]="space" [schema]="profileSchema" (linkingToSpace)="updateSpace($event)"></datawhore-space-item>
+    </div>
+  </div>
+  <div class="column is-half">
+    <div class="header">
+      <h3 class="is-pulled-left heading">Profile Schema</h3>
+    </div>
+    <!-- {{}} -->
+    <div *ngIf="profileSchema?.propertyBucket">
+
+      <div [class.is-loading]="isFetchingSchema">
+        <datawhore-profile-form [model]="profileSchema" [dimType]="'profile'" [space]="space" (onProfileSchema)="profileSchema = $event"
+          (onNewDimensions)="newDimensions($event)"></datawhore-profile-form>
+        <hr>
+        <article class="message is-warning">
+          <div class="message-body is-inline-flex">
+            <small>
+              Resetting the profile doesn't affect the structure, but will edit the items
+              available in
+              it, and so the example space item.
+            </small>
+          </div>
+        </article>
+      </div>
+    </div>
+    <hr>
+    <p *ngIf="!profileSchema?.propertyBucket">
+      No profile schema fetched yet.
+    </p>
+  </div>
+</div>
