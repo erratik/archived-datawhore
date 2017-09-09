@@ -46,7 +46,7 @@
             <datawhore-profile-config [space]="space" (onUpdateSpace)="updateSpace($event)"></datawhore-profile-config>
         </div>
         <div class="tab space" *ngSwitchCase="'rain'">
-            <datawhore-rain-configs [spaceOauthSettings]="spaceOauthSettings" [newDimensions]="newDimensions" [space]="space"></datawhore-rain-configs>
+            <datawhore-rain-configs [spaceOauthSettings]="spaceOauthSettings" [space]="space"></datawhore-rain-configs>
         </div>
         <div class="tab space" *ngSwitchCase="'space'">
             <datawhore-space-config (onRemoveSpace)="removeSpace()" (onUpdateSpace)="updateSpace($event)" (onToggleEditSpace)="toggleEditSpace()"></datawhore-space-config>

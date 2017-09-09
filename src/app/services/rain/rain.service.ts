@@ -25,15 +25,15 @@ export class RainService extends SpaceItemService {
         return this.http.get(`${this.apiServer}/get/rain/${space}`)
             .map((res: Response) => {
                 const rainResponse = res.json();
-                const types =  _.groupBy(rainResponse.dimensions, 'type');
+                const types = _.groupBy(rainResponse.dimensions, 'type');
 
                 this.rain = this.rainSchemas.map(schema => new Rain(
                     space,
-                    !!types[schema.type] ? types[schema.type].map((dims: RainDimension) => new RainDimension(dims.friendlyName, dims.schemaPath, dims.type, dims['_id'])).filter(({type}) => schema.type === type) : [],
+                    !!types[schema.type] ? types[schema.type].map((dims: RainDimension) => new RainDimension(dims.friendlyName, dims.schemaPath, dims.type, dims['_id'])).filter(({ type }) => schema.type === type) : [],
                     schema.type,
                     rainResponse.modified
                 ));
-                // debugger;
+                
                 return this.rain;
             })
             .catch(this.handleError);
@@ -45,7 +45,7 @@ export class RainService extends SpaceItemService {
         return this.http.get(`${this.apiServer}/get/drops/${space}${queryObj}`)
             .map((res: Response) => {
                 const dropsResponse = res.json();
-                // debugger;
+                
                 if (!rainService.drops[space]) {
                     rainService.drops[space] = [];
                 }
@@ -70,15 +70,14 @@ export class RainService extends SpaceItemService {
 
 
     public deleteDrops(drops: [Drop], space): any {
-        // const bodyString = JSON.stringify(drops.map(drop => drop.id));
+        
 
-        const headers = new Headers({'Content-Type': 'application/json'}); // ... Set content type to JSON
+        const headers = new Headers({ 'Content-Type': 'application/json' }); // ... Set content type to JSON
         const options = new RequestOptions({
             headers: headers,
             body: drops.map(drop => drop.id),
         }); // Create a request option
 
-        // return this.http.put(`${this.apiServer}/update/schema/${space}`).map((res: Response) => {
         return this.http.delete(`${this.apiServer}/delete/drops/${space}`, options)
             .map((res: Response) => res.json())
             .catch(this.handleError);
@@ -97,7 +96,5 @@ export class RainService extends SpaceItemService {
             return res.json();
         }).catch(this.handleError);
     }
-
-
 
 }

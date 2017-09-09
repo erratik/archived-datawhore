@@ -1,8 +1,5 @@
 <div [ngSwitch]="drop.space">
-  <!-- <div class="content"></div> -->
   <div class="is-flex" *ngSwitchDefault>
-    <!--<i class="fa fa-{{drop.space}} icon is-small"></i>-->
-    <!--{{drop.content.date }}-->
     <div class="is-flex center date">
       <datawhore-image-figure [size]="16" [src]="spaceIconImage"></datawhore-image-figure>
       <span class="">{{drop.timestamp | date:'short'}}</span>
@@ -12,8 +9,6 @@
   </div>
 
   <div class="is-flex" *ngSwitchCase="'moves'">
-    <!--<i class="fa fa-{{drop.space}} icon is-small"></i>-->
-    <!--{{drop.content.date }}-->
     <div class="is-flex">
       <datawhore-image-figure [size]="16" [src]="spaceIconImage"></datawhore-image-figure>
     </div>
@@ -21,15 +16,11 @@
       Activities for {{drop.timestamp | amDateFormat:'dddd, MMMM Do YYYY'}}
       <ul>
         <li *ngFor="let ac of drop.content.activities">
-          <!-- <span class="icon">
-            <i class="fa fa-home"></i>
-          </span> -->
           was <b>{{ac.activity}}</b> during <b>{{ac.duration | amDuration:'seconds'}}</b> over <em>{{ac.distance}}</em> meters
         </li>
       </ul>
-    </div>  
+    </div>
     <div class="is-flex">
-      <!-- <span class="">{{drop.timestamp | date:'short'}}</span> -->
       <a class="delete is-small" (click)="deleteDrop()"></a>
     </div>
 
@@ -57,7 +48,7 @@
       <span class="">{{drop.timestamp | date:'short'}}</span>
     </div>
     <div class="is-filling">
-        
+
       <div class="is-flex-inline" *ngSwitchCase="'rain.audio'">
         <datawhore-image-figure [size]="16" [src]="drop.content.album_art" [classes]="['is-circle', 'is-shadowed']" class="is-marginless"></datawhore-image-figure>
         <span class="caption">Played <strong>{{drop.content.track_name}}</strong> by <strong>{{drop.content.artist}}</strong> from <em>{{drop.content.source_title}}</em></span>
@@ -66,43 +57,38 @@
       <div class="is-flex" *ngSwitchCase="'rain.photo'">
         <datawhore-image-figure [size]="128" [src]="drop.content.photos[0].original_size.url" [specs]="drop.content.photos[0].original_size"
           [classes]="['is-shadowed']"></datawhore-image-figure>
-          <div>
+        <div>
 
-            <span class="caption is-marginless">{{drop.content.caption}}</span>
-            <ul class="breadcrumbs is-flex-inline">
-              <li *ngFor="let trail of drop.content.trail" [class.is-hidden]="trail.is_root_item">
-                <a href="http://{{trail.blog.name}}.tumblr.com/" target="_blank">{{trail.blog.name}}</a>
-              </li>
-            </ul>
-          </div>
+          <span class="caption is-marginless">{{drop.content.caption}}</span>
+          <ul class="breadcrumbs is-flex-inline">
+            <li *ngFor="let trail of drop.content.trail" [class.is-hidden]="trail.is_root_item">
+              <a href="http://{{trail.blog.name}}.tumblr.com/" target="_blank">{{trail.blog.name}}</a>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
 
-        <nav class="level is-mobile">
-          <div class="level-left">
-            <span class="level-item">
+    <nav class="level is-mobile">
+      <div class="level-left">
+        <span class="level-item">
                 <span class="icon is-small"><i class="fa fa-sticky-note"></i></span>
-              <small>{{drop.content.note_count | number : '1.0'.a}}</small>
-            </span>
-          </div>
-        </nav>
+        <small>{{drop.content.note_count | number : '1.0'.a}}</small>
+        </span>
+      </div>
+    </nav>
 
   </div>
 
 
   <div class="is-flex" *ngSwitchCase="'instagram'">
-    <!--<i class="fa fa-{{drop.space}} icon is-small"></i>-->
-    <!--{{drop.content.date }}-->
-
     <article class="media">
       <div class="media-left">
-        <datawhore-image-figure [size]="64" [src]="drop.content.thumbnail"
-          [classes]="['is-shadowed']"></datawhore-image-figure>
+        <datawhore-image-figure [size]="64" [src]="drop.content.thumbnail" [classes]="['is-shadowed']"></datawhore-image-figure>
       </div>
       <div class="media-content">
         <div class="content">
           <p><small>{{drop.content.date | date:'short'}}</small>
-            <!--<strong>John Smith</strong> <small>@johnsmith</small> -->
             <br>{{drop.content.caption }}
           </p>
         </div>
@@ -115,6 +101,46 @@
             <span class="level-item">
                 <span class="icon is-small"><i class="fa fa-heart"></i></span>
             <small>{{drop.content.count_likes}}</small>
+            </span>
+            <span class="level-item" *ngIf="drop.content.location_name">
+                <span class="icon is-small"><i class="fa fa-map-marker"></i></span>
+            <small>{{drop.content.location_name}}</small>
+            </span>
+          </div>
+        </nav>
+      </div>
+      <div class="media-right">
+        <datawhore-image-figure [size]="16" [src]="spaceIconImage"></datawhore-image-figure>
+      </div>
+    </article>
+
+  </div>
+
+  <div class="is-flex" *ngSwitchCase="'facebook'">
+    <!--<i class="fa fa-{{drop.space}} icon is-small"></i>-->
+    <!--{{drop.content.date }}-->
+
+    <article class="media">
+      <div class="media-left" *ngIf="drop.content.picture">
+        <datawhore-drop-image [size]="64" [src]="drop.content.picture" [classes]="['is-shadowed', drop.content.type]" type="{{drop.content.type}}"
+          [link]="[drop.content.permalink_url, drop.content.link]"></datawhore-drop-image>
+      </div>
+      <div class="media-content">
+        <div class="content">
+          <p><small>{{drop.timestamp | amDateFormat:'dddd, MMMM Do YYYY @ hh:MMa'}}</small>
+            <!--<strong>John Smith</strong> <small>@johnsmith</small> -->
+            <br>{{drop.content.caption }}
+          </p>
+        </div>
+        <nav class="level is-mobile">
+          <div class="level-left">
+            <span class="level-item" *ngIf="!!drop.content.comments">
+                <span class="icon is-small"><i class="fa fa-comments"></i></span>
+            <small>{{drop.content.comments.length}}</small>
+            </span>
+            <span class="level-item" *ngIf="!!drop.content.likes">
+                <span class="icon is-small"><i class="fa fa-heart"></i></span>
+            <small>{{drop.content.likes.length}}</small>
             </span>
             <span class="level-item" *ngIf="drop.content.location_name">
                 <span class="icon is-small"><i class="fa fa-map-marker"></i></span>
@@ -139,7 +165,6 @@
       <div class="media-content">
         <div class="content">
           <p><small>{{drop.content.date | date:'short'}}</small>
-            <!--<strong>John Smith</strong> <small>@johnsmith</small> -->
             <br>{{drop.content.caption }}
           </p>
         </div>
@@ -168,7 +193,7 @@
   </div>
 
 
-  
+
 
   <details>
     <summary>drop raw content</summary>

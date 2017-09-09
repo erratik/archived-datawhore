@@ -7,6 +7,8 @@ import { Space } from '../../../models/space.model';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import * as _ from 'lodash';
+import { ProfileService } from "app/services/profile/profile.service";
+import { OauthSettingsService } from "app/services/space/oauth-settings.service";
 
 @Component({
   selector: 'datawhore-drops',
@@ -18,7 +20,6 @@ export class DropsComponent extends RainConfigsComponent implements OnInit, OnDe
   @Input() public space: Space;
   public drops;
   public dropTypes;
-  // public rainSchemas;
   public rain;
   public isLoading = false;
   public getDrops$: Observable<any> = new Observable<any>();
@@ -30,10 +31,11 @@ export class DropsComponent extends RainConfigsComponent implements OnInit, OnDe
   public overrideRainName: any = {};
 
   constructor(spacesService: SpacesService,
-  spaceItemService: SpaceItemService,
-    activatedRoute: ActivatedRoute,
-    rainService: RainService) {
-      super(spacesService, spaceItemService, activatedRoute, rainService);
+              spaceItemService: SpaceItemService,
+              activatedRoute: ActivatedRoute,
+              rainService: RainService,
+              profileService: ProfileService) {
+      super(spacesService, spaceItemService, activatedRoute, rainService, profileService);
   }
 
   ngOnDestroy() {
@@ -58,26 +60,9 @@ export class DropsComponent extends RainConfigsComponent implements OnInit, OnDe
             });
             this.dropTypes = this.rainService.rainSchemas.map((rain, i) => rain.type);
             this.getSomeDrops(this.dropTypes[0]);
-            // console.log(this.rainSchemas);
         }
     });
   }
-
-
-//   private getRain(): any {
-//     // debugger;
-//     return this.rainService.getRain(this.space.name).do((rain) => {
-//         // console.log(rain);
-//     });
-// }
-
-//   private getRawRain(): any {
-//       return this.spaceItemService.fetchSchema(this.space.name, 'rain').do((rain) => {
-//           this.rainService.rainSchemas = rain.map(rainSchema => this.toSchema(rainSchema));
-//           // this.getActiveTab();
-//           // this.activeSubTab = 'config';
-//       });
-//   }
 
   private getSomeDrops(dropType = null): any {
 
@@ -121,7 +106,7 @@ export class DropsComponent extends RainConfigsComponent implements OnInit, OnDe
     this.deleteDrops$ = this.rainService.deleteDrops([drop], this.space.name).do((drops) => {
       // this.drops = _.groupBy(drops, 'type');
       console.log(drops)
-    debugger;
+      debugger;
     });
 
     this.deleteDrops$.subscribe((newDrops) => {

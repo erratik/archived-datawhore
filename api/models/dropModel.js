@@ -15,45 +15,44 @@ const dropSchema = new mongoose.Schema({
 let Drop;
 const DropSchema = {
     schema: {
-        space: String,  
+        space: String,
         drops: [dropSchema]
     },
     self: {
         getSpaceDrops: function (params, cb) {
-        
+
             const that = this;
-            
-            that.findOne({ space: params.space}, function (err, result) {
+
+            that.findOne({ space: params.space }, function (err, result) {
                 if (err) cb(err);
                 if (result) {
 
                     const dropDocId = result._id;
-                    // debugger;
-                    
-                    const dropQuery = (!!params.query && !!params.query.after) ? {'drops.timestamp': { $lt: Number(params.query.after) }} : {'drops.timestamp': { $lt: Date.now() }} ;
-                    
-                    
+                    const dropQuery = (!!params.query && !!params.query.after) ? { 'drops.timestamp': { $lt: Number(params.query.after) } } : { 'drops.timestamp': { $lt: Date.now() } };
+
                     let aggregation = {
                         base: [
-                            { $match: { space: params.space, "_id": dropDocId}},
+                            { $match: { space: params.space, "_id": dropDocId } },
                             { $unwind: "$drops" },
-                            { $match: dropQuery},
-                            { $sort: { 'drops.timestamp': -1 }},
-                            { $project: {_id: '$_id', drops: '$drops', type: '$drops.type'} },
-                            { $group: {_id: '$type', count: {'$sum': 1}, drops: {$push: '$drops'}}}
+                            { $match: dropQuery },
+                            { $sort: { 'drops.timestamp': -1 } },
+                            { $project: { _id: '$_id', drops: '$drops', type: '$drops.type' } },
+                            { $group: { _id: '$type', count: { '$sum': 1 }, drops: { $push: '$drops' } } }
                         ],
                         getType: [
-                            { $group: {
-                                    _id: '$_id', 
-                                    aggregatedDrops: {$addToSet: '$drops'}
+                            {
+                                $group: {
+                                    _id: '$_id',
+                                    aggregatedDrops: { $addToSet: '$drops' }
                                 }
                             },
-                            { $match: { '_id': params.type} }
+                            { $match: { '_id': params.type } }
                         ],
                         getAll: [
-                            { $group: {
-                                    _id: params.space, 
-                                    types: {$push: {type: '$_id', count: '$count', drops: '$drops'}}
+                            {
+                                $group: {
+                                    _id: params.space,
+                                    types: { $push: { type: '$_id', count: '$count', drops: '$drops' } }
                                 }
                             }
                         ]
@@ -64,7 +63,7 @@ const DropSchema = {
                     const query = aggregation.base.concat(options);
 
                     if (!!params.query && !!params.query.limit) {
-                        query.splice(4, 0, { $limit: Number(params.query.limit)} );
+                        query.splice(4, 0, { $limit: Number(params.query.limit) });
                     }
                     that.aggregate(query).exec(function (err, docs) {
                         if (err) cb(err);
@@ -82,27 +81,28 @@ const DropSchema = {
                 }
 
             });
-            
+
         },
         findAll: function (options, cb) {
-            
+
             const query = options;
 
-            this.find(query,function (err, docs) {
+            this.find(query, function (err, docs) {
                 if (err) cb(err);
                 cb(docs[0]);
             });
         },
         countByTypes: function (spaceName, cb) {
             this.aggregate(
-                { $match: { space: spaceName }},
+                { $match: { space: spaceName } },
                 { $unwind: "$drops" },
                 { $unwind: "$drops.type" },
-                { $project: {_id: '$_id', type: '$drops.type'} },
-                { $group: {_id: '$type', count: {'$sum': 1}}},
-                { $group: {
-                        _id: spaceName, 
-                        types: {$push: {type: '$_id', count: '$count'}}
+                { $project: { _id: '$_id', type: '$drops.type' } },
+                { $group: { _id: '$type', count: { '$sum': 1 } } },
+                {
+                    $group: {
+                        _id: spaceName,
+                        types: { $push: { type: '$_id', count: '$count' } }
                     }
                 }, (err, docs) => {
                     const types = docs.length ? docs[0].types : [];
@@ -121,7 +121,7 @@ const DropSchema = {
 
         },
         removeDrops: function (space, dropIds, cb) {
-            var query = { space: space};
+            var query = { space: space };
             const drops = dropIds.map(drop => ObjectId(drop));
             // this.update(query, { $pull: { 'drops': {$in: drops}  } }, { multi: true }, function (error, _updated) {
             //     if (_updated.ok) {
@@ -153,8 +153,8 @@ const DropSchema = {
                     dateFormat = 'YYYYMMDD';
                     break;
                 case 'facebook':
-                
-                    dateFormat = moment.ISO_8601 + 'Z';
+
+                    dateFormat = 'YYYY-MM-DDTHH:mm:ssZ';
                     break;
                 default:
 
@@ -171,38 +171,33 @@ const DropSchema = {
                         if (possibleTimestampKeys.includes(key)) {
                             drop.timestamp = dateFormat ? moment(drop.content[key], dateFormat).format('x') : moment.unix(drop.content[key]).format('X');
                             drop.timestamp = (key !== 'timestamp') ? Number(drop.timestamp) : Number(moment(drop.content[key], 'X').format('x'));
-                            // )new Timestamp(
                         }
                     });
 
                     return drop;
 
-                }).filter(drop => {
-                    return !existingDropTimestamps.includes(Number(drop.timestamp));
-                });
+                }).filter(drop => !existingDropTimestamps.includes(Number(drop.timestamp)));
 
                 if (drops.length) {
 
-                            that.findOneAndUpdate(
-                                {space: space}, 
-                                { $addToSet: { drops: { $each: drops } }  }, 
-                                { upsert: true, returnNewDocument: true }, 
-                                function (err, updated) {
-                                
-                                
-                                if (!!updated) {
-                                    const lastDrop = _.max(_.filter(updated.drops, {type}), function(o) { return o.timestamp; });
-                                    const lastDropAdded = _.min(_.filter(drops, {type}), function(o) { return o.timestamp; });
-                                    if (!!lastDropAdded) {
-                                        console.log(`[dropModel] 💧 ${drops.length} | ${type} added on ${space} `);
-                                        cb(updated.drops, lastDropAdded, drops.length);
-                                    }
-
-                                } else {
-                                    cb([], null, 0);
+                    that.findOneAndUpdate(
+                        { space: space },
+                        { $addToSet: { drops: { $each: drops } } },
+                        { upsert: true, returnNewDocument: true },
+                        (err, updated) => {
+                            if (!!updated) {
+                                const lastDrop = _.max(_.filter(updated.drops, { type }), function (o) { return o.timestamp; });
+                                const lastDropAdded = _.min(_.filter(drops, { type }), function (o) { return o.timestamp; });
+                                if (!!lastDropAdded) {
+                                    console.log(`[dropModel] 💧 ${drops.length} | ${type} added on ${space} `);
+                                    cb(updated.drops, lastDropAdded, drops.length);
                                 }
-                            });
-                            
+
+                            } else {
+                                cb([], null, 0);
+                            }
+                        });
+
                 }
 
             };
@@ -213,7 +208,7 @@ const DropSchema = {
             that.findOne(query, function (err, spaceDrops) {
                 if (!!spaceDrops) {
                     existingDropTimestamps = spaceDrops.drops.map(drop => {
-                        if (drop.timestamp && drop.type === type )
+                        if (drop.timestamp && drop.type === type)
                             return drop.timestamp
                     });
                 }

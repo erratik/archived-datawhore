@@ -35,11 +35,11 @@ export class SpaceConfigComponent implements OnInit {
     @ViewChild(SpaceItemComponent) public spaceItemComponent;
 
     constructor(public spacesService: SpacesService,
-                public oauthService: OauthSettingsService,
                 public spaceItemService?: SpaceItemService,
-                public profileService?: ProfileService,
-                public rainService?: RainService,
                 public activatedRoute?: ActivatedRoute,
+                public rainService?: RainService,
+                public profileService?: ProfileService,
+                public oauthService?: OauthSettingsService,
                 public router?: Router) {
 
         this.retrieveSpace$ = this.activatedRoute.params.do(params => params)
