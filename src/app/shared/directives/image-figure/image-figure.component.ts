@@ -7,11 +7,11 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class ImageFigureComponent implements OnInit {
 
-  @Input() size: string;
-  @Input() src: string;
+  public aspect: string;
   @Input() classes: string;
+  @Input() size: string;
   @Input() specs: any;
-  protected aspect: string;
+  @Input() src: string;
 
   constructor() { }
 
@@ -23,7 +23,7 @@ export class ImageFigureComponent implements OnInit {
         const r = this.gcd (w, h);
 
         this.aspect = 'square';
-        
+
         if (w / r < h / r) {
           this.aspect = 'long';
         }

@@ -41,6 +41,7 @@ import { KeyPipe } from './shared/pipes/key-pipe.pipe';
 import { OrderDropByPipe } from './shared/pipes/order-drop-by.pipe';
 import { ImageFigureComponent } from './shared/directives/image-figure/image-figure.component';
 import { ProfileConfigComponent } from './views/profile/profile-config/profile-config.component';
+import { DropImageComponent } from './shared/directives/drop-image/drop-image.component';
 
 const appRoutes: Routes = [
     {
@@ -97,7 +98,8 @@ const appRoutes: Routes = [
         KeyPipe,
         OrderDropByPipe,
         ImageFigureComponent,
-        ProfileConfigComponent
+        ProfileConfigComponent,
+        DropImageComponent
     ],
     providers: [
         SpacesService,

@@ -1,18 +1,19 @@
+@import "../../../../assets/styles/less/bulma-vars";
+
 .image {
-  top: 1px;
-  overflow: hidden;
-  img {
-      height: auto;
-      &.is-long { transform: translateY(-25%); }
-  }
+    overflow: hidden;
+    position: relative;
+    top: 1px;
+    img {
+        height: auto;
+        &.is-long { transform: translateY(-25%); }
+    }
 }
+
 .is-bordered {
     border: 1px solid lightgrey;
 }
 
 .is-shadowed {
     box-shadow: 0px 0px 5px rgba(100,100,100,0.5);
-}
-:host {
-    // margin-right: 1.5rem;
 }
