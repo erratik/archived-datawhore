@@ -1,8 +1,8 @@
 const Setting = require('../models/settingModel');
 
-const EndpointController = require('../controllers/endpoint.controller');
-const OauthService = require('./oauth.service');
-const FetchingService = require('./fetch-params.service');
+const EndpointController = require('./endpoint.controller');
+const OauthService = require('../services/oauth.service');
+const FetchingService = require('../services/fetch-params.service');
 
 const Utils = require('../lib/utils');
 

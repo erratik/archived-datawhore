@@ -51,7 +51,8 @@ module.exports = {
 
         },
         getAll: function (options, cb) {
-            // options.spaces = JSON.parse(options.spaces);
+            
+            options.spaces = options.spaces.split(',');
             Schema.findAllSchemas(options, (schemas) => {
                 // console.log(schema);
                 cb(schemas);
@@ -80,15 +81,25 @@ module.exports = {
                 cb(content);
             });
         },
-        status: function (space) {
-            Setting.findSettings(options.space, (settings) => {cb(settings.connected)});
+        getAll: function (options, cb) {
+            Space.getAll((err, data) => cb(data));
+        },
+        status: function (params, cb) {
+            params.spaces = params.spaces.split(',');
+            // find settings to check the oauth extras properties, must have more than 2 to be connected
+            Setting.findAllSettings(params, (settings) => {
+                const status = settings.map(({space, extras, modified}) => {
+                    let obj = {};
+                    return obj[space] = { modified, connected: extras.length > 2 };
+                });
+                cb(status);
+            });
         }
     },
     rain: {
         write: function (params, content, cb) {
             params.type = content[0].type;
             Rain.updateRain(params, content, (updatedRain) => {
-                console.log(updatedRain);
                 cb(content);
             });
         },

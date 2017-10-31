@@ -12,30 +12,40 @@ const Schema = require('../models/schemaModel');
 
 const NamespaceController = require('../controllers/namespace.controller');
 const EndpointController = require('../controllers/endpoint.controller');
-const postEndpoint = EndpointController.post;
-const getEndpoint = EndpointController.get;
+const SpaceController = EndpointController.space;
+const EndpointService = require('../services/endpoint.service');
+const postEndpoint = EndpointService.post;
+const getEndpoint = EndpointService.get;
 
 router
+    .get('/status/', (req, res) => {
+        SpaceController.status(req.query, status => {
+            res.status(200).send({ status: status });
+        });
+    })
     .get('/spaces', (req, res) => {
-        Space.getAll((err, data) => res.json(data));
+        SpaceController.getAll(req.query, spaces => {
+            res.status(200).send(spaces);
+        });
     })
     .get('/space/:space', (req, res) => {
+        // TODO: move this to the spaceController
         Space.findByName(req.params.space, (err, data) => res.json(data[0]));
     })
+    .post('/endpoint/space', (req, res) => {
+    // SPACES: ENDPOINTS TO FETCH DATA FROM SPACES (TWITTER, INSTAGRAM, ETC)
+        let data = req.body.data;
+        // TODO: add a way to return the last drop added, for reports
+        NamespaceController.runCall(data, (resp, lastDropAdded, countAdded) => res.json(resp));
+    })
     .delete('/space/:space', (req, res) => {
+        // TODO: move this to the spaceController
         Space.removeSpace(req.params.space, () => res.status(200).send({ message: `${req.params.space} was deleted` }));
     })
-    .delete('/schema/:space/:type', (req, res) => {
-        Schema.removeSchema(req.params.space, req.params.type, function () {
-            res.status(200).send({ message: `${req.params.space} schema was deleted for ${req.params.space}` });
-        });
-    });
-// SPACES: ENDPOINTS TO GET DATA FROM DATAWHORE API
-router
     .get('/get/schemas', (req, res) => {
 
         const data = {
-            spaces: req.query.spaces ? req.query.spaces.split(',') : null,
+            spaces: !!req.query.spaces ? req.query.spaces: null,
             type: req.query.type,
             mode: 'count',
             action: 'schema.getAll'
@@ -46,6 +56,15 @@ router
         });
 
     })
+    .delete('/schema/:space/:type', (req, res) => {
+        // TODO: move this to the schemaController
+        Schema.removeSchema(req.params.space, req.params.type, function () {
+            res.status(200).send({ message: `${req.params.space} schema was deleted for ${req.params.space}` });
+        });
+    });
+
+// SPACES: ENDPOINTS TO GET DATA FROM DATAWHORE API
+router
     .get('/get/:endpoint/:space', (req, res) => {
 
         const data = {
@@ -87,12 +106,7 @@ router
         })
     });
 
-// SPACES: ENDPOINTS TO GET DATA FROM SPACES (TWITTER, INSTAGRAM, ETC)
-router.post('/endpoint/space', (req, res) => {
-    let data = req.body.data;
-    // TODO: add a way to return the last drop added, for reports
-    NamespaceController.runCall(data, (resp, lastDropAdded, countAdded) => res.json(resp));
-});
+
 
 // UPLOADS
 // TODO: change this to a put request

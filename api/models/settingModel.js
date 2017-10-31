@@ -17,14 +17,16 @@ var SettingSchema = {
     self: {
         findSettings: function(spaceName, cb) {
             this.find({ space: spaceName }, function(err, docs) {
+                if (err) cb(err);
                 if (!docs) {
                     docs = [{ space: spaceName, modified: Date.now(), $currentDate : { lastModified: true} }];
                 }
                 cb(docs[0]);
             });
         },
-        findAllSettings: function(cb) {
-            this.find({}, function(err, docs) {
+        findAllSettings: function(params, cb) {
+            const query = !!params.spaces ? { space: { $in: params.spaces } } : {};
+            this.find(query, function(err, docs) {
                 if (err) cb(err);
                 cb(docs);
             });

@@ -1,6 +1,6 @@
 const Setting = require('../models/settingModel');
 
-const EndpointController = require('../controllers/endpoint.controller');
+const EndpointService = require('./endpoint.service');
 const OauthService = require('./oauth.service');
 const FetchingService = require('./fetch-params.service');
 
@@ -58,7 +58,7 @@ module.exports = NamespaceService = {
                             let buffer = '';
                             result.setEncoding('utf8');
                             result.on('data', (dataReceived) => buffer += dataReceived);
-                            result.on('end', () => EndpointController.post(data, JSON.parse(buffer), cb));
+                            result.on('end', () => EndpointService.post(data, JSON.parse(buffer), cb));
                         });
 
                         break;
@@ -129,7 +129,7 @@ module.exports = NamespaceService = {
 
                 } else {
                     
-                    EndpointController.post(data, body, cb);
+                    EndpointService.post(data, body, cb);
                 }
             } catch(e) {
 
@@ -140,7 +140,7 @@ module.exports = NamespaceService = {
     endpointSpaceCall: (data, req, res, cb = null) => {
         // let extras;
         if (req) {
-            NamespaceService.runCall(data, EndpointController.responseHandler(res, cb) );
+            NamespaceService.runCall(data, EndpointService.responseHandler(res, cb) );
         } else {
 
         }

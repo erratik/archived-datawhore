@@ -1,13 +1,13 @@
-const EndpointService = require('../services/endpoint.service');
+const EndpointController = require('../controllers/endpoint.controller');
 const objectPath = require('object-path');
 
 module.exports = {
     get: (data, cb) => {
         
-        const endpointService = objectPath.get(EndpointService, data.action);
-        if (typeof endpointService === 'function') {
-            return endpointService(data, function(resp) {
-                //FIXME: refactor
+        const endpointController = objectPath.get(EndpointController, data.action);
+        if (typeof endpointController === 'function') {
+            return endpointController(data, function(resp) {
+                //FIXME: refactor this
                 if (!!resp && !!resp.length && data.type.includes('rain')) {
                     resp = resp.map(schema => {
                         // schema.content = JSON.stringify(schema.content);
@@ -23,12 +23,12 @@ module.exports = {
     },
     post: (data, content, cb) => {
 
-        const endpointService = objectPath.get(EndpointService, data.action);
+        const endpointController = objectPath.get(EndpointController, data.action);
          
         if (data.type.includes('rain') && !data.action.includes('update')) 
             content['fetchUrl'] = data.fetchUrl;
         
-        return endpointService(data, content, (resp) => {
+        return endpointController(data, content, (resp) => {
             cb(resp);
         });
     },
