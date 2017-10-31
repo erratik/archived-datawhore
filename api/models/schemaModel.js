@@ -30,53 +30,72 @@ const SchemaSchema = {
                             modified: Date.now()
                         }]
                     });
-                    docs = {schemas: [schema]};
+                    docs = { schemas: [schema] };
                 }
                 if (!params.type.includes('rain')) {
                     cb(docs.schemas.filter(function (schema) {
                         return schema.type === params.type;
                     })[0]);
-                } else if (docs) { 
-                    
+                } else if (docs) {
+
                     let schemas = docs.schemas.filter(schema => !!schema.type && schema.type.includes('rain'));
-                    
+
                     Drop.countByTypes(params.space, (types) => {
                         schemas = schemas.map(schema => {
-                            schema.dropCount =  types.filter(c => c.type === schema.type)[0] ? types.filter(c => c.type === schema.type)[0].count : 0;
+                            schema.dropCount = types.filter(c => c.type === schema.type)[0] ? types.filter(c => c.type === schema.type)[0].count : 0;
                             return schema;
                         });
                         cb(schemas);
                     });
-                            
+
+                    // TODO: replace with the new count function
+                    // countDropsBySchema(space, schemas, _schemas => cb(_schemas))
+
                 }
-             });
+            });
         },
-        findAllSchemas: function (cb) {
-            this.find({}, function (err, docs) {
-                if (err) cb(err);
-                cb(docs);
+        findAllSchemas: function (params, cb) {
+
+            const query = !!params.spaces ? { space: { $in: params.spaces } } : {};
+            params.mode = !!params.mode ? params.mode : null;
+
+            this.find(query, (err, docs) => {
+                if (err) {
+                    cb(err);
+                } else if (params.mode === 'count') {
+
+                    const counts = {};
+                    let cnt = 0;
+                    
+                    for (let i = 0; i < docs.length ; i++) {
+                        
+                        countDropsBySchema(docs[i].space, docs[i].schemas, (dropCounts, spaceName) => {
+                            counts[spaceName] = dropCounts;
+                            if (params.spaces.length === Object.keys(counts).length) {
+                                cb(counts);
+                            } else {
+                                cnt++;
+                            }
+                        }, 'count');
+
+                    }
+                } else {
+                    cb(docs);
+                }
+
             });
         },
         removeSchema: function (space, type, cb) {
             var query = { space: space, 'schemas.type': type };
-            this.update(query, { $pull: { schemas: { type: type } } }, { multi: true }, function (error, _updated) {
-                if (_updated.ok) {
+            this.update(query, { $pull: { schemas: { type: type } } }, { multi: true }, (err, _updated) => {
+
+                if (err) {
+                    cb(err);
+                } else if (_updated.ok) {
                     cb();
                 }
             });
         },
-        // updateSchema: function (options, schema, cb) {
-
-        //     const that = this;
-        //     this.findOneAndUpdate(
-        //         { space: options.space, 'schemas.type': options.type },      
-        //         { $addToSet: { schemas: schema }  } , 
-        //         { upsert: true, returnNewDocument: true }, function (err, updated) {
-        //         if (err) cb(err);
-        //             debugger;
-        //     });
-
-        // },
         writeSchema: function (options, schema, cb) {
             const that = this;
             const sid = new ObjectId(schema.id);
@@ -120,6 +139,20 @@ const SchemaSchema = {
         }
     }
 };
+
+const countDropsBySchema = (spaceName, schemas, cb, mode = null) => {
+    return Drop.countByTypes(spaceName, (types) => {
+        if (mode === 'count') {
+            cb(types, spaceName);
+        } else {
+            schemas = schemas.map(schema => {
+                schema.dropCount = types.filter(c => c.type === schema.type)[0] ? types.filter(c => c.type === schema.type)[0].count : 0;
+                return schema;
+            });
+        }
+    });
+};
+
 Schema = require('./createModel')(mongoose, 'Schema', SchemaSchema);
 module.exports = Schema;
 //# sourceMappingURL=/Users/erratik/Sites/datawhore/admin/api/models/schemaModel.js.map

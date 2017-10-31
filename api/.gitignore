@@ -1,10 +1,10 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
+.env
 # compiled output
 /dist
 /tmp
 /src/assets/uploads/.tmp
-
 # dependencies
 /node_modules
 /api/node_modules
@@ -24,6 +24,7 @@
 .vscode/launch.json
 .vscode/extensions.json
 .history
+
 
 # misc
 /.sass-cache
@@ -48,4 +49,6 @@ testem.log
 .DS_Store
 Thumbs.db
 npm-debug.*
-.history
+/.history
+/.idea
+/.vscode

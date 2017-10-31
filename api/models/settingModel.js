@@ -71,7 +71,14 @@ var SettingSchema = {
 
             update.$currentDate = { lastModified: true};
             
-            this.findOneAndUpdate(query, update, { upsert: true, returnNewDocument: true }, (err, updated) => Space.updateSpace(query.space, {}, () => cb(updated)));
+            this.findOneAndUpdate(
+                query, 
+                update, 
+                { upsert: true, returnNewDocument: true }, 
+                (err, updated) => Space.updateSpace(query.space, {}, () => {
+                    if (!!cb) {cb(updated) }
+                })
+            );
         }
     }
 };

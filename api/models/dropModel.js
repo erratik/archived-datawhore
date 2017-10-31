@@ -22,8 +22,8 @@ const DropSchema = {
         getSpaceDrops: function (params, cb) {
 
             const that = this;
-
-            that.findOne({ space: params.space }, function (err, result) {
+            const query = params.space === 'all' ? {} : { space: params.space };
+            that.findOne(query, function (err, result) {
                 if (err) cb(err);
                 if (result) {
 
@@ -48,29 +48,49 @@ const DropSchema = {
                             },
                             { $match: { '_id': params.type } }
                         ],
-                        getAll: [
+                        getAllByType: [
                             {
                                 $group: {
                                     _id: params.space,
                                     types: { $push: { type: '$_id', count: '$count', drops: '$drops' } }
                                 }
                             }
+                        ],
+                        getAfterTimestamp: [
+                            { $match: {  } },
+                            { $unwind: "$drops" },
+                            { $match: dropQuery },
+                            { $sort: { 'drops.timestamp': -1 } },
+                            { $limit: (!!params.query && !!params.query.limit) ? Number(params.query.limit) : 20 },
+                            { $unwind: "$drops.type" },
+                            { $project: { _id: '$_id', type: '$drops.type', drops: '$drops', space: '$space' } },
+                            { $group: { _id: '$space', count: { '$sum': 1 }, drops: { $push: '$drops' } } }
                         ]
                     };
 
-
-                    const options = !!params.type ? aggregation.getType : aggregation.getAll;
-                    const query = aggregation.base.concat(options);
+                    const options = params.type !== 'drops' ? aggregation.getType : aggregation.getAll;
+                    const query = params.space === 'all' ? aggregation.getAfterTimestamp : aggregation.base.concat(options);
 
                     that.aggregate(query).exec(function (err, docs) {
                         if (err) cb(err);
                         if (!!docs) {
                             let drops;
-                            if (docs.length && docs[0].aggregatedDrops[0].length) {
-                                let limit = (!!params.query && !!params.query.limit) ? Number(params.query.limit) : 0;
-                                const aggDrops = docs[0].aggregatedDrops[0];
-                                drops =  limit ? aggDrops.slice(0, limit) : aggDrops;
-                            } else {
+                            let typedDrops = [];
+                            let limit = (!!params.query && !!params.query.limit) ? Number(params.query.limit) : 0;
+                            if (docs.length) {
+                                if (params.type === 'drops') {
+                                    Object.keys(docs[0].types).forEach((typeKey) => {
+                                        typedDrops = typedDrops.concat(docs[0].types[typeKey].drops);
+                                    });
+                                    drops = typedDrops.slice(0, limit);
+
+                                } else if (!!docs[0].aggregatedDrops && docs[0].aggregatedDrops[0].length) {
+                                    const aggDrops = docs[0].aggregatedDrops[0];
+                                    drops = limit ? aggDrops.slice(0, limit) : aggDrops;
+                                } else if (params.space === 'all') {
+                                    drops = docs;
+                                }
+                            } else  {
                                 console.log('empty aggregate query result for: ', query)
                                 drops = [];
                             }

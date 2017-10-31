@@ -7,8 +7,8 @@ import { Space } from '../../../models/space.model';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import * as _ from 'lodash';
-import { ProfileService } from "app/services/profile/profile.service";
-import { OauthSettingsService } from "app/services/space/oauth-settings.service";
+import { ProfileService } from 'app/services/profile/profile.service';
+import { OauthSettingsService } from 'app/services/space/oauth-settings.service';
 
 @Component({
   selector: 'datawhore-drops',

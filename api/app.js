@@ -23,6 +23,7 @@ if (environment === 'development') {
     env(__dirname + '/.env');
 }
 
+app.use('/public', express.static(path.join(__dirname, '../public')))
 app.set('constants', require('./lib/constants/urls')(datawhoreConfig));
 
 console.log(app.get('constants'));
@@ -97,7 +98,7 @@ const mongoURI = (app.get('env') === 'development') ? process.env.MONGODB_LOCAL_
 // mongoose
 mongoose.connect(mongoURI, function(err) {
     if (err) throw err;
-    Space.getAll((err, spaces) => Schema.findAllSchemas((schemas) => Settings.findAllSettings((settings) => require('./scheduler')(app, spaces, settings, schemas))));
+    Space.getAll((err, spaces) => Schema.findAllSchemas({}, (schemas) => Settings.findAllSettings((settings) => require('./scheduler')(app, spaces, settings, schemas))));
 });
 
 app.use('/api', api);

@@ -56,8 +56,7 @@ export class RainService extends SpaceItemService {
                     rainService.drops[space] = [];
                 }
                 rainService.drops[space] = rainService.drops[space].concat(rainService.enrichDrops(dropsResponse));
-                // debugger;
-                console.log(rainService.drops[space])
+
                 return rainService.drops[space];
             })
             .catch(this.handleError);
@@ -69,12 +68,11 @@ export class RainService extends SpaceItemService {
         return this.http.get(`${this.apiServer}/get/drops/all${queryObj}`)
             .map((res: Response) => {
                 const resp = res.json();
-                // debugger;
                 resp.forEach(space => {
                     space.drops = space.drops.map(drop => {
                         drop.space = space._id;
                         return drop;
-                    })
+                    });
                 });
                 return resp;
             })

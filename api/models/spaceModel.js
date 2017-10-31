@@ -14,7 +14,7 @@ var SpaceSchema = {
     },
     self: {
         getAll: function (cb) {
-            return this.find({}, cb);
+            return this.find({name: { $type: 'string' }}, cb);
         },
         findByName: function (name, cb) {
             return this.find({ name: name }, cb);

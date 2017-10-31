@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
+// uploading
 const multer = require('multer');
 const fs = require('fs');
 const mkdirp = require('mkdirp');
@@ -9,31 +10,42 @@ const Space = require('../models/spaceModel');
 const Setting = require('../models/settingModel');
 const Schema = require('../models/schemaModel');
 
-const NamespaceService = require('../services/namespace.service');
-const postEndpoint = NamespaceService.postEndpoint;
-const getEndpoint = NamespaceService.getEndpoint;
+const NamespaceController = require('../controllers/namespace.controller');
+const EndpointController = require('../controllers/endpoint.controller');
+const postEndpoint = EndpointController.post;
+const getEndpoint = EndpointController.get;
 
 router
-    .get('/spaces', function (req, res) {
-        Space.getAll(function (err, data) {
-            res.json(data);
-        });
+    .get('/spaces', (req, res) => {
+        Space.getAll((err, data) => res.json(data));
     })
-    .get('/space/:space', function (req, res) {
-        Space.findByName(req.params.space, function (err, data) {
-            res.json(data[0]);
-        });
+    .get('/space/:space', (req, res) => {
+        Space.findByName(req.params.space, (err, data) => res.json(data[0]));
     })
-    .delete('/space/:space', function (req, res) {
+    .delete('/space/:space', (req, res) => {
         Space.removeSpace(req.params.space, () => res.status(200).send({ message: `${req.params.space} was deleted` }));
     })
-    .delete('/schema/:space/:type', function (req, res) {
+    .delete('/schema/:space/:type', (req, res) => {
         Schema.removeSchema(req.params.space, req.params.type, function () {
             res.status(200).send({ message: `${req.params.space} schema was deleted for ${req.params.space}` });
         });
     });
 // SPACES: ENDPOINTS TO GET DATA FROM DATAWHORE API
 router
+    .get('/get/schemas', (req, res) => {
+
+        const data = {
+            spaces: req.query.spaces ? req.query.spaces.split(',') : null,
+            type: req.query.type,
+            mode: 'count',
+            action: 'schema.getAll'
+        };
+        
+        getEndpoint(data, (resp) => {   
+            res.status(200).send(resp);
+        });
+
+    })
     .get('/get/:endpoint/:space', (req, res) => {
 
         const data = {
@@ -42,7 +54,7 @@ router
             action: `${req.params.endpoint}.get`,
             query: req.query
         };
-
+        
         getEndpoint(data, (resp) => {
             res.status(200).send(resp);
         });
@@ -61,7 +73,7 @@ router
         })
     })
     .delete('/delete/:endpoint/:space', (req, res) => {
-
+        // FIXME: DO NOT USE, deletes all the drops in the space! 😕
         const data = {
             space: req.params.space,
             type: req.params.endpoint,
@@ -76,19 +88,20 @@ router
     });
 
 // SPACES: ENDPOINTS TO GET DATA FROM SPACES (TWITTER, INSTAGRAM, ETC)
-router.post('/endpoint/space', function (req, res) {
+router.post('/endpoint/space', (req, res) => {
     let data = req.body.data;
-    NamespaceService.endpointSpaceCall(data, req, res);
+    // TODO: add a way to return the last drop added, for reports
+    NamespaceController.runCall(data, (resp, lastDropAdded, countAdded) => res.json(resp));
 });
 
 // UPLOADS
-// todo: change this to a put request
-router.post('/upload/:space/:folder/:filename', function (req, res) {
+// TODO: change this to a put request
+router.post('/upload/:space/:folder/:filename', (req, res) => {
 
     // multer settings
     const storage = multer.diskStorage({
         destination: (_req, file, cb) => {
-            const folderName = './public/uploads/' + _req.params.space + '/' + _req.params.folder;
+            const folderName = 'http://datawhore.erratik.ca:10010/public/uploads/' + _req.params.space + '/' + _req.params.folder;
             mkdirp(folderName, function (err) {
                 cb(null, folderName);
             });

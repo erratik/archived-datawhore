@@ -9,7 +9,7 @@ const Space = require('./models/spaceModel');
 const Schema = require('./models/schemaModel');
 const Drop = require('./models/dropModel');
 const NamespaceService = require('./services/namespace.service');
-const FetchingService = require('./services/fetch-params.service')(Drop);
+const FetchingService = require('./services/fetch-params.service');
 const objectPath = require('object-path');
 
 let namespaces = [];
@@ -92,11 +92,11 @@ module.exports = function (app, spaces, settings, schemaGroups) {
         
         Drop.getSpaceDrops(options, (drops) => {
             const urlParams = FetchingService.composeParams(options, drops);
-            // if (options.isFetchingPast) {
-            //     console.log('🔄 [initFetch] FETCHING PAST');
-            // } else {
-            //     console.log('🔄 [initFetch] FETCHING FUTURE');
-            // }
+            if (options.isFetchingPast) {
+                console.log('🔄 [initFetch] FETCHING PAST');
+            } else {
+                console.log('🔄 [initFetch] FETCHING FUTURE');
+            }
             // console.log('🔄 [initFetch -> getSpaceDrops]', options.space, options.type, urlParams);
             // debugger;
             options.urlParams = urlParams;
@@ -156,17 +156,16 @@ module.exports = function (app, spaces, settings, schemaGroups) {
 
     }
 
-    const shiftDrops = schedule.scheduleJob('*/1 * * * *', function () {
-        // const shiftDrops = schedule.scheduleJob('*/5 * * * *', function() {
+    const shiftDrops = schedule.scheduleJob('* */1 * * *', function() {
         fetchDrops();
-        console.log(`🔄  📅 💧 shifting older drops to the bottom until... 📅 ${endTime}`);
+        console.log(`🔄  📅 💧 getting older drops`);
         console.log(` `);
     });
 
-    const unshiftDrops = schedule.scheduleJob('*/1 * * * *', function () {
-        // fetchDrops(false);
-        // console.log(`🔄 🔥 💧 adding new  drops! 📅 ${new Date()}`);
-        // console.log(` `);
+    const unshiftDrops = schedule.scheduleJob('*/10 * * * *', function () {
+        fetchDrops(false);
+        console.log(`🔄 🔥 💧 adding new  drops! `);
+        console.log(` `);
 
     });
 
