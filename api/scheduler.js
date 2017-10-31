@@ -164,9 +164,9 @@ module.exports = function (app, spaces, settings, schemaGroups) {
     });
 
     const unshiftDrops = schedule.scheduleJob('*/1 * * * *', function () {
-        fetchDrops(false);
-        console.log(`🔄 🔥 💧 adding new  drops! 📅 ${new Date()}`);
-        console.log(` `);
+        // fetchDrops(false);
+        // console.log(`🔄 🔥 💧 adding new  drops! 📅 ${new Date()}`);
+        // console.log(` `);
 
     });
 

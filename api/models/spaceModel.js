@@ -4,7 +4,7 @@ var SpaceSchema = {
     schema: {
         name: String,
         modified: Number,
-        lastModified: { type: Date },
+        lastModified: Number,
         avatar: String,
         description: String,
         username: String,

@@ -1,9 +1,7 @@
 <figure class="image is-{{size}}x{{size}} is-{{aspect}}" [ngClass]="classes" [ngSwitch]="type">
-  
-  <!-- <a href="{{(type === 'photo') ? link[0] : link[1]}}" target="_blank" class="type-overlay"> -->
-  <a href="{{link}}" target="_blank" class="type-overlay">
+  <a href="{{link}}" target="_blank" class="type-overlay" *ngIf="!!type">
       <i class="fa fa-play" *ngSwitchCase="'video'"></i>
       <i class="fa fa-link" *ngSwitchCase="'link'"></i>
   </a>
-  <img src="{{src}}">
+  <img src="{{thumbnail}}">
 </figure>

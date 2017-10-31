@@ -16,27 +16,32 @@ export class ImageFigureComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+    this.getAspect();
+  }
+
+  public getAspect(): any {
+
     if (!!this.specs) {
 
-        const w = this.specs.width;
-        const h = this.specs.height;
-        const r = this.gcd (w, h);
+      const w = this.specs.width;
+      const h = this.specs.height;
+      const r = this.gcd(w, h);
 
-        this.aspect = 'square';
+      this.aspect = 'square';
 
-        if (w / r < h / r) {
-          this.aspect = 'long';
-        }
+      if (w / r < h / r) {
+        this.aspect = 'long';
+      }
 
-        // console.log ('Dimensions = ', w, ' x ', h, '<br>');
-        // console.log ('Gcd        = ', r, '<br>');
-        // console.log ('Aspect     = ', w / r, ':', h / r);
+      // console.log('Dimensions = ', w, ' x ', h, '<br>');
+      // console.log('Gcd        = ', r, '<br>');
+      // console.log('Aspect     = ', w / r, ':', h / r);
 
     }
   }
 
-  private gcd (a, b): any {
-      return (b === 0) ? a : this.gcd (b, a % b);
+  public gcd(a, b): any {
+    return (b === 0) ? a : this.gcd(b, a % b);
   }
 
 }

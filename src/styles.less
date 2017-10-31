@@ -93,13 +93,16 @@ figure {
     align-items: center;
   }
   .is-filling {
-      flex: 1 1 auto;
+    flex: 1 1 auto;
   }
 }
 
 .is-flex-inline {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
+  figure {
+    margin-right: 0.5rem;
+  }
 }
 
 .is-flex-vertical {
@@ -107,7 +110,7 @@ figure {
   flex-direction: column;
   .stretched {
     flex: 1 0 auto;
-
+    
     display: flex;
     flex-direction: column;
     .content {

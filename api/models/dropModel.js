@@ -62,15 +62,14 @@ const DropSchema = {
                     const options = !!params.type ? aggregation.getType : aggregation.getAll;
                     const query = aggregation.base.concat(options);
 
-                    if (!!params.query && !!params.query.limit) {
-                        query.splice(4, 0, { $limit: Number(params.query.limit) });
-                    }
                     that.aggregate(query).exec(function (err, docs) {
                         if (err) cb(err);
                         if (!!docs) {
                             let drops;
                             if (docs.length && docs[0].aggregatedDrops[0].length) {
-                                drops = docs[0].aggregatedDrops[0];
+                                let limit = (!!params.query && !!params.query.limit) ? Number(params.query.limit) : 0;
+                                const aggDrops = docs[0].aggregatedDrops[0];
+                                drops =  limit ? aggDrops.slice(0, limit) : aggDrops;
                             } else {
                                 console.log('empty aggregate query result for: ', query)
                                 drops = [];
