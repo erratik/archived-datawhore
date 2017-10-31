@@ -1,4 +1,8 @@
 <div [ngSwitch]="drop.space">
+  <details>
+    <summary>drop raw content</summary>
+    <pre>{{drop | json}}</pre>
+  </details>
   <div class="is-flex" *ngSwitchDefault>
     <div class="is-flex center date">
       <datawhore-image-figure [size]="16" [src]="spaceIconImage"></datawhore-image-figure>
@@ -8,93 +12,76 @@
 
   </div>
 
-  <!-- <div class="is-flex" *ngSwitchCase="'moves'">
-    <div class="is-flex">
-      <datawhore-image-figure [size]="16" [src]="spaceIconImage"></datawhore-image-figure>
-    </div>
-    <div class="content is-filling">
-      Activities for {{drop.timestamp | amDateFormat:'dddd, MMMM Do YYYY'}}
-      <ul>
-        <li *ngFor="let ac of drop.content.activities">
-          was <b>{{ac.activity}}</b> during <b>{{ac.duration | amDuration:'seconds'}}</b> over <em>{{ac.distance}}</em> meters
-        </li>
-      </ul>
-    </div>
-    <div class="is-flex">
-      <a class="delete is-small" (click)="deleteDrop()"></a>
-    </div>
-
-  </div> -->
-
-
-
   <div class="is-flex" *ngSwitchCase="'moves'">
-      <article class="media">
-        <div class="media-left">
-            <datawhore-image-figure [size]="16" [src]="spaceIconImage"></datawhore-image-figure>
-          <!-- <datawhore-image-figure [size]="64" [src]="drop.content.thumbnail" [classes]="['is-shadowed']"></datawhore-image-figure> -->
+    <article class="media">
+      <div class="media-left">
+        <datawhore-image-figure [size]="16" [src]="spaceIconImage"></datawhore-image-figure>
+        <!-- <datawhore-image-figure [size]="64" [src]="drop.content.thumbnail" [classes]="['is-shadowed']"></datawhore-image-figure> -->
+      </div>
+      <div class="media-content">
+        <div class="content">
+          <p>{{drop.content.date | amDateFormat:'dddd, MMMM Do YYYY'}} {{(type === 'rain.storyline') ? 'Storyline' : 'Activity
+            Segment' }}</p>
         </div>
-        <div class="media-content">
-          <div class="content">
-            <p>{{drop.content.date | amDateFormat:'dddd, MMMM Do YYYY'}} {{(type === 'rain.storyline') ? 'Storyline' : 'Activity Segment' }}</p>
-          </div>
 
-          <ul>
-            <li  *ngFor="let segment of drop.content.segments" [ngSwitch]="segment.type">
-              <div class="is-inline-flex" *ngSwitchCase="'place'">
-                <span class="icon is-small"><i class="fa fa-{{segment.place.type}}"></i></span>
-                {{segment.place.name}} ( {{segment.startTime }}  to {{segment.endTime }})
-              </div>
-              <div class="is-inline-flex" *ngSwitchDefault>
-                <span class="icon is-small"><i class="fa fa-folder"></i></span>
-                {{segment.type}} ( {{segment.startTime }}  to {{segment.endTime }})
-              </div>
-              <ul>
-                <li *ngFor="let ac of segment.activities">
-                  was <b>{{ac.activity}}</b> during <b>{{ac.duration | amDuration:'seconds'}}</b> over <em>{{ac.distance}}</em> meters
-                </li>
-              </ul>
-            </li>
-          </ul>
-          <!-- <nav class="level is-mobile">
-            <div class="level-left">
-              <span class="level-item">
-                  <span class="icon is-small"><i class="fa fa-comments"></i></span>
-              <small>{{drop.content.count_comments}}</small>
-              </span>
-              <span class="level-item">
-                  <span class="icon is-small"><i class="fa fa-heart"></i></span>
-              <small>{{drop.content.count_likes}}</small>
-              </span>
-              <span class="level-item" *ngIf="drop.content.location_name">
-                  <span class="icon is-small"><i class="fa fa-map-marker"></i></span>
-              <small>{{drop.content.location_name}}</small>
-              </span>
+        <ul>
+          <li *ngFor="let segment of drop.content.segments" [ngSwitch]="segment.type">
+            <div class="is-inline-flex" *ngSwitchCase="'place'">
+              <span class="icon is-small"><i class="fa fa-{{segment.place.type}}"></i></span> {{segment.place.name}} ( {{segment.startTime
+              }} to {{segment.endTime }})
             </div>
-          </nav> -->
-        </div>
-        <div class="media-right">
-            <a class="delete is-small" (click)="deleteDrop()"></a>
-        </div>
-      </article>
-  
-    </div>
-
-  <div class="is-flex" *ngSwitchCase="'spotify'">
-    <div class="is-flex center date">
-      <datawhore-image-figure [size]="16" [src]="spaceIconImage"></datawhore-image-figure>
-      <span class="">{{drop.timestamp | date:'short'}}</span>
-    </div>
-
-    <div class="is-flex">
-      <datawhore-image-figure [size]="16" [src]="drop.content.album_images[2].url" [classes]="['is-circle', 'is-shadowed']" class="is-marginless"></datawhore-image-figure>
-      <span class="caption">
-        <p>Played <strong>{{drop.content.track_name}}</strong> by <strong>{{drop.content.track_artists[0].name}}</strong></p>
-        <small>{{drop.content.album_name}}</small>
-      </span>
-    </div>
+            <div class="is-inline-flex" *ngSwitchDefault>
+              <span class="icon is-small"><i class="fa fa-folder"></i></span> {{segment.type}} ( {{segment.startTime }} to
+              {{segment.endTime }})
+            </div>
+            <ul>
+              <li *ngFor="let ac of segment.activities">
+                was <b>{{ac.activity}}</b> during <b>{{ac.duration | amDuration:'seconds'}}</b> over <em>{{ac.distance}}</em>                meters
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div class="media-right">
+        <a class="delete is-small" (click)="deleteDrop()"></a>
+      </div>
+    </article>
 
   </div>
+
+  <div class="is-flex" *ngSwitchCase="'spotify'">
+    <article class="media">
+      <div class="media-left" *ngIf="!!drop.content.album_images && drop.content.album_images.length">
+        <datawhore-image-figure *ngIf="drop.content.album_images" [size]="16" [src]="drop.content.album_images[2].url" [classes]="['is-circle', 'is-shadowed']"
+          class="is-marginless"></datawhore-image-figure>
+
+      </div>
+      <div class="media-content">
+        <div class="content">
+          <div class="is-flex-inline">
+            <div class="caption" *ngIf="drop.content.track_name">
+              <p>Played <strong>{{drop.content.track_name}}</strong> by <strong>{{drop.content.track_artists[0].name}}</strong></p>
+              <small>{{drop.content.album_name}}</small>
+            </div>
+          </div>
+        </div>
+              <small>{{drop.timestamp | amDateFormat:'dddd, MMMM Do YYYY @ hh:MMa'}}</small>
+        <nav class="level is-mobile">
+          <div class="level-left">
+            <span class="level-item" *ngIf="!!drop.content.favorite_count">
+                  <span class="icon is-small"><i class="fa fa-heart"></i></span>
+            <small>{{drop.content.favorite_count}}</small>
+            </span>
+          </div>
+        </nav>
+      </div>
+      <div class="media-right">
+        <datawhore-image-figure [size]="16" [src]="spaceIconImage"></datawhore-image-figure>
+      </div>
+    </article>
+
+  </div>
+
 
   <div class="is-flex" *ngSwitchCase="'tumblr'" [ngSwitch]="type">
     <div class="is-flex center date">
@@ -247,8 +234,8 @@
   <div class="is-flex" *ngSwitchCase="'twitter'">
     <article class="media">
       <div class="media-left" *ngIf="!!drop.content.media && drop.content.media.length">
-        <datawhore-drop-image [size]="64" [src]="drop.content.media[0].media_url" [classes]="['is-shadowed']" [space]="drop.space" 
-        [specs]="{ width: drop.content.media[0].sizes.small.w, height: drop.content.media[0].sizes.small.h}"></datawhore-drop-image>
+        <!-- <datawhore-drop-image [size]="64" [src]="drop.content.media[0].media_url" [classes]="['is-shadowed']" [space]="drop.space" 
+        [specs]="{ width: drop.content.media[0].sizes.small.w, height: drop.content.media[0].sizes.small.h}"></datawhore-drop-image> -->
       </div>
       <div class="media-content">
         <div class="content"><small>{{drop.timestamp | amDateFormat:'dddd, MMMM Do YYYY @ hh:MMa'}}</small>
@@ -258,10 +245,6 @@
         </div>
         <nav class="level is-mobile">
           <div class="level-left">
-            <!-- <span class="level-item" *ngIf="!!drop.content.comments.count">
-                <span class="icon is-small"><i class="fa fa-comments"></i></span>
-              <small>{{drop.content.comments.length}}</small>
-            </span> -->
             <span class="level-item" *ngIf="!!drop.content.favorite_count">
               <span class="icon is-small"><i class="fa fa-heart"></i></span>
             <small>{{drop.content.favorite_count}}</small>
@@ -315,8 +298,4 @@
 
 
 
-  <details>
-    <summary>drop raw content</summary>
-    <pre>{{drop.content | json}}</pre>
-  </details>
 </div>

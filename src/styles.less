@@ -87,6 +87,7 @@ figure {
 }
 
 // custom flex classes
+.no-wrap { white-space: nowrap; }
 .is-flex {
   align-items: flex-start;
   &.center {
@@ -96,7 +97,6 @@ figure {
     flex: 1 1 auto;
   }
 }
-
 .is-flex-inline {
   display: flex;
   align-items: center;
@@ -169,4 +169,8 @@ table {
       margin-right: 0.3rem;
     }
   }
+}
+
+[ng-reflect-type="rain.audio"]:nth-of-type(n+3) {
+  display: none;
 }

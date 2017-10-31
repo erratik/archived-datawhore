@@ -18,7 +18,7 @@ export class DropAtomicComponent implements OnInit, OnDestroy {
   constructor(private spaceItemService: SpaceItemService) {}
 
   ngOnInit() {
-    this.spaceIconImage = `public/uploads/${this.drop.space}/space/${this.drop.space}-icon.png`;
+    this.spaceIconImage = `http://datawhore.erratik.ca:10010/public/uploads/${this.drop.space}/space/${this.drop.space}-icon.png`;
   }
 
 

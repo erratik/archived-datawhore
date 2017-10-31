@@ -11,17 +11,19 @@ import { ProfileService } from "app/services/profile/profile.service";
 import { OauthSettingsService } from "app/services/space/oauth-settings.service";
 
 @Component({
-  selector: 'datawhore-drops',
-  templateUrl: './drops.component.html',
-  styleUrls: ['./drops.component.less']
+  selector: 'datawhore-drop-cloud',
+  templateUrl: './drop-cloud.component.html',
+  styleUrls: ['./drop-cloud.component.less']
 })
-export class DropsComponent extends RainConfigsComponent implements OnInit, OnDestroy {
+export class DropCloudComponent extends RainConfigsComponent implements OnInit, OnDestroy {
+
 
   @Input() public space: Space;
   public drops;
   public dropTypes;
   public rain;
   public isLoading = false;
+  public getCloudDrops$: Observable<any> = new Observable<any>();
   public getDrops$: Observable<any> = new Observable<any>();
   public moreDrops$: Observable<any> = new Observable<any>();
   public deleteDrops$: Observable<any> = new Observable<any>();
@@ -43,31 +45,24 @@ export class DropsComponent extends RainConfigsComponent implements OnInit, OnDe
   }
 
   ngOnInit() {
+    // this.getCloudDrops$ = this.getSomeDrops();
 
-    this.getRainSchemas$ = this.getRain();
+    // this.getRainSchemas$ = this.getRawRain()
+    // .switchMap(() => this.getRain());
 
-    this.getRainSchemas$.subscribe(() => {
-        this.rain = this.rainService.rain;
-        this.activeTab = this.rainService.type = this.rain[this.space.name].length ? this.rain[this.space.name][0].rainType : this.activeTab;
-
-
-        if (this.rain[this.space.name].length) {
-            this.dropTypes = this.rain[this.space.name].map(rain => rain.rainType);
-            this.getSomeDrops(this.dropTypes[0]);
-        }
-    });
   }
 
-  private getSomeDrops(dropType = null): any {
+  private getSomeDrops(): any {
 
-    const options = { limit: 10, after: Date.now() };
-    if (dropType) {
-      options['type'] = dropType;
-    }
-    
-    this.getDrops$ = this.rainService.getDrops(this.space.name, options).do((drops) => {
+    const options = { limit: 10, after: Date.now(), type: false };
+    // if (dropType) {
+    //   options['type'] = dropType;
+    // }
+    // debugger;
+    this.getDrops$ = this.rainService.getCloudDrops(options).do((drops) => {
       this.drops = _.groupBy(drops, 'type');
-      this.activeTab =  dropType;
+      console.log(this.drops)
+      // this.activeTab =  dropType;
     });
 
     this.getDrops$.subscribe();
@@ -88,24 +83,17 @@ export class DropsComponent extends RainConfigsComponent implements OnInit, OnDe
     });
   }
 
-  public setActiveTab(dropType: string): void {
-    this.activeTab = this.rainService.type = dropType;
-    this.rainService.drops[this.space.name] = null;
-    this.getSomeDrops(dropType);
-
-  }
 
   protected deleteDrop(drop): any {
 
     this.deleteDrops$ = this.rainService.deleteDrops([drop], this.space.name).do((drops) => {
       // this.drops = _.groupBy(drops, 'type');
-      console.log(drops);
+      console.log(drops)
+      debugger;
     });
 
     this.deleteDrops$.subscribe((newDrops) => {
       this.isLoading = !this.isLoading;
     });
   }
-
-
 }

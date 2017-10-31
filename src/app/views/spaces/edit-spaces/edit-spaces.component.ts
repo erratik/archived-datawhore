@@ -1,10 +1,10 @@
-import {Component, OnInit} from '@angular/core';
-import {SpacesService} from '../../../services/spaces.service';
-import {Space} from '../../../models/space.model';
+import { Component, OnInit } from '@angular/core';
+import { SpacesService } from '../../../services/spaces.service';
+import { Space } from '../../../models/space.model';
 import 'rxjs/add/operator/map';
-import {Router} from '@angular/router';
-import {OauthSettingsService} from '../../../services/space/oauth-settings.service';
-import {SpaceItemService} from '../../../shared/services/space-item/space-item.service';
+import { Router } from '@angular/router';
+import { OauthSettingsService } from '../../../services/space/oauth-settings.service';
+import { SpaceItemService } from '../../../shared/services/space-item/space-item.service';
 
 @Component({
     selector: 'datawhore-edit-spaces',
@@ -13,42 +13,37 @@ import {SpaceItemService} from '../../../shared/services/space-item/space-item.s
     providers: [SpacesService]
 })
 
+
 export class EditSpacesComponent implements OnInit {
 
     protected isLoadingSpaces = true;
     protected spaces: Array<Space>;
+    protected dropCounts: any = {};
 
     constructor(private spacesService: SpacesService,
-                private spaceItemService: SpaceItemService,
-                private oauthService: OauthSettingsService,
-                private router: Router) {
+        private spaceItemService: SpaceItemService,
+        private oauthService: OauthSettingsService,
+        private router: Router) {
     }
 
     ngOnInit() {
 
         const getSpaces$ = this.spacesService.getAllSpaces()
-            .switchMap((spaces) => {
-                spaces.forEach(space => {
-                    const detailedSpaceInfo$ = this.spaceItemService.fetchSchema(space.name, 'rain')
-                        .do((rainSchemas) => {
-                            // debugger; 
-                            space.rainSchemas = rainSchemas.map(({type, dropCount}) => {return {type, dropCount}})
-                            // space.rainSchemas = rainSchemas.map((s) => {return {type: s.type, dropCount: s.dropCount}})
-                            // debugger;
-                        })
-                        .switchMap(() => this.oauthService.getOauthSettings(space.name));
+            .do((spaces) => {
 
-                    detailedSpaceInfo$.subscribe(settings => {
-                        space.oauth = settings;
-                    })
+                const spaceList = spaces.map(({ name }) => name);
+                const getDropCounts$ = this.spaceItemService.fetchSchemas(spaceList, 'rain')
+                    .switchMap(() => this.spacesService.getSpaceStatus(spaceList));
+
+                getDropCounts$.subscribe((spaceStatus) => {
+                    console.log('spaces status:', spaceStatus);
+                    this.isLoadingSpaces = false;
                 });
-                return this.spaces = spaces;
-            })
-            .do(() => this.isLoadingSpaces = false);
 
-        getSpaces$.subscribe(() => {
-            this.sortByKey(this.spaces, 'modified');
-        });
+                return this.spaces = spaces;
+            });
+
+        getSpaces$.subscribe();
 
     }
 
@@ -67,5 +62,8 @@ export class EditSpacesComponent implements OnInit {
         this.router.navigate([`/space/${space.name}`]);
         // this.spaces.unshift(space);
     }
+
+
+
 
 }

@@ -23,7 +23,6 @@ export class DropImageComponent extends ImageFigureComponent implements OnInit {
     this.getAspect();
     this.aspect += `-${this.space}`;
     this.thumbnail = this.getThumbnailUrl(this.src);
-    console.log(this.thumbnail, this.aspect);
 
     if (!!this.type) {
       const linkedTypes = ['video', 'link'];
@@ -32,7 +31,6 @@ export class DropImageComponent extends ImageFigureComponent implements OnInit {
   }
 
   private getThumbnailUrl(thumbData): any {
-    
     if (typeof thumbData !== 'string') {
       switch (this.space) {
         case 'swarm':

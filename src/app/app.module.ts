@@ -1,10 +1,14 @@
+
 import {BrowserModule} from '@angular/platform-browser';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {NgModule} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {HttpModule} from '@angular/http';
 import {RouterModule, Routes} from '@angular/router';
 import {MomentModule} from 'angular2-moment';
-import * as _ from "lodash";
+import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { ChartsModule } from 'ng2-charts';
+import * as _ from 'lodash';
 
 import {FileSelectDirective, FileDropDirective} from 'ng2-file-upload';
 
@@ -42,6 +46,12 @@ import { OrderDropByPipe } from './shared/pipes/order-drop-by.pipe';
 import { ImageFigureComponent } from './shared/directives/image-figure/image-figure.component';
 import { ProfileConfigComponent } from './views/profile/profile-config/profile-config.component';
 import { DropImageComponent } from './shared/directives/drop-image/drop-image.component';
+import { CloudComponent } from './views/cloud/cloud/cloud.component';
+import { DropCloudComponent } from './views/cloud/drop-cloud/drop-cloud.component';
+import { SpaceIconComponent } from './shared/directives/space-icon/space-icon.component';
+import { LineChartComponent } from './shared/ui/charts/line-chart/line-chart.component';
+import { PieChartAdvancedComponent } from './shared/ui/charts/pie-chart--advanced/pie-chart--advanced.component';
+import { DonutChartComponent } from './shared/ui/charts/donut-chart/donut-chart.component';
 
 const appRoutes: Routes = [
     {
@@ -54,6 +64,9 @@ const appRoutes: Routes = [
     },
     {
         path: 'spaces', component: EditSpacesComponent
+    },
+    {
+        path: 'cloud', component: CloudComponent
     },
     {
         path: 'space/:space', component: SpaceViewComponent
@@ -69,6 +82,9 @@ const appRoutes: Routes = [
         FormsModule,
         HttpModule,
         MomentModule,
+        BrowserAnimationsModule,
+        NgxChartsModule,
+        ChartsModule,
         // NgSemanticModule,
         RouterModule.forRoot(appRoutes)
     ],
@@ -99,7 +115,13 @@ const appRoutes: Routes = [
         OrderDropByPipe,
         ImageFigureComponent,
         ProfileConfigComponent,
-        DropImageComponent
+        DropImageComponent,
+        CloudComponent,
+        DropCloudComponent,
+        SpaceIconComponent,
+        LineChartComponent,
+        PieChartAdvancedComponent,
+        DonutChartComponent
     ],
     providers: [
         SpacesService,

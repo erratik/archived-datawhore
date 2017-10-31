@@ -27,13 +27,14 @@ export class RainService extends SpaceItemService {
                 const rainResponse = res.json();
                 const types = _.groupBy(rainResponse.dimensions, 'type');
 
-                this.rain = this.rainSchemas.map(schema => new Rain(
+                this.rain[space] = Object.keys(types).map(rainType => new Rain(
                     space,
-                    !!types[schema.type] ? types[schema.type].map((dims: RainDimension) => new RainDimension(dims.friendlyName, dims.schemaPath, dims.type, dims['_id'])).filter(({ type }) => schema.type === type) : [],
-                    schema.type,
+                    types[rainType].map((dims: RainDimension) => new RainDimension(dims.friendlyName, dims.schemaPath, dims.type, dims['_id'])).filter(({ type }) => rainType === type),
+                    rainType,
                     rainResponse.modified
                 ));
-                
+
+
                 return this.rain;
             })
             .catch(this.handleError);
@@ -44,33 +45,64 @@ export class RainService extends SpaceItemService {
         const rainService = this;
         return this.http.get(`${this.apiServer}/get/drops/${space}${queryObj}`)
             .map((res: Response) => {
-                const dropsResponse = res.json();
-                
+                let dropsResponse = res.json();
+
+                dropsResponse = dropsResponse.map(drop => {
+                    drop.space = space;
+                    return drop;
+                });
                 if (!rainService.drops[space]) {
+
                     rainService.drops[space] = [];
                 }
-                rainService.drops[space] = rainService.drops[space].concat(rainService.enrichDrops(space, rainService.type, dropsResponse));
+                rainService.drops[space] = rainService.drops[space].concat(rainService.enrichDrops(dropsResponse));
+                // debugger;
+                console.log(rainService.drops[space])
                 return rainService.drops[space];
             })
             .catch(this.handleError);
     }
 
-    private enrichDrops(space, type, drops = null): any {
-        if (!drops) {
-            drops = this.drops[space];
-        }
+    public getCloudDrops(queryObj = null): Observable<any> {
+        queryObj = queryObj ? '?' + Object.keys(queryObj).map((k) => encodeURIComponent(k) + '=' + encodeURIComponent(queryObj[k])).join('&') : '';
+        const rainService = this;
+        return this.http.get(`${this.apiServer}/get/drops/all${queryObj}`)
+            .map((res: Response) => {
+                const resp = res.json();
+                // debugger;
+                resp.forEach(space => {
+                    space.drops = space.drops.map(drop => {
+                        drop.space = space._id;
+                        return drop;
+                    })
+                });
+                return resp;
+            })
+            .catch(this.handleError);
+    }
+
+    public enrichDrops(drops = null): Drop[] {
+        // if (!drops) {
+        //     drops = this.drops[space];
+        // }
+
         return drops.map(drop => {
             const content = {};
-            const dropProperties = this.rain.filter(rain => rain.rainType === type)[0].properties;
-            dropProperties.forEach(prop => content[prop.friendlyName] = objectPath.get(drop, prop.schemaPath));
-            return new Drop(drop._id, space, drop.type, content, drop.timestamp);
+            // console.log(drop.space, this.rain[drop.space][0].properties)
+            const dropProperties = this.rain[drop.space][0].properties;
+            // debugger;
+            dropProperties.forEach(({ friendlyName, schemaPath }) => {
+                // console.log(friendlyName, schemaPath)
+                content[friendlyName] = objectPath.get(drop, schemaPath)
+            });
+            return new Drop(drop._id, drop.space, drop.type, content, drop.timestamp);
         });
 
     }
 
 
     public deleteDrops(drops: [Drop], space): any {
-        
+
 
         const headers = new Headers({ 'Content-Type': 'application/json' }); // ... Set content type to JSON
         const options = new RequestOptions({

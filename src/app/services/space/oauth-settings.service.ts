@@ -17,7 +17,7 @@ export class OauthSettingsService {
     public getOauthSettings(spaceName: string): Observable<SpaceOauthSettings> {
         return this.http.get(`${this.apiServer}/get/settings/${spaceName}`)
             .map((res: Response) => this.toSpaceSettings(res))
-            .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
+            .catch(this.handleError);
     }
 
     public updateSpaceSettings(space: Space): Observable<any> {

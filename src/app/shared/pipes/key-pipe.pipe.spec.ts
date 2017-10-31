@@ -1,8 +1,8 @@
-import { KeyPipePipe } from './key-pipe.pipe';
+import { KeyPipe } from './key-pipe.pipe';
 
-describe('KeyPipePipe', () => {
+describe('KeyPipe', () => {
   it('create an instance', () => {
-    const pipe = new KeyPipePipe();
+    const pipe = new KeyPipe();
     expect(pipe).toBeTruthy();
   });
 });

@@ -18,6 +18,12 @@ export class SpacesService {
     constructor(private http: Http, private router: Router) {
     }
 
+    public getSpaceStatus(spaces: string[]): Observable<any> {
+        return this.http.get(`${this.apiServer}/space/status/${spaces}`)
+            .map((res: Response) => res.json())
+            .catch(this.handleError);
+    }
+
     public getSpace(spaceName: string): Observable<Space> {
         return this.http.get(`${this.apiServer}/space/${spaceName}`).map((res: Response) => {
 

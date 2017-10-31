@@ -39,7 +39,8 @@ export class SpaceViewComponent implements OnInit {
 
     constructor(private spacesService: SpacesService,
                 private oauthService: OauthSettingsService,
-                private activatedRoute: ActivatedRoute) {
+                private activatedRoute: ActivatedRoute,
+                public router: Router) {
     }
 
     ngOnInit() {
@@ -87,6 +88,8 @@ export class SpaceViewComponent implements OnInit {
 
     public setActiveTab(tabName: string): void {
         this.activeTab = tabName;
+        debugger;
+        this.router.navigate(['/space', this.space.name]);
         this.activatedRoute.params['tab'] = tabName;
     }
 

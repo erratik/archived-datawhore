@@ -16,7 +16,16 @@ export class SpaceItemService {
     public fetchSchema(space: string, schemaType = this.type): Observable<any> {
         return this.http.get(`${this.apiServer}/get/schema/${space}?type=${schemaType}`)
             .map((res: Response) => {
-                let resp = res.json();
+                const resp = res.json();
+                return resp;
+            })
+            .catch(this.handleError);
+    }
+
+    public fetchSchemas(spaces: string[], schemaType = this.type): Observable<any> {
+        return this.http.get(`${this.apiServer}/get/schemas/?type=${schemaType}&spaces=${spaces}`)
+            .map((res: Response) => {
+                const resp = res.json();
                 return resp;
             })
             .catch(this.handleError);
