@@ -1,6 +1,6 @@
 {
   "project": {
-    "version": "1.0.0-beta.24",
+    "version": "4.3.6",
     "name": "datawhore"
   },
   "apps": [
@@ -9,7 +9,9 @@
       "outDir": "dist",
       "assets": [
         "assets",
+        { "glob": "/*", "input": "../public", "output": "./public" },
         "../public",
+        "uploads",
         "favicon.ico"
       ],
       "index": "index.html",
