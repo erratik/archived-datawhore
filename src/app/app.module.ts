@@ -55,6 +55,7 @@ import { PieChartAdvancedComponent } from './shared/ui/charts/pie-chart--advance
 import { DonutChartComponent } from './shared/ui/charts/donut-chart/donut-chart.component';
 import { BaseChartComponent } from './shared/ui/charts/base-chart/base-chart.component';
 import { ColorPickerComponent } from './shared/ui/tools/color-picker/color-picker.component';
+import { DayViewerComponent } from './views/cloud/day-viewer/day-viewer.component';
 
 const appRoutes: Routes = [
     {
@@ -70,6 +71,9 @@ const appRoutes: Routes = [
     },
     {
         path: 'cloud', component: CloudComponent
+    },
+    {
+        path: 'cloud/viewer', component: DayViewerComponent
     },
     {
         path: 'space/:space', component: SpaceViewComponent
@@ -127,7 +131,8 @@ const appRoutes: Routes = [
         PieChartAdvancedComponent,
         DonutChartComponent,
         BaseChartComponent,
-        ColorPickerComponent
+        ColorPickerComponent,
+        DayViewerComponent
     ],
     providers: [
         SpacesService,

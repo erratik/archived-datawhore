@@ -1,8 +1,8 @@
 <div [ngSwitch]="drop.space">
-  <details>
+  <!-- <details>
     <summary>drop raw content</summary>
     <pre>{{drop | json}}</pre>
-  </details>
+  </details> -->
   <div class="is-flex" *ngSwitchDefault>
     <div class="is-flex center date">
       <datawhore-image-figure [size]="16" [src]="spaceIconImage"></datawhore-image-figure>
@@ -65,13 +65,10 @@
             </div>
           </div>
         </div>
-              <small>{{drop.timestamp | amDateFormat:'dddd, MMMM Do YYYY @ hh:MMa'}}</small>
+              <small>{{drop.timestamp | amDateFormat:'dddd, MMMM Do YYYY @ hh:mma'}}</small>
         <nav class="level is-mobile">
           <div class="level-left">
-            <span class="level-item" *ngIf="!!drop.content.favorite_count">
-                  <span class="icon is-small"><i class="fa fa-heart"></i></span>
-            <small>{{drop.content.favorite_count}}</small>
-            </span>
+            
           </div>
         </nav>
       </div>
@@ -168,7 +165,7 @@
       </div>
       <div class="media-content">
         <div class="content">
-          <p><small>{{drop.timestamp | amDateFormat:'dddd, MMMM Do YYYY @ hh:MMa'}}</small>
+          <p><small>{{drop.timestamp | amDateFormat:'dddd, MMMM Do YYYY @ hh:mma'}}</small>
             <!--<strong>John Smith</strong> <small>@johnsmith</small> -->
             <br>{{drop.content.caption }}
           </p>

@@ -110,9 +110,9 @@ module.exports = NamespaceController = {
             if (!!errorObj.error || err.status === 401) {
 
                 console.log('⛔ [namespace ctrl: request]', errorObj.error);
-                if (data.space === 'spotify') {
-                    debugger;
-                }
+                // if (data.space === 'spotify') {
+                //     debugger;
+                // }
                 if (hasExpiredToken(body).length) {
 
                     Setting.findSettings(data.space, (settings) => {
@@ -132,8 +132,6 @@ module.exports = NamespaceController = {
                                 settings.connected = true;
                                 Setting.updateSettings(settings, EndpointService.post(data, body, cb));
                             }
-
-
                         });
                     });
                 } else {

@@ -8,9 +8,9 @@ import 'rxjs/add/operator/map';
 import { Router } from '@angular/router';
 import { OauthSettingsService } from '../../../services/space/oauth-settings.service';
 import { SpaceItemService } from '../../../shared/services/space-item/space-item.service';
-import { Drop } from "app/models/drop.model";
+import { Drop } from 'app/models/drop.model';
 import * as _ from 'lodash';
-import { DimensionSchema } from "app/models/dimension-schema.model";
+import { DimensionSchema } from 'app/models/dimension-schema.model';
 
 @Component({
   selector: 'datawhore-cloud',
@@ -26,22 +26,34 @@ export class CloudComponent implements OnInit {
   public newDrops: any = [];
   public dropRepository: any = [];
   public dropsBySpace = [];
-  public options: any = { limit: 50, after: Date.now(), type: false };
+  public options: any = { limit: 50, max: Date.now(), type: false };
   public getDrops$ = new Observable<any>();
   public getSpaces$ = new Observable<any>();
 
 
-  constructor(private spacesService: SpacesService,
-    private spaceItemService: SpaceItemService,
-    private rainService: RainService,
-    private router: Router) {
+  constructor(public spacesService: SpacesService,
+    public spaceItemService: SpaceItemService,
+    public rainService: RainService,
+    public router: Router) {
   }
 
   ngOnInit() {
 
 
-    this.getSpaces$ = this.spacesService.getAllSpaces().switchMap((spaces) => {
+    this.getSpaces$ = this.getSpaces();
+
+    this.getSpaces$.subscribe(() => {
+      // debugger;
+
+      // this.newDrops = [];
+    });
+
+  }
+
+  public getSpaces(): any {
+    return this.spacesService.getAllSpaces().switchMap((spaces) => {
       this.spaces = spaces;
+      
       this.getDrops$ = this.rainService.getCloudDrops(this.options).do((cloudDrops) => {
 
         this.generateCloud(cloudDrops);
@@ -55,33 +67,26 @@ export class CloudComponent implements OnInit {
       });
       return this.getDrops$;
     })
-      .do((spaces) => {
-        this.isLoadingSpaces = false;
-        const that = this;
-        const source = Observable.range(0, this.spaces.length).combineLatest(x => that.spaces[x].name);
+    .do((spaces) => {
+      this.isLoadingSpaces = false;
+      const that = this;
+      const source = Observable.range(0, this.spaces.length).combineLatest(x => that.spaces[x].name);
 
-        source.subscribe((space) => {
-          const getRain$ = that.rainService.getRain(space);
+      source.subscribe((space) => {
+        const getRain$ = that.rainService.getRain(space);
 
-          getRain$.subscribe((rain) => {
-            this.newDrops = this.newDrops.map(d => {
-              d.space = space;
-              return d;
-            })
-            this.drops = this.drops.concat(this.rainService.enrichDrops(this.newDrops.filter(({type}) => rain[space][0].rainType === type)));
+        getRain$.subscribe((rain) => {
+          this.newDrops = this.newDrops.map(d => {
+            d.space = space;
+            return d;
+          })
+          this.drops = this.drops.concat(this.rainService.enrichDrops(this.newDrops.filter(({ type }) => rain[space][0].rainType === type)));
 
-            console.log(this.newDrops.filter(({type}) => rain[space][0].rainType === type));
-            console.log(this.rainService.rain);
-          });
+          console.log(this.newDrops.filter(({ type }) => rain[space][0].rainType === type));
+          console.log(this.rainService.rain);
         });
       });
-
-    this.getSpaces$.subscribe(() => {
-      // debugger;
-      
-      // this.newDrops = [];
     });
-
   }
 
   public getRawRain(space): any {
@@ -94,73 +99,73 @@ export class CloudComponent implements OnInit {
 
   public getMoreDrops(): any {
     let newDrops = [];
-    
-    this.options.after = _.minBy(this.drops, (o) => o['timestamp'])['timestamp'];
+
+    this.options.max = _.minBy(this.drops, (o) => o['timestamp'])['timestamp'];
 
 
     const getMoreDrops$ = this.rainService.getCloudDrops(this.options).do((cloudDrops) => {
       this.newDrops = [];
-        cloudDrops.forEach(({ drops }) => {
-          this.newDrops = this.newDrops.concat(drops);
-        });
-        
+      cloudDrops.forEach(({ drops }) => {
+        this.newDrops = this.newDrops.concat(drops);
+      });
+
       this.generateCloud(cloudDrops);
-      
-      
-        return this.spaces;
+
+
+      return this.spaces;
     });
-    
+
 
     getMoreDrops$.subscribe((spaces) => {
-        
-        const source = Observable.range(0, spaces.length).combineLatest(x => {
-          return spaces[x]._id;
-        });
 
-        source.subscribe((space) => {
-          const getRain$ = this.rainService.getRain(space);
+      const source = Observable.range(0, spaces.length).combineLatest(x => {
+        return spaces[x]._id;
+      });
 
-          getRain$.subscribe(() => {
-            this.drops = this.drops.concat(this.rainService.enrichDrops(this.newDrops.filter(drop => drop.space === space)));
-          });
+      source.subscribe((space) => {
+        const getRain$ = this.rainService.getRain(space);
+
+        getRain$.subscribe(() => {
+          this.drops = this.drops.concat(this.rainService.enrichDrops(this.newDrops.filter(drop => drop.space === space)));
         });
       });
+    });
   }
-  
+
 
   public getDropFlex(dropSpace): any {
 
-      return '1 0 ' + dropSpace.drops.length / this.drops.length * 100 + '%';
+    return '1 1 ' + dropSpace.drops.length / this.drops.length * 100 + '%';
   }
 
 
   public generateCloud(cloudDrops, newDrops = null): any {
     // this.dropRepository.push(cloudDrops);
-    this.dropRepository  = cloudDrops.map(({_id, drops, count}, k) => {
-        const space = this.dropsBySpace.filter(o => o._id === _id);
-        const prevCount = space.length ? space[0].count : 0;
-        const prevDrops = space.length ? space[0].drops : [];
-        return {_id, drops: drops, count: count };
+    this.dropRepository = cloudDrops.map(({ _id, drops, count }) => {
+      return { _id, drops, count };
     });
-    const spacesFetched = cloudDrops.map(({_id}) => _id);
-    const existingSpaces = this.dropsBySpace.map(({_id}) => _id);
-    const allSpaces = _.uniq(spacesFetched.concat(existingSpaces));
-    // debugger;Î
-    this.dropsBySpace = allSpaces.map(space => {
-      let spaceRepo = this.dropRepository.filter(o => o._id === space)[0];
-      if (!existingSpaces.includes(space)) {
-        console.log(this.drops.length);
-        return {_id: space, drops: spaceRepo.drops, count: spaceRepo.count};
-      } else {
-          const dropSpace = this.dropsBySpace.filter(o => o._id === space);
-          // const prevCount = dropSpace.length ? dropSpace[0].count : 0;
-          const prevDrops = dropSpace.length ? dropSpace[0].drops : [];
-          const spawnDrops = !!spaceRepo ? spaceRepo.drops.concat(prevDrops) : prevDrops;
 
-          return {_id: space, drops: spawnDrops, count: spawnDrops.length};
-          // return {_id: space, drops: spaceRepo.drops, count: spaceRepo.count};
+    const spacesFetched: string[] = cloudDrops.map(({ _id }) => _id);
+    const existingSpaces: string[] = this.dropsBySpace.map(({ _id }) => _id);
+    const allSpaces: string[] = _.uniq(spacesFetched.concat(existingSpaces));
+
+    this.dropsBySpace = allSpaces.map(space => {
+      const spaceRepo = this.dropRepository.filter(o => o._id === space)[0];
+
+      const spaceObj = { _id: space, color: this.spaces.filter((s: Space) => s.name === space)[0].display.color };
+
+      if (!existingSpaces.includes(space)) {
+        spaceObj['drops'] = spaceRepo.drops;
+        spaceObj['count'] = spaceRepo.count;
+      } else {
+        const dropSpace = this.dropsBySpace.filter(o => o._id === space);
+        const prevDrops = dropSpace.length ? dropSpace[0].drops : [];
+        const spawnDrops = !!spaceRepo ? spaceRepo.drops.concat(prevDrops) : prevDrops;
+        spaceObj['drops'] = spawnDrops;
+        spaceObj['count'] = spawnDrops.length;
       }
 
+      return spaceObj;
     });
 
     this.dropSpaces = this.dropsBySpace.map(({ _id }) => _id);

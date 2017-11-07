@@ -110,6 +110,7 @@ router
 
 // UPLOADS
 // TODO: change this to a put request
+// FIXME: uploading to the wrong place!!!
 router.post('/upload/:space/:folder/:filename', (req, res) => {
 
     // multer settings

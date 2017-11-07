@@ -28,13 +28,17 @@ const DropSchema = {
                 if (result) {
 
                     const dropDocId = result._id;
-                    const dropQuery = (!!params.query && !!params.query.after) ? { 'drops.timestamp': { $lt: Number(params.query.after) } } : { 'drops.timestamp': { $lt: Date.now() } };
+                    
+                    const timestampQuery = (!!params.query && !!params.query.max) ? { 'drops.timestamp': { $lt: Number(params.query.max) } } : { 'drops.timestamp': { $lt: Date.now() } };
+                    if (!!params.query && !!params.query.min) {
+                        timestampQuery['drops.timestamp']['$gt'] = Number(params.query.min);
+                    }
 
                     let aggregation = {
                         base: [
                             { $match: { space: params.space, "_id": dropDocId } },
                             { $unwind: "$drops" },
-                            { $match: dropQuery },
+                            { $match: timestampQuery },
                             { $sort: { 'drops.timestamp': -1 } },
                             { $project: { _id: '$_id', drops: '$drops', type: '$drops.type' } },
                             { $group: { _id: '$type', count: { '$sum': 1 }, drops: { $push: '$drops' } } }
@@ -56,10 +60,10 @@ const DropSchema = {
                                 }
                             }
                         ],
-                        getAfterTimestamp: [
+                        getTimestamp: [
                             { $match: {  } },
                             { $unwind: "$drops" },
-                            { $match: dropQuery },
+                            { $match: timestampQuery },
                             { $sort: { 'drops.timestamp': -1 } },
                             { $limit: (!!params.query && !!params.query.limit) ? Number(params.query.limit) : 20 },
                             { $unwind: "$drops.type" },
@@ -68,15 +72,15 @@ const DropSchema = {
                         ]
                     };
 
-                    const options = params.type !== 'drops' ? aggregation.getType : aggregation.getAll;
-                    const query = params.space === 'all' ? aggregation.getAfterTimestamp : aggregation.base.concat(options);
+                    const options = params.type !== 'drops' ? aggregation.getType : aggregation.base;
+                    const query = params.space === 'all' ? aggregation.getTimestamp : aggregation.base.concat(options);
 
                     that.aggregate(query).exec(function (err, docs) {
                         if (err) cb(err);
                         if (!!docs) {
                             let drops;
                             let typedDrops = [];
-                            let limit = (!!params.query && !!params.query.limit) ? Number(params.query.limit) : 0;
+                            let limit = (!!params.query && !!params.query.limit) ? Number(params.query.limit) : 20;
                             if (docs.length) {
                                 if (params.type === 'drops') {
                                     Object.keys(docs[0].types).forEach((typeKey) => {

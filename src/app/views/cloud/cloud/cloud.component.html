@@ -25,12 +25,8 @@
                 <a (click)="getMoreDrops()" class="button is-info is-small is-pulled-right is-marginless"> fetch more drops</a>
             <div class="column" *ngIf="drops.length">
 
-                <datawhore-drop-atomic *ngFor="let drop of drops" [type]="drop.type" [drop]="drop"></datawhore-drop-atomic> 
+                <datawhore-drop-atomic *ngFor="let drop of drops | orderBy:'timestamp':false" [type]="drop.type" [drop]="drop"></datawhore-drop-atomic> 
                 
-                <!-- <article class="media" *ngFor="let space of spaces">
-                  <datawhore-drop-cloud [space]="space" class="columns"></datawhore-drop-cloud>
-                    
-                </article> -->
                 <hr>
 
             </div>
