@@ -52,6 +52,7 @@ import { SpaceIconComponent } from './shared/directives/space-icon/space-icon.co
 import { LineChartComponent } from './shared/ui/charts/line-chart/line-chart.component';
 import { PieChartAdvancedComponent } from './shared/ui/charts/pie-chart--advanced/pie-chart--advanced.component';
 import { DonutChartComponent } from './shared/ui/charts/donut-chart/donut-chart.component';
+import { BaseChartComponent } from './shared/ui/charts/base-chart/base-chart.component';
 
 const appRoutes: Routes = [
     {
@@ -121,7 +122,8 @@ const appRoutes: Routes = [
         SpaceIconComponent,
         LineChartComponent,
         PieChartAdvancedComponent,
-        DonutChartComponent
+        DonutChartComponent,
+        BaseChartComponent
     ],
     providers: [
         SpacesService,

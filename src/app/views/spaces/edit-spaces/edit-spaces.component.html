@@ -1,15 +1,14 @@
 <section class="section">
     <div class="container">
         <div class="columns">
-
+            
             <div class="column">
-
 
                 <datawhore-add-space (addedSpace)="onAddedSpace($event)"></datawhore-add-space>
                 
                 <article class="media" *ngFor="let space of spaces">
                     <div class="media-left space-drop-chart is-flex">
-                        <datawhore-donut-chart [data]="space.rainSchemas"></datawhore-donut-chart>
+                        <datawhore-donut-chart [data]="space.counts"></datawhore-donut-chart>
                         <figure>
                             <p class="image is-32x32">
                                 <img src="{{(space.icon) ? 'http://datawhore.erratik.ca:10010/'+space.icon : 'http://bulma.io/images/placeholders/32x32.png'}}">
@@ -19,7 +18,7 @@
                     <div class="media-content">
                         <div class="content">
                             <div>
-                                <figure class="image is-24x24 is-circle" *ngIf="space.avatar">
+                                <figure class="image is-24x24 is-circle">
                                     <img src="{{space.avatar}}">
                                 </figure>
                                 <var *ngIf="!space.username">{{space.name}}</var>

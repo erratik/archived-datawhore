@@ -19,7 +19,7 @@ export class SpacesService {
     }
 
     public getSpaceStatus(spaces: string[]): Observable<any> {
-        return this.http.get(`${this.apiServer}/space/status/${spaces}`)
+        return this.http.get(`${this.apiServer}/status?spaces=${spaces}`)
             .map((res: Response) => res.json())
             .catch(this.handleError);
     }

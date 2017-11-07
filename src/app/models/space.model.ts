@@ -11,7 +11,8 @@ export class Space {
                 public description?: string,
                 public avatar?: string,
                 public rainSchemas?: any[],
-                public dropCount?: number) {
+                public counts?: any,
+                public connected?: boolean) {
     }
 
 }

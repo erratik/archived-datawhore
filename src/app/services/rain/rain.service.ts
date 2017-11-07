@@ -84,16 +84,17 @@ export class RainService extends SpaceItemService {
         //     drops = this.drops[space];
         // }
 
-        return drops.map(drop => {
+        return drops.map((drop: Drop) => {
             const content = {};
-            // console.log(drop.space, this.rain[drop.space][0].properties)
-            const dropProperties = this.rain[drop.space][0].properties;
+
+            const dropProperties = this.rain[drop.space].filter(({rainType}) => rainType === drop.type)[0].properties;
+            // console.log(dropProperties);
             // debugger;
+
             dropProperties.forEach(({ friendlyName, schemaPath }) => {
-                // console.log(friendlyName, schemaPath)
-                content[friendlyName] = objectPath.get(drop, schemaPath)
+                content[friendlyName] = objectPath.get(drop, schemaPath);
             });
-            return new Drop(drop._id, drop.space, drop.type, content, drop.timestamp);
+            return new Drop(drop['_id'], drop.space, drop.type, content, drop.timestamp);
         });
 
     }

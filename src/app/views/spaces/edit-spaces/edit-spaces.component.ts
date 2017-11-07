@@ -1,3 +1,4 @@
+import { retry } from 'rxjs/operator/retry';
 import { Component, OnInit } from '@angular/core';
 import { SpacesService } from '../../../services/spaces.service';
 import { Space } from '../../../models/space.model';
@@ -16,9 +17,9 @@ import { SpaceItemService } from '../../../shared/services/space-item/space-item
 
 export class EditSpacesComponent implements OnInit {
 
-    protected isLoadingSpaces = true;
-    protected spaces: Array<Space>;
-    protected dropCounts: any = {};
+    public isLoadingSpaces = true;
+    public spaces: Array<Space>;
+    public dropCounts: any = {};
 
     constructor(private spacesService: SpacesService,
         private spaceItemService: SpaceItemService,
@@ -29,21 +30,31 @@ export class EditSpacesComponent implements OnInit {
     ngOnInit() {
 
         const getSpaces$ = this.spacesService.getAllSpaces()
-            .do((spaces) => {
-
-                const spaceList = spaces.map(({ name }) => name);
-                const getDropCounts$ = this.spaceItemService.fetchSchemas(spaceList, 'rain')
-                    .switchMap(() => this.spacesService.getSpaceStatus(spaceList));
-
-                getDropCounts$.subscribe((spaceStatus) => {
-                    console.log('spaces status:', spaceStatus);
-                    this.isLoadingSpaces = false;
+            .switchMap((spaces) => {
+                this.spaces = spaces;
+                const spaceList = spaces.map((s) => s.name);
+                return this.spacesService.getSpaceStatus(spaceList);
+            })
+            // TODO: sucks to have to wait on space to exist! figure out a way to let it load?
+            .switchMap(spaceStatus => {
+                const spaceList = spaceStatus.filter(s => s.connected === true).map(s => s.space);
+                this.spaces = this.spaces.map(space => {
+                    // Object.keys(space).forEach((key) => (space[key] == null) && delete space[key]);
+                    space.connected = spaceList.includes(space.name);
+                    return space;
                 });
-
-                return this.spaces = spaces;
+                return this.spaceItemService.fetchSchemas(spaceList, 'rain');
             });
 
-        getSpaces$.subscribe();
+            getSpaces$.subscribe((spaceCounts) => {
+                // console.log('spaces:', this.spaces);
+                // console.log('counts:', spaceCounts);
+                this.spaces = this.spaces.map(s => {
+                    s.counts = spaceCounts[s.name];
+                    return s;
+                });
+                this.isLoadingSpaces = false;
+            });
 
     }
 

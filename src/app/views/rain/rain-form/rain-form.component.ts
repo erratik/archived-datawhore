@@ -20,15 +20,14 @@ export class RainFormComponent extends DimensionFormComponent implements OnInit 
     @Output() onRainSchema = new EventEmitter<any>();
 
     constructor(spacesService: SpacesService,
-                rainService: RainService) {
+        rainService: RainService) {
         super(null, rainService, spacesService)
     }
 
     ngOnInit() {
         const rainSchema = this.rainService.rainSchemas[this.rainSchemaIndex];
-        const rain = this.rainService.rain.filter(({rainType}) => rainType === rainSchema.type)[0];
-        console.log(rain);
-        debugger;
+        const rain = this.rainService.rain[this.space.name].filter(({ rainType }) => rainType === this.dimType)[0];
+
         rainSchema.propertyBucket = rainSchema.assignValues(rain.properties);
 
         this.model = rainSchema.propertyBucket;
