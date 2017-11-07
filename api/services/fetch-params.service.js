@@ -5,7 +5,7 @@ module.exports = {
     composeParams: (options, drops) => {
 
         // if fetching past but there are no drops, fetch fute/present
-        isFetchingPast = options.isFetchingPast && drops.length;
+        isFetchingPast = !!(options.isFetchingPast && drops.length);
         
         let dropOldest, dropNewest, params;
 
@@ -72,13 +72,23 @@ module.exports = {
                 }
                 break;
             case 'moves':
-                params = { date: moment().format('YYYYMMDD') };
+                params = { trackPoints: true };
+                
+                const count = 7;
 
                 if (isFetchingPast) {
-                    params.date = moment(dropOldest['timestamp']).subtract(1, 'days').format('YYYYMMDD');
+                    params.to = moment(dropOldest['timestamp']).subtract(1, 'days').format('YYYYMMDD');
+                    params.from = moment(dropOldest['timestamp']).subtract(count, 'days').format('YYYYMMDD');
+                    // params.date = moment(dropOldest['timestamp']).subtract(1, 'days').format('YYYYMMDD');
                 } else if (drops.length) {
-                    params.date = moment(dropNewest['timestamp']).add(1, 'days').format('YYYYMMDD');
+                    params.to = moment(dropNewest['timestamp']).format('YYYYMMDD');
+                    params.from = moment(dropNewest['timestamp']).subtract(count-1, 'days').format('YYYYMMDD');
+                    // params.date = moment(dropNewest['timestamp']).add(1, 'days').format('YYYYMMDD');
+                } else {
+                    params.to = moment().format('YYYYMMDD');
+                    params.from = moment().subtract(count-1, 'days').format('YYYYMMDD');
                 }
+                
                 break;
             case 'facebook':
 

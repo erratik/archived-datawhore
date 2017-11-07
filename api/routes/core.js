@@ -20,7 +20,7 @@ const getEndpoint = EndpointService.get;
 router
     .get('/status/', (req, res) => {
         SpaceController.status(req.query, status => {
-            res.status(200).send({ status: status });
+            res.status(200).send(status);
         });
     })
     .get('/spaces', (req, res) => {

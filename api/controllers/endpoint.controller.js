@@ -51,7 +51,7 @@ module.exports = {
 
         },
         getAll: function (options, cb) {
-            
+
             options.spaces = options.spaces.split(',');
             Schema.findAllSchemas(options, (schemas) => {
                 // console.log(schema);
@@ -88,11 +88,11 @@ module.exports = {
             params.spaces = params.spaces.split(',');
             // find settings to check the oauth extras properties, must have more than 2 to be connected
             Setting.findAllSettings(params, (settings) => {
-                const status = settings.map(({space, extras, modified}) => {
+                const statusList = settings.map(({ space, extras, modified }) => {
                     let obj = {};
-                    return obj[space] = { modified, connected: extras.length > 2 };
+                    return obj[space] = { space, modified, connected: extras.length > 2 };
                 });
-                cb(status);
+                cb(statusList);
             });
         }
     },
@@ -105,7 +105,7 @@ module.exports = {
         },
         get: function (options, cb) {
             Rain.findBySpace(options.space, (rain) => cb(rain));
-        }   
+        }
     },
     settings: {
         write: function (space, content, type = null, cb) {
@@ -117,38 +117,25 @@ module.exports = {
     },
     drops: {
         fetch: function (options, data, cb) {
-
-            let drops = typeof data === 'string' && !data.includes('<html>')  ? JSON.parse(data) : data;
+            
+            let drops = typeof data === 'string' && !data.includes('<html>') ? JSON.parse(data) : data;
             let dropCount = 0;
             const error = Object.keys(drops).filter(o => o.includes('error'));
-            if (!drops.errors || error.length || !drops.error) {
+            // console.log('drops.fetch -> ' + options.space, options.type);
 
-                drops = options.contentPath ? objectPath.get(drops, options.contentPath): drops;
+            if (!drops.errors || error.length || !drops.error || (!!drops.status && ['notfound', 'error'].includes(drops.status))) {
+
+                drops = options.contentPath ? objectPath.get(drops, options.contentPath) : drops;
+                if (options.space === 'moves') {
+                    drops = JSON.parse(data);
+                }
                 if (drops && drops.length) {
-                    let schema = drops.map(drop => { return {type: options.type, content: drop}} );
+                    let schema = drops.map(drop => { return { type: options.type, content: drop } });
 
                     Drop.writeDrops(options.space, schema, options.type, function (data, lastDropAdded) {
-                        // if (space === 'spotify') {
-                        //     debugger;
-                        // }
+                        
                         cb(data, lastDropAdded);
                     });
-               } else if (options.space === 'moves') {
-                    if (!!JSON.parse(data).error || JSON.parse(data).status === 'error' || JSON.parse(data).status === 'notfound' ) {
-                        cb(JSON.parse(data), dropCount);
-                        return;
-                    }
-                    let schema = [{
-                        type: options.type,
-                        content: {
-                            timestamp: moment(JSON.parse(data)[0].date).format('x')
-                        }
-                    }];
-
-                    Drop.writeDrops(options.space, schema, options.type, function (data, lastDropAdded) {
-                        cb(data, lastDropAdded);
-                    });
-
                 } else {
                     cb(data, false);
                 }

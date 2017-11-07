@@ -8,7 +8,7 @@ mongoose.Promise = require('bluebird');
 const Space = require('./models/spaceModel');
 const Schema = require('./models/schemaModel');
 const Drop = require('./models/dropModel');
-const NamespaceService = require('./services/namespace.service');
+const NamespaceController = require('./controllers/namespace.controller');
 const FetchingService = require('./services/fetch-params.service');
 const objectPath = require('object-path');
 
@@ -41,11 +41,12 @@ module.exports = function (app, spaces, settings, schemaGroups) {
         }
     }));
 
+    let allOpts;
     const fetchDrops = (isFetchingPast = true) => {
 
         dropsToFetch = 1;
-        namespaces.forEach(namespace => {
-            
+        const namespaceOptions = namespaces.map(namespace => {
+
 
             const types = _.uniq(_.map(schemas[namespace], 'type'));
 
@@ -74,63 +75,82 @@ module.exports = function (app, spaces, settings, schemaGroups) {
             });
 
 
-            types.forEach((t, i) => {
+            return types.map((t, i) => {
                 // console.log(_.filter(dataByTypes, {type: t}));
                 // console.log(t, i, _.filter(dataByTypes, {type: t}));
-                const isLastType = i === types.length-1;
+                const isLastType = i === types.length - 1;
 
-                const thisDataFetch = _.filter(dataByTypes, {type: t})[0];
-                const nextDataFetch = isLastType ? null : _.filter(dataByTypes, {type: types[i+1]})[0];
-                
-                initFetch(thisDataFetch, nextDataFetch);
+                const thisDataFetch = _.filter(dataByTypes, { type: t })[0];
+                const nextDataFetch = isLastType ? null : _.filter(dataByTypes, { type: types[i + 1] })[0];
+                // if (!i) {
+                //     initFetch(thisDataFetch, nextDataFetch);
+                // }
+                return [thisDataFetch, nextDataFetch];
             });
-            
+
+            // prepareFetchOptions(thisDataFetch, nextDataFetch);
+
         });
+
+        allOpts = JSON.parse(JSON.stringify(_.flattenDeep(namespaceOptions).filter(n => n)));
+        initFetch(allOpts[0], 0);
     };
 
-    const initFetch = (options, cbOptions) => {
-        
+
+    const initFetch = (options, index) => {
+
+        // console.log('allOpts', allOpts);
+        options = allOpts[index];
         Drop.getSpaceDrops(options, (drops) => {
             const urlParams = FetchingService.composeParams(options, drops);
-            if (options.isFetchingPast) {
-                console.log('🔄 [initFetch] FETCHING PAST');
-            } else {
-                console.log('🔄 [initFetch] FETCHING FUTURE');
-            }
-            // console.log('🔄 [initFetch -> getSpaceDrops]', options.space, options.type, urlParams);
-            // debugger;
+            // if (options.isFetchingPast) {
+            //     console.log('🔄 [initFetch] FETCHING PAST');
+            // } else {
+            //     console.log('🔄 [initFetch] FETCHING FUTURE');
+            // }
+            console.log(` `);
+            console.log('🔄 💦 [initFetch -> getSpaceDrops]', options.space, options.type, urlParams);
             options.urlParams = urlParams;
-            NamespaceService.runCall(options, (resp, lastDropAdded, countAdded) => {
-                // find out if we still get results, to implement start/end
-                // console.log('resp', resp, data);
 
-                // let dropCount =  objectPath.get(resp, options.contentPath) ? objectPath.get(resp, options.contentPath).length : 0;
-                let dropCount =  resp.length;
-
+            NamespaceController.runCall(options, (resp, lastDropAdded, countAdded) => {
+                // if (options.space === 'moves' && options.type === 'rain.storyline') {
+                //     debugger;
+                // }
+                
+                // TODO: how many drops were added is resp
+                let dropCount = !!resp ? resp.length : 0;
                 dropCountLastRun += dropCount;
 
-                // if (dropCountLastRun <= dropCountLastRun - dropCount) {
+                messageTotal(dropCount, options.space);
+                if (index + 1 === allOpts.length) {
 
-                //     console.log(` `);
-                //     console.log('🔄 💀 💀 💀 -------------->  KILLED CUM DUMPTRUCK @ 📅 ' + new Date());
-                //     console.log(` `);
-                //     shiftDrops.cancel();
-                //     return;
-                // }
+                    // TODO: send real total..
+                    console.log('🔄 💦 total drops added: ' + dropCountLastRun);
+                    console.log('🔄 💤  CUM DUMPTRUCK DONE @ 📅 ' + new Date());
 
+                    // if (dropCountLastRun <= dropCountLastRun - dropCount) {
 
-                if (!!cbOptions) {
-                    // debugger;
+                    //     console.log(` `);
+                    //     console.log('🔄 💀 💀 💀 -------------->  KILLED CUM DUMPTRUCK @ 📅 ' + new Date());
+                    //     console.log(` `);
+                    //     shiftDrops.cancel();
+                    //     return;
+                    // }
+
+                } else {
+                    ++index;
+                    // console.log('nextOptionSet', allOpts[index]);
+                    dropCallback(options, dropCount, index);
                 }
-                dropCallback(options, dropCount, cbOptions);
+
 
             });
         });
 
     };
 
-    
-    const dropCallback = (options, dropCount, cbOptions) => {
+
+    const dropCallback = (options, dropCount, index) => {
 
         // console.log(`🔄 [namespace service] fetching for ${options.type} on ${options.space}`);
 
@@ -148,36 +168,43 @@ module.exports = function (app, spaces, settings, schemaGroups) {
         }
 
 
-        messageTotal(dropCount, options.space, dropCountLastRun);
-        if (cbOptions) {
-            // console.log(`🔄 [namespace service] running ${cbOptions.type} on ${cbOptions.space} next`);
-            initFetch(cbOptions);
+        const nextOptionSet = allOpts[index];
+        // console.log('nextOptionSet', nextOptionSet);
+        if (!!nextOptionSet) {
+            console.log(`🔄 --------------------------------------------------------------------------------------------`);
+            // console.log(`🔄 [namespace service] running ${nextOptionSet.type} on ${nextOptionSet.space} next (${index})`);
+
+            initFetch(nextOptionSet, index);
         }
 
     }
 
-    const shiftDrops = schedule.scheduleJob('* */1 * * *', function() {
-        fetchDrops();
-        console.log(`🔄  📅 💧 getting older drops`);
-        console.log(` `);
+    const shiftDrops = schedule.scheduleJob('* */1 * * *', function () {
+        // fetchDrops();
+        // console.log(`🔄  📅 💧 getting older drops`);
+        // console.log(` `);
     });
 
     const unshiftDrops = schedule.scheduleJob('*/10 * * * *', function () {
         fetchDrops(false);
-        console.log(`🔄 🔥 💧 adding new  drops! `);
+        console.log(`🔄 🔥 adding new  drops! `);
         console.log(` `);
 
     });
+    fetchDrops(false);
+
 
 
 
     function messageTotal(dropCount, space, total) {
 
-        if (dropCount) {
-            console.log(`🔄 | ${space} | 💧 ${dropCount}`);
-            console.log(`🔄 ----------------------------`);
+        console.log(`🔄 | ${space} | 💧 drops added: ${dropCount}`);
+        // if (dropCount) {
+        //     console.log(`🔄 ----------------------------`);
 
-        } else if (total) { }
+        // } else if (total) {
+
+        //  }
         // console.log(`🔄 💦 total drops added: ${total - dropCount}`);
     }
 

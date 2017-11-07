@@ -12,7 +12,8 @@ var SettingSchema = {
         lastModified: { type: Date },
         connected: Boolean,
         oauth: [],
-        extras: []
+        extras: [],
+        display: {}
     },
     self: {
         findSettings: function(spaceName, cb) {

@@ -91,9 +91,11 @@ const DropSchema = {
                                     drops = docs;
                                 }
                             } else  {
+                                
                                 console.log('empty aggregate query result for: ', query)
                                 drops = [];
                             }
+
                             cb(drops);
                         }
                     });
@@ -198,7 +200,7 @@ const DropSchema = {
                 }).filter(drop => !existingDropTimestamps.includes(Number(drop.timestamp)));
 
                 if (drops.length) {
-
+                    
                     that.findOneAndUpdate(
                         { space: space },
                         { $addToSet: { drops: { $each: drops } } },
@@ -217,6 +219,9 @@ const DropSchema = {
                             }
                         });
 
+                } else {
+
+                    cb([], null, 0);
                 }
 
             };
@@ -240,4 +245,3 @@ const DropSchema = {
 };
 Drop = require('./createModel')(mongoose, 'Drop', DropSchema);
 module.exports = Drop;
-//# sourceMappingURL=/Users/erratik/Sites/datawhore/admin/api/models/dropModel.js.map

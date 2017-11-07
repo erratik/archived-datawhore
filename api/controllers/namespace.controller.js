@@ -1,6 +1,6 @@
 const Setting = require('../models/settingModel');
 
-const EndpointController = require('./endpoint.controller');
+const EndpointService = require('../services/endpoint.service');
 const OauthService = require('../services/oauth.service');
 const FetchingService = require('../services/fetch-params.service');
 
@@ -27,7 +27,7 @@ module.exports = NamespaceController = {
             let urlExtras;
             if (!!data.urlParams) {
 
-                urlExtras = Object.keys(data.urlParams).map(function(k) {
+                urlExtras = Object.keys(data.urlParams).map(function (k) {
                     return encodeURIComponent(k) + "=" + encodeURIComponent(data.urlParams[k]);
                 }).join('&');
             }
@@ -54,11 +54,11 @@ module.exports = NamespaceController = {
                             }
                         };
 
-                        https.get(options, function(result) {
+                        https.get(options, function (result) {
                             let buffer = '';
                             result.setEncoding('utf8');
                             result.on('data', (dataReceived) => buffer += dataReceived);
-                            result.on('end', () => EndpointController.post(data, JSON.parse(buffer), cb));
+                            result.on('end', () => EndpointService.post(data, JSON.parse(buffer), cb));
                         });
 
                         break;
@@ -67,7 +67,11 @@ module.exports = NamespaceController = {
                         urlExtras += '&key=' + data.accessToken;
 
                     case 'moves':
-                        data.apiEndpointUrl += data.urlParams.date;
+                        if (!!data.urlParams.date) {
+                            data.apiEndpointUrl += data.urlParams.date;
+                        } else {
+                            data.apiEndpointUrl = data.apiEndpointUrl.replace('daily/', 'daily');
+                        }
 
                     default:
 
@@ -96,13 +100,20 @@ module.exports = NamespaceController = {
     requestDataWithToken: (data, options, cb) => request(options, (error, response, body) => {
 
         if (body) {
-            const errorMsgArr = ['expired_access_token'];
 
-            const errorObj = typeof body === 'string' && !errorMsgArr.includes(body) ? JSON.parse(body) : {status: 401};
-            const err = body.includes('html') ?  {status: 401} : errorObj;
-            try {
+            const expiredTokenMsg = ['expired'];
+            const hasExpiredToken = str => expiredTokenMsg.filter(msg => str.includes(msg));
 
-                if (!!errorObj.error || err.status === 401) {
+            const errorObj = typeof body === 'string' && !expiredTokenMsg.includes(body) ? JSON.parse(body) : { status: 401 };
+            const err = body.includes('html') ? { status: 401 } : errorObj;
+
+            if (!!errorObj.error || err.status === 401) {
+
+                console.log('⛔ [namespace ctrl: request]', errorObj.error);
+                if (data.space === 'spotify') {
+                    debugger;
+                }
+                if (hasExpiredToken(body).length) {
 
                     Setting.findSettings(data.space, (settings) => {
                         refresh.requestNewAccessToken(data.space, data.refreshToken, (_e, accessToken, refreshToken) => {
@@ -119,28 +130,27 @@ module.exports = NamespaceController = {
                                     };
                                 });
                                 settings.connected = true;
-
-                                Setting.updateSettings(settings);
+                                Setting.updateSettings(settings, EndpointService.post(data, body, cb));
                             }
-                            
+
 
                         });
                     });
-
                 } else {
-                    
-                    EndpointController.post(data, body, cb);
+                    cb();
                 }
-            } catch(e) {
 
+            } else {
+
+                EndpointService.post(data, body, cb);
             }
-            // res.status(err.status).json({message: err.message});
+
         }
     }),
     endpointSpaceCall: (data, req, res, cb = null) => {
         // let extras;
         if (req) {
-            NamespaceController.runCall(data, EndpointController.responseHandler(res, cb) );
+            NamespaceController.runCall(data, EndpointService.responseHandler(res, cb));
         } else {
 
         }
