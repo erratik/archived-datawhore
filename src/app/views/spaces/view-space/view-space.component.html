@@ -6,7 +6,7 @@
                 <h2 class="is-flex">
                     <a (click)="uploadImage=!uploadImage">
                         <figure class="image is-32x32">
-                            <img src="{{(space.icon) ? space.icon : 'http://bulma.io/images/placeholders/32x32.png'}}">
+                            <img src="{{(space.icon) ? 'http://datawhore.erratik.ca:10010/'+space.icon : 'http://bulma.io/images/placeholders/32x32.png'}}">
                         </figure>
                     </a>
                     {{space?.name}}

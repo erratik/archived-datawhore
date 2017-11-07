@@ -15,6 +15,8 @@ export class DonutChartComponent extends BaseChartComponent implements OnInit, O
   };
 
   public colors: Array<any> = [{ backgroundColor: ['#CCCCCC'] }];
+ 
+  @Input() color: string = null;
 
   constructor() { super(); }
 
@@ -24,7 +26,6 @@ export class DonutChartComponent extends BaseChartComponent implements OnInit, O
   }
 
   ngOnInit() {
-
   }
 
   public setChartData(data): void {
@@ -33,9 +34,9 @@ export class DonutChartComponent extends BaseChartComponent implements OnInit, O
       // debugger;
       const computedLabels = data.map(({ type }) => type);
       const computedValues = data.map(({ count }) => count);
-      const computedColors = data.map(() => '#' + Math.floor(Math.random() * 16777215).toString(16));
+      // const computedColors = data.map(() => );
 
-      this.colors[0].backgroundColor = computedColors.concat(this.colors[0].backgroundColor);
+      this.colors[0].backgroundColor.unshift(this.color);
       this.labels = computedLabels.concat(this.labels);
 
       const sumValues = computedValues.length > 1 ? computedValues.reduce((a, c) => a + c) : computedValues[0];

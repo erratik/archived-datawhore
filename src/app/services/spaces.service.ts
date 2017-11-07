@@ -28,6 +28,7 @@ export class SpacesService {
         return this.http.get(`${this.apiServer}/space/${spaceName}`).map((res: Response) => {
 
             res = res.json();
+            
             this.space = new Space(
                 res['name'],
                 res['modified'],
@@ -37,7 +38,10 @@ export class SpacesService {
                 res['icon'],
                 res['username'],
                 res['description'],
-                res['avatar']
+                res['avatar'],
+                null,
+                null,
+                res['display'] || { color: '#' + Math.floor(Math.random() * 16777215).toString(16) }
             );
 
             return this.space;
@@ -56,6 +60,7 @@ export class SpacesService {
         return this.http.get(`${this.apiServer}/spaces`).map((res: Response) => {
 
             const spaces = res.json();
+            
             return spaces.map(space => {
                 return new Space(
                     space.name,
@@ -66,7 +71,10 @@ export class SpacesService {
                     space.icon,
                     space.username,
                     space.description,
-                    space.avatar
+                    space.avatar,
+                    null,
+                    null,
+                    space.display || { color: '#' + Math.floor(Math.random() * 16777215).toString(16) }
                 );
 
             });

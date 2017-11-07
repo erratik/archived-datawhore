@@ -109,10 +109,11 @@ module.exports = {
     },
     settings: {
         write: function (space, content, type = null, cb) {
+            if (typeof type === 'function') cb = type;
             Setting.updateSettings(content, (updatedSettings) => cb(content));
         },
         get: function (options, cb) {
-            Setting.findSettings(options.space, (settings) => cb(settings));
+        Setting.findSettings(options.space, (settings) => {cb(settings)});
         }
     },
     drops: {

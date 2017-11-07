@@ -63,11 +63,14 @@ export class SpaceConfigComponent implements OnInit {
                 this.space.modified = res.modified;
             }
         };
+
     }
 
     public setSpace(): void {
         this.space = this.spacesService.space;
+        // this.space.display = !!this.space.display ? { color: '#' + Math.floor(Math.random() * 16777215).toString(16) } : this.space.display;
     }
+
 
     public addLegacySettings(): void {
         this.space.oauth.addLegacySettings(this.isPassportCapable);
@@ -89,6 +92,14 @@ export class SpaceConfigComponent implements OnInit {
             const dimRain = this.rainService.rain.filter(r => r.rainType === rainType)[0];
             dimRain.properties = data[0];
         }
+    }
+
+    public changeSpaceColor(color): void {
+
+        console.log(color);
+        this.space.display = { color };
+        this.spacesService.updateSpace(this.space).subscribe();
+
     }
 
 }

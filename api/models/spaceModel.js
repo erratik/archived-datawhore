@@ -10,7 +10,8 @@ var SpaceSchema = {
         username: String,
         icon: String,
         docUrl: String,
-        apiUrl: String
+        apiUrl: String,
+        display: {}
     },
     self: {
         getAll: function (cb) {

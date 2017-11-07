@@ -74,7 +74,4 @@ export class EditSpacesComponent implements OnInit {
         // this.spaces.unshift(space);
     }
 
-
-
-
 }

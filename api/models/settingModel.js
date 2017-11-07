@@ -12,8 +12,7 @@ var SettingSchema = {
         lastModified: { type: Date },
         connected: Boolean,
         oauth: [],
-        extras: [],
-        display: {}
+        extras: []
     },
     self: {
         findSettings: function(spaceName, cb) {
@@ -22,6 +21,10 @@ var SettingSchema = {
                 if (!docs) {
                     docs = [{ space: spaceName, modified: Date.now(), $currentDate : { lastModified: true} }];
                 }
+                docs = docs.map(doc => {
+                    doc.connected = !!doc.extras ? Boolean(doc.extras.filter(d => d.label === 'accessToken').length) : false;
+                    return doc;
+                });
                 cb(docs[0]);
             });
         },
@@ -79,7 +82,10 @@ var SettingSchema = {
                 update, 
                 { upsert: true, returnNewDocument: true }, 
                 (err, updated) => Space.updateSpace(query.space, {}, () => {
-                    if (!!cb) {cb(updated) }
+                    if (!!cb) {
+
+                        cb(updated);
+                    }
                 })
             );
         }

@@ -37,6 +37,7 @@
     "ng2-charts": "^1.6.0",
     "ng2-file-upload": "^1.2.1",
     "ngx-clipboard": "^8.0.4",
+    "ngx-color-picker": "^4.5.0",
     "object-path": "~0.11.3",
     "passport-goodreads": "^1.0.0",
     "passport-oauth2-refresh": "^1.0.0",

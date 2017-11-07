@@ -1,23 +1,86 @@
 <div class="columns">
+
   <div class="column is-half">
+    <div class="header">
+      <h3 class="is-pulled-left heading">Space Settings</h3>
+    </div>
+
+    <hr>
+
+    <div class="control">
+      <div class="label">Description</div>
+      <textarea [(ngModel)]="space.description" class="textarea"></textarea>
+      <a class="button is-success" (click)="onUpdateSpace.emit()">
+        <span>Save</span>
+      </a>
+    </div>
+  </div>
+  <div class="column is-quarter">
+      
+
+    <div class="header">
+      <h3 class="is-pulled-left heading">Display Settings</h3>
+    </div>
+
+    <hr>
+
+    <div>
+      <div class="label">Graph Color</div>
+      
+      <datawhore-color-picker [color]="space.display.color" (onColorChange)="changeSpaceColor($event)"></datawhore-color-picker>
+    </div>
+
+    <hr>
+
+    <div>
+      <div class="label">Logo</div>
+      <a (click)="uploader.uploadAll()">
+        <span class="fa fa-cloud-upload"></span>
+      </a>
+      <input type="file" class="is-expanded" name="single" ng2FileSelect [uploader]="uploader" />
+    </div>
+
+  </div>
+
+  <div class="column space-actions is-flex is-quarter">
+      <div *ngIf="space.oauth.settings.length">
+        <a class="button is-{{(!space.oauth.connected) ? 'success' : 'warning'}}" href="{{space.oauth.authorizationUrl}}" *ngIf="space.oauth && space.oauth.authorizationUrl">
+          <span *ngIf="!space.oauth.connected">Connect</span>
+          <span *ngIf="space.oauth.connected">Reconnect</span>
+        </a>
+      </div>
+      <a class="button is-danger" (click)="onRemoveSpace.emit()">
+        <span>Remove space</span>
+      </a>
+    </div>
+</div>
+<hr>
+
+<div class="columns">
+  <div class="column">
     <div class="header">
       <h3 class="is-pulled-left heading">Oauth Settings</h3>
     </div>
     <hr>
-  <!--<pre>{{ space.oauth | json}}</pre>-->
+    <!--<pre>{{ space.oauth | json}}</pre>-->
     <div *ngIf="space.oauth.settings.length && !space.inEditMode">
       <table class="is-small">
         <tr *ngFor="let spaceProp of space.oauth.settings">
-          <td class="label"><strong>{{spaceProp.label}}</strong></td>
+          <td class="label">
+            <strong>{{spaceProp.label}}</strong>
+          </td>
           <td *ngIf="spaceProp.value">{{spaceProp.value}}</td>
-          <td *ngIf="!spaceProp.value">(<em>{{spaceProp.keyName}}</em>) has not been set yet</td>
+          <td *ngIf="!spaceProp.value">(
+            <em>{{spaceProp.keyName}}</em>) has not been set yet</td>
         </tr>
       </table>
 
       <div *ngIf="space.oauth.extras.length && !space.inEditMode">
         <table class="is-small is-grey">
           <tr *ngFor="let spaceProp of space.oauth.extras">
-            <td class="label is-grey"><strong>{{spaceProp.label}}</strong></td>
+            <td class="label is-grey">
+              <strong>{{spaceProp.label}}</strong>
+            </td>
             <td>{{spaceProp.value}}</td>
           </tr>
         </table>
@@ -36,8 +99,8 @@
       </div>
       <p class="control">
         <label class="checkbox">
-          <input #passportEnabled type="checkbox" [(ngModel)]="isPassportCapable" (change)="addLegacySettings()">
-          Passport enabled? (<a class="is-primary" href="http://passportjs.org/">check here</a>)
+          <input #passportEnabled type="checkbox" [(ngModel)]="isPassportCapable" (change)="addLegacySettings()"> Passport enabled? (
+          <a class="is-primary" href="http://passportjs.org/">check here</a>)
         </label>
       </p>
       <div *ngIf="isPassportCapable">
@@ -59,47 +122,6 @@
       <span>{{(space.oauth.configured) ? 'Edit' : 'Add'}} Oauth Settings</span>
     </a>
   </div>
-  <div class="column">
-    <div class="header">
-      <h3 class="is-pulled-left heading">Space Settings</h3>
-    </div>
 
-    <hr>
-
-    <div class="control">
-      <div class="label">Description</div>
-      <textarea [(ngModel)]="space.description" class="textarea"></textarea>
-      <a class="button is-success" (click)="onUpdateSpace.emit()">
-        <span>Save</span>
-      </a>
-    </div>
-
-    <hr>
-
-    <div>
-      <div class="label">Logo</div>
-      <a (click)="uploader.uploadAll()">
-        <span class="fa fa-cloud-upload"></span>
-      </a>
-      <input type="file" class="is-expanded" name="single" ng2FileSelect [uploader]="uploader" />
-    </div>
-
-    <hr>
-
-    <div class="space-actions is-flex">
-      <div *ngIf="space.oauth.settings.length">
-        <a
-          class="button is-{{(!space.oauth.connected) ? 'success' : 'warning'}}"
-          href="{{space.oauth.authorizationUrl}}"
-          *ngIf="space.oauth && space.oauth.authorizationUrl">
-          <span *ngIf="!space.oauth.connected">Connect</span>
-          <span *ngIf="space.oauth.connected">Reconnect</span>
-        </a>
-      </div>
-      <a class="button is-danger" (click)="onRemoveSpace.emit()">
-        <span>Remove space</span>
-      </a>
-    </div>
-  </div>
 </div>
 <!--<pre>{{space | json}}</pre>-->

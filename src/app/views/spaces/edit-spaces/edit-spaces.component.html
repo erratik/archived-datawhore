@@ -8,7 +8,7 @@
                 
                 <article class="media" *ngFor="let space of spaces">
                     <div class="media-left space-drop-chart is-flex">
-                        <datawhore-donut-chart [data]="space.counts"></datawhore-donut-chart>
+                        <datawhore-donut-chart [data]="space.counts" [color]="space.display.color" *ngIf="space.display"></datawhore-donut-chart>
                         <figure>
                             <p class="image is-32x32">
                                 <img src="{{(space.icon) ? 'http://datawhore.erratik.ca:10010/'+space.icon : 'http://bulma.io/images/placeholders/32x32.png'}}">
