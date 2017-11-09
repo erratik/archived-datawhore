@@ -1,0 +1,39 @@
+<div class="columns">
+
+  <div class="column is-quarter">
+
+    <div class="column">
+      <div class="is-flex" *ngIf="drops.length">
+
+        <ul class="is-flex center" class="drop-counter is-flex is-filling center">
+          <li *ngFor="let space of dropsBySpace | orderBy:'count'" [ngStyle]="{'flex': getDropFlex(space), 'background-color': space.color} " class="is-flex">
+            <div class="is-flex-inline">
+              <datawhore-space-icon [space]="space.name"></datawhore-space-icon>
+              <div>{{space.count}}</div>
+            </div>
+          </li>
+
+        </ul>
+
+      </div>
+      <hr>
+      <datawhore-date-picker [date]="minDate" (onDateRangeChange)="changeDateRange('min', $event)"></datawhore-date-picker>
+      
+
+    </div>
+  </div>
+  <div class="column is-three-quarters">
+
+    <div class="column" *ngIf="!drops.length">
+      Loading...
+      </div>
+    <div class="column" *ngIf="drops.length">
+
+      <datawhore-drop-atomic *ngFor="let drop of drops | orderBy:'timestamp':false" [type]="drop.type" [drop]="drop"></datawhore-drop-atomic>
+
+      <hr>
+
+    </div>
+    
+  </div>
+</div>
