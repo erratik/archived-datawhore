@@ -61,7 +61,7 @@ export class RainConfigsComponent extends SpaceConfigComponent implements OnChan
     ngOnInit() {
 
         this.getRainSchemas$ = this.getRawRain()
-            .switchMap(() => this.getRain());
+            .switchMap(() => this.getSpaceRain());
 
         this.getRainSchemas$.subscribe(() => {
             this.activeTab = this.rainSchemas.length ? this.rainSchemas[0].type : this.activeTab;
@@ -83,8 +83,8 @@ export class RainConfigsComponent extends SpaceConfigComponent implements OnChan
         // this.getActiveTab();
     }
 
-    public getRain(): any {
-        return this.rainService.getRain(this.space.name).do((rain) => {
+    public getSpaceRain(): any {
+        return this.rainService.getSpaceRain(this.space.name).do((rain) => {
         });
     }
 

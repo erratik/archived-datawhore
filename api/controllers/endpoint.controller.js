@@ -12,9 +12,7 @@ module.exports = {
     schema: {
         update: function (params, content, cb) {
             Schema.findSchema(params, (schema) => {
-
                 schema.content = content;
-
                 Schema.writeSchema(params, schema, (updatedSchema) => {
                     console.log('[schema.update callback]', updatedSchema);
                     cb(updatedSchema);
@@ -36,7 +34,6 @@ module.exports = {
             Schema.writeSchema(params, schema, (updatedSchema) => {
                 updatedSchema.space = updatedSchema.name = params.space;
                 console.log('[schema.write callback]', updatedSchema);
-
                 cb(updatedSchema);
             });
 
@@ -44,34 +41,20 @@ module.exports = {
         },
         get: function (options, cb) {
 
-            Schema.findSchema(options, (schema) => {
-                // console.log(schema);
-                cb(schema);
-            });
+            Schema.findSchema(options, (schema) => cb(schema));
 
         },
         getAll: function (options, cb) {
-
             options.spaces = options.spaces.split(',');
-            Schema.findAllSchemas(options, (schemas) => {
-                // console.log(schema);
-                cb(schemas);
-            });
-
+            Schema.findAllSchemas(options, (schemas) => cb(schemas));
         }
     },
     profile: {
         write: function (space, content, cb) {
-
-            Profile.writeProfile(space, content, (updatedProfile) => {
-                // console.log(updatedProfile);
-                cb(content);
-            });
+            Profile.writeProfile(space, content, (updatedProfile) => cb(content));
         },
         get: function (options, cb) {
-
             Profile.findProfile(options.space, (profile) => cb(profile));
-
         }
     },
     space: {
@@ -105,6 +88,12 @@ module.exports = {
         },
         get: function (options, cb) {
             Rain.findBySpace(options.space, (rain) => cb(rain));
+        },
+        getAll: function (options, cb) {
+
+            options.spaces = options.spaces.split(',');
+            Rain.findAllRain(options, (rain) => cb(rain));
+
         }
     },
     settings: {
@@ -113,7 +102,7 @@ module.exports = {
             Setting.updateSettings(content, (updatedSettings) => cb(content));
         },
         get: function (options, cb) {
-        Setting.findSettings(options.space, (settings) => {cb(settings)});
+            Setting.findSettings(options.space, (settings) => cb(settings));
         }
     },
     drops: {

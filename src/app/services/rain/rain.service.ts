@@ -21,7 +21,36 @@ export class RainService extends SpaceItemService {
         super(http);
     }
 
-    public getRain(space: string): Observable<Rain[]> {
+    public getRain(spaces: string[]): Observable<Rain[]> {
+        return this.http.get(`${this.apiServer}/get/rain?spaces=${spaces}`)
+            .map((res: Response) => {
+                const rainResponse = res.json();
+
+                const _spaces = rainResponse.map(rainRes => rainRes.space);
+
+                _spaces.forEach(space => {
+
+                    this.rain[space] = rainResponse.filter(s => s.space === space).map(rain => {
+
+                        const types = _.groupBy(rain.dimensions, 'type');
+                        return Object.keys(types).map(rainType => new Rain(
+                            rain.space,
+                            rain.dimensions.map((dims: RainDimension) => new RainDimension(dims.friendlyName, dims.schemaPath, dims.type, dims['_id'])),
+                            rainType,
+                            rainResponse.modified
+                        ));
+                    })[0];
+
+                });
+
+
+                return this.rain;
+            })
+            .catch(this.handleError);
+    }
+
+    // TODO: all getSpaceRain calls to use new getRain method.
+    public getSpaceRain(space: string): Observable<Rain[]> {
         return this.http.get(`${this.apiServer}/get/rain/${space}`)
             .map((res: Response) => {
                 const rainResponse = res.json();
@@ -34,7 +63,7 @@ export class RainService extends SpaceItemService {
                     rainResponse.modified
                 ));
 
-
+                // console.log(this.rain);
                 return this.rain;
             })
             .catch(this.handleError);
@@ -80,16 +109,11 @@ export class RainService extends SpaceItemService {
     }
 
     public enrichDrops(drops = null): Drop[] {
-        // if (!drops) {
-        //     drops = this.drops[space];
-        // }
 
         return drops.map((drop: Drop) => {
             const content = {};
 
-            const dropProperties = this.rain[drop.space].filter(({rainType}) => rainType === drop.type)[0].properties;
-            // console.log(dropProperties);
-            // debugger;
+            const dropProperties = this.rain[drop.space].filter(({ rainType }) => rainType === drop.type)[0].properties;
 
             dropProperties.forEach(({ friendlyName, schemaPath }) => {
                 content[friendlyName] = objectPath.get(drop, schemaPath);

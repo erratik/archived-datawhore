@@ -1,8 +1,4 @@
 <div [ngSwitch]="drop.space">
-  <!-- <details>
-    <summary>drop raw content</summary>
-    <pre>{{drop | json}}</pre>
-  </details> -->
   <div class="is-flex" *ngSwitchDefault>
     <div class="is-flex center date">
       <datawhore-image-figure [size]="16" [src]="spaceIconImage"></datawhore-image-figure>
@@ -13,6 +9,11 @@
   </div>
 
   <div class="is-flex" *ngSwitchCase="'moves'">
+
+  <details>
+    <summary>drop raw content</summary>
+    <pre>{{drop | json}}</pre>
+  </details>
     <article class="media">
       <div class="media-left">
         <datawhore-image-figure [size]="16" [src]="spaceIconImage"></datawhore-image-figure>
@@ -26,11 +27,11 @@
 
         <ul>
           <li *ngFor="let segment of drop.content.segments" [ngSwitch]="segment.type">
-            <div class="is-inline-flex" *ngSwitchCase="'place'">
-              <span class="icon is-small"><i class="fa fa-{{segment.place.type}}"></i></span> {{segment.place.name}} ( {{segment.startTime
+            <div class="is-flex-inline" *ngSwitchCase="'place'">
+              <span class="icon is-small"><i class="fa fa-{{(segment.place && segment.place.type === 'unknown') ? 'map-pin' : segment.place.type}}" *ngIf="segment.place"></i></span> {{(segment.place)?segment.place.name:''}} ( {{segment.startTime
               }} to {{segment.endTime }})
             </div>
-            <div class="is-inline-flex" *ngSwitchDefault>
+            <div class="is-flex-inline" *ngSwitchDefault>
               <span class="icon is-small"><i class="fa fa-folder"></i></span> {{segment.type}} ( {{segment.startTime }} to
               {{segment.endTime }})
             </div>

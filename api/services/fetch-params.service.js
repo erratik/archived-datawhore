@@ -81,12 +81,11 @@ module.exports = {
                     params.from = moment(dropOldest['timestamp']).subtract(count, 'days').format('YYYYMMDD');
                     // params.date = moment(dropOldest['timestamp']).subtract(1, 'days').format('YYYYMMDD');
                 } else if (drops.length) {
-                    params.to = moment(dropNewest['timestamp']).format('YYYYMMDD');
-                    params.from = moment(dropNewest['timestamp']).subtract(count-1, 'days').format('YYYYMMDD');
-                    // params.date = moment(dropNewest['timestamp']).add(1, 'days').format('YYYYMMDD');
+                    params.to = moment().format('YYYYMMDD');
+                    params.from = moment().subtract(count, 'days').format('YYYYMMDD');
                 } else {
                     params.to = moment().format('YYYYMMDD');
-                    params.from = moment().subtract(count-1, 'days').format('YYYYMMDD');
+                    params.from = moment().subtract(count, 'days').format('YYYYMMDD');
                 }
                 
                 break;

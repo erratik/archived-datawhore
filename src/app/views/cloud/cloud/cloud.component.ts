@@ -40,7 +40,7 @@ export class CloudComponent implements OnInit {
   ngOnInit() {
 
 
-    this.getSpaces$ = this.getSpaces();
+    this.getSpaces$ = this.getSpaces(this.options);
 
     this.getSpaces$.subscribe(() => {
       // debugger;
@@ -50,43 +50,58 @@ export class CloudComponent implements OnInit {
 
   }
 
-  public getSpaces(): any {
-    return this.spacesService.getAllSpaces().switchMap((spaces) => {
-      this.spaces = spaces;
-      
-      this.getDrops$ = this.rainService.getCloudDrops(this.options).do((cloudDrops) => {
-
-        this.generateCloud(cloudDrops);
-
-        this.dropsBySpace.forEach(({ drops }) => {
-          this.newDrops = this.newDrops.concat(drops);
+  public getSpaces(options): any {
+    return this.spacesService.getAllSpaces()
+      .do((spaces) => {
+        this.spaces = spaces;
+        this.dropsBySpace = spaces.map(({ display, name }) => {
+          return {
+            color: display.color,
+            count: 0,
+            name
+          };
         });
+        return spaces;
+      })
+      .switchMap((spaces) => this.rainService.getCloudDrops(options))
+      .do((cloudDrops) => {
 
-        return this.spaces;
+        this.drops = [];
 
-      });
-      return this.getDrops$;
-    })
-    .do((spaces) => {
-      this.isLoadingSpaces = false;
-      const that = this;
-      const source = Observable.range(0, this.spaces.length).combineLatest(x => that.spaces[x].name);
+        this.dropsBySpace = this.dropsBySpace.map(dropSpace => {
+          const cloud = cloudDrops.filter(_cloud => _cloud._id === dropSpace.name)[0];
+          if (!!cloud) {
+            dropSpace.count = cloud.count;
+            this.drops = this.drops.concat(cloud.drops);
+            return dropSpace;
+          }
+        }).filter(d => d);
 
-      source.subscribe((space) => {
-        const getRain$ = that.rainService.getRain(space);
+        // return this.spaces;
+
+      })
+      .do((spaces) => {
+
+        const getRain$ = this.rainService.getRain(this.dropsBySpace.map(({ name }) => name));
 
         getRain$.subscribe((rain) => {
-          this.newDrops = this.newDrops.map(d => {
-            d.space = space;
-            return d;
-          })
-          this.drops = this.drops.concat(this.rainService.enrichDrops(this.newDrops.filter(({ type }) => rain[space][0].rainType === type)));
 
-          console.log(this.newDrops.filter(({ type }) => rain[space][0].rainType === type));
+          console.log(rain);
           console.log(this.rainService.rain);
+          this.drops = this.rainService.enrichDrops(this.drops);
+          // this.newDrops = this.newDrops.map(d => {
+          //   d.space = space;
+          //   return d;
+          // // })
+          // this.drops = this.drops.concat(this.rainService.enrichDrops(this.newDrops.filter(({ type }) => rain[space][0].rainType === type)));
+
+          // console.log(this.newDrops.filter(({ type }) => rain[space][0].rainType === type));
+          // console.log(this.rainService.rain);
+
+          this.isLoadingSpaces = false;
         });
+
       });
-    });
   }
 
   public getRawRain(space): any {
@@ -123,7 +138,7 @@ export class CloudComponent implements OnInit {
       });
 
       source.subscribe((space) => {
-        const getRain$ = this.rainService.getRain(space);
+        const getRain$ = this.rainService.getSpaceRain(space);
 
         getRain$.subscribe(() => {
           this.drops = this.drops.concat(this.rainService.enrichDrops(this.newDrops.filter(drop => drop.space === space)));
@@ -133,9 +148,8 @@ export class CloudComponent implements OnInit {
   }
 
 
-  public getDropFlex(dropSpace): any {
-
-    return '1 1 ' + dropSpace.drops.length / this.drops.length * 100 + '%';
+  public getDropFlex(dropSpace): string {
+    return '1 1 ' + dropSpace.count / this.drops.length * 100 + '%';
   }
 
 

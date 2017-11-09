@@ -48,7 +48,7 @@ export class DropCloudComponent extends RainConfigsComponent implements OnInit, 
     // this.getCloudDrops$ = this.getSomeDrops();
 
     // this.getRainSchemas$ = this.getRawRain()
-    // .switchMap(() => this.getRain());
+    // .switchMap(() => this.getSpaceRain());
 
   }
 

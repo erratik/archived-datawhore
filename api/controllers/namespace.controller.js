@@ -99,6 +99,8 @@ module.exports = NamespaceController = {
     },
     requestDataWithToken: (data, options, cb) => request(options, (error, response, body) => {
 
+        try {
+            
         if (body) {
 
             const expiredTokenMsg = ['expired'];
@@ -143,7 +145,11 @@ module.exports = NamespaceController = {
                 EndpointService.post(data, body, cb);
             }
 
+
         }
+            } catch (error) {
+                console.log(error)
+            }
     }),
     endpointSpaceCall: (data, req, res, cb = null) => {
         // let extras;

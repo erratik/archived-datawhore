@@ -9,6 +9,8 @@ import { MomentModule } from 'angular2-moment';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { ChartsModule } from 'ng2-charts';
 import { ColorPickerModule } from 'ngx-color-picker';
+import { NgDatepickerModule } from 'ng2-datepicker';
+
 import * as _ from 'lodash';
 
 import { FileSelectDirective, FileDropDirective } from 'ng2-file-upload';
@@ -56,6 +58,7 @@ import { DonutChartComponent } from './shared/ui/charts/donut-chart/donut-chart.
 import { BaseChartComponent } from './shared/ui/charts/base-chart/base-chart.component';
 import { ColorPickerComponent } from './shared/ui/tools/color-picker/color-picker.component';
 import { DayViewerComponent } from './views/cloud/day-viewer/day-viewer.component';
+import { DatePickerComponent } from './shared/ui/tools/date-picker/date-picker.component';
 
 const appRoutes: Routes = [
     {
@@ -93,6 +96,7 @@ const appRoutes: Routes = [
         NgxChartsModule,
         ChartsModule,
         ColorPickerModule,
+        NgDatepickerModule,
         // NgSemanticModule,
         RouterModule.forRoot(appRoutes)
     ],
@@ -132,7 +136,8 @@ const appRoutes: Routes = [
         DonutChartComponent,
         BaseChartComponent,
         ColorPickerComponent,
-        DayViewerComponent
+        DayViewerComponent,
+        DatePickerComponent
     ],
     providers: [
         SpacesService,

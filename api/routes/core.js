@@ -13,6 +13,7 @@ const Schema = require('../models/schemaModel');
 const NamespaceController = require('../controllers/namespace.controller');
 const EndpointController = require('../controllers/endpoint.controller');
 const SpaceController = EndpointController.space;
+const RainController = EndpointController.rain;
 const EndpointService = require('../services/endpoint.service');
 const postEndpoint = EndpointService.post;
 const getEndpoint = EndpointService.get;
@@ -32,6 +33,7 @@ router
         // TODO: move this to the spaceController
         Space.findByName(req.params.space, (err, data) => res.json(data[0]));
     })
+    
     .post('/endpoint/space', (req, res) => {
     // SPACES: ENDPOINTS TO FETCH DATA FROM SPACES (TWITTER, INSTAGRAM, ETC)
         let data = req.body.data;
@@ -60,6 +62,11 @@ router
         // TODO: move this to the schemaController
         Schema.removeSchema(req.params.space, req.params.type, function () {
             res.status(200).send({ message: `${req.params.space} schema was deleted for ${req.params.space}` });
+        });
+    })
+    .get('/get/rain', (req, res) => {
+        RainController.getAll(req.query, rain => {
+            res.status(200).send(rain);
         });
     });
 

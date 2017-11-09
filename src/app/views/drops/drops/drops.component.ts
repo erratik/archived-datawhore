@@ -44,7 +44,7 @@ export class DropsComponent extends RainConfigsComponent implements OnInit, OnDe
 
   ngOnInit() {
 
-    this.getRainSchemas$ = this.getRain();
+    this.getRainSchemas$ = this.getSpaceRain();
 
     this.getRainSchemas$.subscribe(() => {
         this.rain = this.rainService.rain;

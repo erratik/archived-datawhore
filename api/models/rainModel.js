@@ -26,35 +26,49 @@ var RainSchema = {
                 cb(rain);
             });
         },
+
+        findAllRain: function (params, cb) {
+
+            const query = !!params.spaces && params.spaces[0].length ? { space: { $in: params.spaces } } : {};
+
+            this.find(query, (err, docs) => {
+                if (err) {
+                    cb(err);
+                } else {
+                    cb(docs);
+                }
+
+            });
+        },
         updateRain: function (options, dimensions, cb) {
 
             const dimType = options.type;
             const query = { space: options.space, 'dimensions.type': dimType };
 
-                var that = this;
-                let existingDims = [];
-                var addSchema = function (callback) {
-                    // dimensions = dimensions.map(dim => {
-                    //     dim._id = new ObjectId(dim.id);
-                    //     return dim;
-                    // });
+            var that = this;
+            let existingDims = [];
+            var addSchema = function (callback) {
+                // dimensions = dimensions.map(dim => {
+                //     dim._id = new ObjectId(dim.id);
+                //     return dim;
+                // });
 
-                    that.findOneAndUpdate(
-                        { space: options.space}, 
-                        { $addToSet: {dimensions: { $each: dimensions.concat(existingDims) } } }, 
-                        { upsert: true, returnNewDocument: true, multi: true },  function (err, updated) {
-                            that.find(query, { 'dimensions.$': 1 }, (err, docs) => {
-                                if (err) cb(err);
-                                if (updated) {
-                                    updated.dimensions = docs[0].dimensions;
-                                } else {
-                                    updated = {space: options.space, dimensions: []};
-                                }
-                                cb(updated);
-                            });
-                            
+                that.findOneAndUpdate(
+                    { space: options.space },
+                    { $addToSet: { dimensions: { $each: dimensions.concat(existingDims) } } },
+                    { upsert: true, returnNewDocument: true, multi: true }, function (err, updated) {
+                        that.find(query, { 'dimensions.$': 1 }, (err, docs) => {
+                            if (err) cb(err);
+                            if (updated) {
+                                updated.dimensions = docs[0].dimensions;
+                            } else {
+                                updated = { space: options.space, dimensions: [] };
+                            }
+                            cb(updated);
+                        });
+
                     });
-                };
+            };
 
             this.findOne({ space: options.space }, function (errata, dimList) {
 
@@ -81,4 +95,3 @@ var RainSchema = {
 };
 var Rain = require('./createModel')(mongoose, 'rain', RainSchema);
 module.exports = Rain;
-//# sourceMappingURL=/Users/erratik/Sites/datawhore/admin/api/models/rainModel.js.map

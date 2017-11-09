@@ -1,3 +1,4 @@
+import { HexToRgb } from '../utils/hex-to-rgb.util';
 import { RainService } from './rain/rain.service';
 import { Space } from '../models/space.model';
 import { Injectable } from '@angular/core';
@@ -28,7 +29,9 @@ export class SpacesService {
         return this.http.get(`${this.apiServer}/space/${spaceName}`).map((res: Response) => {
 
             res = res.json();
-            
+            const color = !!res['display'] && !!res['display']['color'] ? res['display']['color'] : null;
+            const display = !!res['display'] ? res['display'] : { color: new HexToRgb(color) };
+
             this.space = new Space(
                 res['name'],
                 res['modified'],
@@ -41,7 +44,7 @@ export class SpacesService {
                 res['avatar'],
                 null,
                 null,
-                res['display'] || { color: '#' + Math.floor(Math.random() * 16777215).toString(16) }
+                res['display']
             );
 
             return this.space;
@@ -60,7 +63,7 @@ export class SpacesService {
         return this.http.get(`${this.apiServer}/spaces`).map((res: Response) => {
 
             const spaces = res.json();
-            
+
             return spaces.map(space => {
                 return new Space(
                     space.name,
