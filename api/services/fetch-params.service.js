@@ -82,10 +82,10 @@ module.exports = {
                     // params.date = moment(dropOldest['timestamp']).subtract(1, 'days').format('YYYYMMDD');
                 } else if (drops.length) {
                     params.to = moment().format('YYYYMMDD');
-                    params.from = moment().subtract(count, 'days').format('YYYYMMDD');
+                    params.from = moment().subtract(count-1, 'days').format('YYYYMMDD');
                 } else {
                     params.to = moment().format('YYYYMMDD');
-                    params.from = moment().subtract(count, 'days').format('YYYYMMDD');
+                    params.from = moment().subtract(count-1, 'days').format('YYYYMMDD');
                 }
                 
                 break;

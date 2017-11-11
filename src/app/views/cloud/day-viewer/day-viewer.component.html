@@ -4,11 +4,12 @@
 
     <div class="column">
       <div class="is-flex" *ngIf="drops.length">
-
+        <!-- TODO: make drop-counter component -->
         <ul class="is-flex center" class="drop-counter is-flex is-filling center">
-          <li *ngFor="let space of dropsBySpace | orderBy:'count'" [ngStyle]="{'flex': getDropFlex(space), 'background-color': space.color} " class="is-flex">
+          <li *ngFor="let space of dropsBySpace | orderBy:'count'" (click)="toggleSpaceDrops(space.name)" [ngStyle]="{'flex': getDropFlex(space), 'background-color': space.color}"
+            class="is-flex" [ngClass]="{'has-hidden-drops': !display[space.name].visible}">
             <div class="is-flex-inline">
-              <datawhore-space-icon [space]="space.name"></datawhore-space-icon>
+              <datawhore-space-icon [space]="space.name" [classes]="['is-circle']"></datawhore-space-icon>
               <div>{{space.count}}</div>
             </div>
           </li>
@@ -18,22 +19,69 @@
       </div>
       <hr>
       <datawhore-date-picker [date]="minDate" (onDateRangeChange)="changeDateRange('min', $event)"></datawhore-date-picker>
-      
+      <pre>{{display | json}}</pre>
 
     </div>
   </div>
   <div class="column is-three-quarters">
 
-    <div class="column" *ngIf="!drops.length">
-      Loading...
-      </div>
-    <div class="column" *ngIf="drops.length">
+    <div class="column" *ngIf="!drops.length && isLoadingSpaces">
 
-      <datawhore-drop-atomic *ngFor="let drop of drops | orderBy:'timestamp':false" [type]="drop.type" [drop]="drop"></datawhore-drop-atomic>
+      <div class="button is-loading">Loading...</div>
+    </div>
+    <div class="column storyline" *ngIf="hasStoryline()">
+      <!-- TODO: make storyline component -->
+      <!-- <datawhore-drop-atomic [type]="'rain.storyline'" [drop]="storyline"></datawhore-drop-atomic> -->
 
-      <hr>
+      <article class="media">
+        <div class="media-left">
+          <!-- <datawhore-image-figure [size]="16" [src]="spaceIconImage"></datawhore-image-figure> -->
+        </div>
+        <div class="media-content">
+          <div class="content">
+            <p>{{storyline.content.date | amDateFormat:'dddd, MMMM Do YYYY'}} Storyline</p>
+          </div>
+
+          <ul>
+            <li *ngFor="let segment of storyline.content.segments" [ngSwitch]="segment.type">
+
+              <div class="is-flex-inline" *ngSwitchCase="'place'">
+
+                <span class="icon is-small">
+                  <i class="fa fa-{{(segment.place && segment.place.type === 'unknown') ? 'map-pin' : segment.place.type}}"
+                    *ngIf="segment.place"></i>
+                </span> {{(segment.place)?segment.place.name:''}} ({{segment.startTime | amDateFormat:'hh:mma' }} to {{segment.endTime
+                | amDateFormat:'hh:mma' }})
+              </div>
+              <div class="is-flex-inline" *ngSwitchDefault>
+                <span class="icon is-small">
+                  <i class="fa fa-folder"></i>
+                </span> {{segment.type}} ({{segment.startTime | amDateFormat:'hh:mma' }} to {{segment.endTime | amDateFormat:'hh:mma'
+                }})
+              </div>
+
+              <ul>
+                <li *ngFor="let ac of segment.activities">
+                  was
+                  <b>{{ac.activity}}</b> during
+                  <b>{{ac.duration | amDuration:'seconds'}}</b> over
+                  <em>{{ac.distance}}</em>m
+                  <div *ngFor="let drop of drops | orderBy:'timestamp':false" [ngClass]="{'is-hidden': !display[drop.space].visible}">
+                    <datawhore-drop-atomic *ngIf="drop.space !== 'moves' && timestampIsBetween(drop, segment)" [type]="drop.type" [drop]="drop"></datawhore-drop-atomic>
+                  </div>
+
+                </li>
+              </ul>
+
+            </li>
+          </ul>
+        </div>
+        <div class="media-right">
+          <a class="delete is-small" (click)="deleteDrop()"></a>
+        </div>
+      </article>
 
     </div>
-    
+
   </div>
 </div>

@@ -1,3 +1,4 @@
+import { HexToRgb } from '../../../utils/hex-to-rgb.util';
 import { Observable } from 'rxjs/Rx';
 import { any } from 'codelyzer/util/function';
 import { RainService } from '../../../services/rain/rain.service';
@@ -55,12 +56,14 @@ export class CloudComponent implements OnInit {
       .do((spaces) => {
         this.spaces = spaces;
         this.dropsBySpace = spaces.map(({ display, name }) => {
+          const hexToRgb = new HexToRgb;
           return {
-            color: display.color,
+            color: hexToRgb.convert(display.color, '0.5'),
             count: 0,
             name
           };
         });
+        console.log(this.dropsBySpace);
         return spaces;
       })
       .switchMap((spaces) => this.rainService.getCloudDrops(options))
@@ -77,30 +80,19 @@ export class CloudComponent implements OnInit {
           }
         }).filter(d => d);
 
-        // return this.spaces;
 
       })
-      .do((spaces) => {
+      .do(() => {
 
         const getRain$ = this.rainService.getRain(this.dropsBySpace.map(({ name }) => name));
-
         getRain$.subscribe((rain) => {
-
-          console.log(rain);
-          console.log(this.rainService.rain);
-          this.drops = this.rainService.enrichDrops(this.drops);
-          // this.newDrops = this.newDrops.map(d => {
-          //   d.space = space;
-          //   return d;
-          // // })
-          // this.drops = this.drops.concat(this.rainService.enrichDrops(this.newDrops.filter(({ type }) => rain[space][0].rainType === type)));
-
-          // console.log(this.newDrops.filter(({ type }) => rain[space][0].rainType === type));
+          // console.log(rain);
           // console.log(this.rainService.rain);
-
+          this.drops = this.rainService.enrichDrops(this.drops);
           this.isLoadingSpaces = false;
-        });
 
+        });
+        return this.spaces;
       });
   }
 

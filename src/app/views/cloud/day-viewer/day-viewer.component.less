@@ -1,0 +1,21 @@
+@import url('../../../../assets/styles/less/mixins.less');
+
+@is-outline: #468ACE;
+@green: #41A53D;
+@red: #9C2525;
+
+.drop-counter {
+  border-radius: 30px;
+  overflow: hidden;
+  li {
+    &:first-child { padding-left: 5px; }
+    &:last-child { padding-right: 10px; }
+
+    &.has-hidden-drops { background: rgb(218, 218, 218) !important; }
+  }
+
+  /deep/ datawhore-space-icon {
+    margin: 5px;
+  }
+
+}

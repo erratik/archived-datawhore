@@ -9,3 +9,20 @@
         border: none;
     }
 }
+
+.bgmixin(@color) {
+    @classname: ~"@{color}"; 
+
+    @data-name: ~'data-color';
+    // [@{data-name}="true"] .@{name}-icon {
+    //     display: inline-block;
+    // }
+    // .@{classname} {
+    //     background-color: @@color;
+        // &.is-outline {
+            background-color: fade(@@color, 50%);
+            border: 1px solid @@color;
+        // }
+    // }
+}
+
