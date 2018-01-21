@@ -1,0 +1,38 @@
+:host {
+
+  flex: 1 0 auto;
+  justify-content: center;
+  margin-right: 3rem;
+  
+  /deep/ input.ngx-datepicker-input {
+      position: absolute;
+      width: 1.8rem !important;
+      height: 1.8rem;
+      display: block;
+      background: transparent;
+      color: transparent;
+      cursor: pointer;
+      padding: 0 !important;
+      border: none !important;
+      margin-left: 3px;
+  }
+
+}
+
+.date-picker {
+  position: relative;
+  align-self: normal;
+}
+
+.open-calendar-trigger {
+  position: absolute;
+  top: 0;
+  left: 10px;
+  z-index: 1;
+}
+
+ng-datepicker {
+  position: absolute;
+  top: 0;
+  left: 0;
+}

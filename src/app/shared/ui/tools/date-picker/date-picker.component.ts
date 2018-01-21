@@ -6,7 +6,7 @@ import * as moment from 'moment';
 @Component({
   selector: 'datawhore-date-picker',
   templateUrl: './date-picker.component.html',
-  styleUrls: ['./date-picker.component.css']
+  styleUrls: ['./date-picker.component.less']
 })
 
 
@@ -17,10 +17,11 @@ export class DatePickerComponent implements OnInit {
 
   public options: DatepickerOptions = {
     minYear: 1970,
-    maxYear: 2030,
+    maxYear: 2030, // Maximal selectable date
     displayFormat: 'MMM D[,] YYYY',
     barTitleFormat: 'MMMM YYYY',
-    firstCalendarDay: 0 // 0 - Sunday, 1 - Monday
+    firstCalendarDay: 0, // 0 - Sunday, 1 - Monday
+    maxDate: new Date(Date.now())
   };
   constructor(private spacesService: SpacesService) { }
 

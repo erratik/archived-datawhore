@@ -117,6 +117,7 @@ module.exports = {
 
                 drops = options.contentPath ? objectPath.get(drops, options.contentPath) : drops;
                 if (options.space === 'moves') {
+                    // debugger;
                     drops = JSON.parse(data);
                 }
                 if (drops && drops.length) {

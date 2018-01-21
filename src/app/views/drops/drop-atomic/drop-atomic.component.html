@@ -10,10 +10,10 @@
 
   <div class="is-flex" *ngSwitchCase="'moves'">
 
-  <details>
-    <summary>drop raw content</summary>
-    <pre>{{drop | json}}</pre>
-  </details>
+    <details>
+      <summary>drop raw content</summary>
+      <pre>{{drop | json}}</pre>
+    </details>
     <article class="media">
       <div class="media-left">
         <datawhore-image-figure [size]="16" [src]="spaceIconImage"></datawhore-image-figure>
@@ -28,16 +28,23 @@
         <ul>
           <li *ngFor="let segment of drop.content.segments" [ngSwitch]="segment.type">
             <div class="is-flex-inline" *ngSwitchCase="'place'">
-              <span class="icon is-small"><i class="fa fa-{{(segment.place && segment.place.type === 'unknown') ? 'map-pin' : segment.place.type}}" *ngIf="segment.place"></i></span> {{(segment.place)?segment.place.name:''}} ({{segment.startTime | amDateFormat:'hh:mma' 
-              }} to {{segment.endTime | amDateFormat:'hh:mma'  }})
+              <span class="icon is-small">
+                <i class="fa fa-{{(segment.place && segment.place.type === 'unknown') ? 'map-pin' : segment.place.type}}" *ngIf="segment.place"></i>
+              </span> {{(segment.place)?segment.place.name:''}} ({{segment.startTime | amDateFormat:'hh:mma' }} to {{segment.endTime
+              | amDateFormat:'hh:mma' }})
             </div>
             <div class="is-flex-inline" *ngSwitchDefault>
-              <span class="icon is-small"><i class="fa fa-folder"></i></span> {{segment.type}} ({{segment.startTime | amDateFormat:'hh:mma' }} to
-              {{segment.endTime | amDateFormat:'hh:mma' }})
+              <span class="icon is-small">
+                <i class="fa fa-folder"></i>
+              </span> {{segment.type}} ({{segment.startTime | amDateFormat:'hh:mma' }} to {{segment.endTime | amDateFormat:'hh:mma'
+              }})
             </div>
             <ul>
               <li *ngFor="let ac of segment.activities">
-                was <b>{{ac.activity}}</b> during <b>{{ac.duration | amDuration:'seconds'}}</b> over <em>{{ac.distance}}</em>                meters
+                was
+                <b>{{ac.activity}}</b> during
+                <b>{{ac.duration | amDuration:'seconds'}}</b> over
+                <em>{{ac.distance}}</em> meters
               </li>
             </ul>
           </li>
@@ -55,21 +62,25 @@
       <div class="media-left" *ngIf="!!drop.content.album_images && drop.content.album_images.length">
         <datawhore-image-figure *ngIf="drop.content.album_images" [size]="16" [src]="drop.content.album_images[2].url" [classes]="['is-circle', 'is-shadowed']"
           class="is-marginless"></datawhore-image-figure>
-
       </div>
       <div class="media-content">
         <div class="content">
           <div class="is-flex-inline">
+
             <div class="caption" *ngIf="drop.content.track_name">
-              <p>Played <strong>{{drop.content.track_name}}</strong> by <strong>{{drop.content.track_artists[0].name}}</strong></p>
+              <p>Played
+                <strong>{{drop.content.track_name}}</strong> by
+                <strong>{{drop.content.track_artists[0].name}}</strong>
+              </p>
               <small>{{drop.content.album_name}}</small>
             </div>
+
           </div>
         </div>
-              <small>{{drop.timestamp | amDateFormat:'dddd, MMMM Do YYYY @ hh:mma'}}</small>
+        <small>{{drop.timestamp | amDateFormat:'dddd, MMMM Do YYYY @ hh:mma'}}</small>
         <nav class="level is-mobile">
           <div class="level-left">
-            
+
           </div>
         </nav>
       </div>
@@ -90,7 +101,11 @@
 
       <div class="is-flex-inline" *ngSwitchCase="'rain.audio'">
         <datawhore-image-figure [size]="16" [src]="drop.content.album_art" [classes]="['is-circle', 'is-shadowed']" class="is-marginless"></datawhore-image-figure>
-        <span class="caption">Played <strong>{{drop.content.track_name}}</strong> by <strong>{{drop.content.artist}}</strong> from <em>{{drop.content.source_title}}</em></span>
+        <span class="caption">Played
+          <strong>{{drop.content.track_name}}</strong> by
+          <strong>{{drop.content.artist}}</strong> from
+          <em>{{drop.content.source_title}}</em>
+        </span>
       </div>
 
       <div class="is-flex" *ngSwitchCase="'rain.photo'">
@@ -111,8 +126,10 @@
     <nav class="level is-mobile">
       <div class="level-left">
         <span class="level-item">
-                <span class="icon is-small"><i class="fa fa-sticky-note"></i></span>
-        <small>{{drop.content.note_count | number : '1.0'.a}}</small>
+          <span class="icon is-small">
+            <i class="fa fa-sticky-note"></i>
+          </span>
+          <small>{{drop.content.note_count | number : '1.0'.a}}</small>
         </span>
       </div>
     </nav>
@@ -127,23 +144,30 @@
       </div>
       <div class="media-content">
         <div class="content">
-          <p><small>{{drop.content.date | date:'short'}}</small>
+          <p>
+            <small>{{drop.content.date | date:'short'}}</small>
             <br>{{drop.content.caption }}
           </p>
         </div>
         <nav class="level is-mobile">
           <div class="level-left">
             <span class="level-item">
-                <span class="icon is-small"><i class="fa fa-comments"></i></span>
-            <small>{{drop.content.count_comments}}</small>
+              <span class="icon is-small">
+                <i class="fa fa-comments"></i>
+              </span>
+              <small>{{drop.content.count_comments}}</small>
             </span>
             <span class="level-item">
-                <span class="icon is-small"><i class="fa fa-heart"></i></span>
-            <small>{{drop.content.count_likes}}</small>
+              <span class="icon is-small">
+                <i class="fa fa-heart"></i>
+              </span>
+              <small>{{drop.content.count_likes}}</small>
             </span>
             <span class="level-item" *ngIf="drop.content.location_name">
-                <span class="icon is-small"><i class="fa fa-map-marker"></i></span>
-            <small>{{drop.content.location_name}}</small>
+              <span class="icon is-small">
+                <i class="fa fa-map-marker"></i>
+              </span>
+              <small>{{drop.content.location_name}}</small>
             </span>
           </div>
         </nav>
@@ -166,7 +190,8 @@
       </div>
       <div class="media-content">
         <div class="content">
-          <p><small>{{drop.timestamp | amDateFormat:'dddd, MMMM Do YYYY @ hh:mma'}}</small>
+          <p>
+            <small>{{drop.timestamp | amDateFormat:'dddd, MMMM Do YYYY @ hh:mma'}}</small>
             <!--<strong>John Smith</strong> <small>@johnsmith</small> -->
             <br>{{drop.content.caption }}
           </p>
@@ -174,16 +199,22 @@
         <nav class="level is-mobile">
           <div class="level-left">
             <span class="level-item" *ngIf="!!drop.content.comments">
-                <span class="icon is-small"><i class="fa fa-comments"></i></span>
-            <small>{{drop.content.comments.length}}</small>
+              <span class="icon is-small">
+                <i class="fa fa-comments"></i>
+              </span>
+              <small>{{drop.content.comments.length}}</small>
             </span>
             <span class="level-item" *ngIf="!!drop.content.likes">
-                <span class="icon is-small"><i class="fa fa-heart"></i></span>
-            <small>{{drop.content.likes.length}}</small>
+              <span class="icon is-small">
+                <i class="fa fa-heart"></i>
+              </span>
+              <small>{{drop.content.likes.length}}</small>
             </span>
             <span class="level-item" *ngIf="drop.content.location_name">
-                <span class="icon is-small"><i class="fa fa-map-marker"></i></span>
-            <small>{{drop.content.location_name}}</small>
+              <span class="icon is-small">
+                <i class="fa fa-map-marker"></i>
+              </span>
+              <small>{{drop.content.location_name}}</small>
             </span>
           </div>
         </nav>
@@ -202,7 +233,8 @@
           [specs]="{ width: 300, height: 400}"></datawhore-drop-image>
       </div>
       <div class="media-content">
-        <div class="content"><small>{{drop.timestamp | amDateFormat:'dddd, MMMM Do YYYY @ hh:MMa'}}</small>
+        <div class="content">
+          <small>{{drop.timestamp | amDateFormat:'dddd, MMMM Do YYYY @ hh:MMa'}}</small>
           <div class="is-flex-inline">
 
             <datawhore-image-figure *ngIf="drop.content.venue_categories" [size]="16" [src]="drop.content.venue_categories[0].icon.prefix + 'bg_32' + drop.content.venue_categories[0].icon.suffix "></datawhore-image-figure>
@@ -212,12 +244,16 @@
         <nav class="level is-mobile">
           <div class="level-left">
             <span class="level-item" *ngIf="!!drop.content.comments.count">
-                <span class="icon is-small"><i class="fa fa-comments"></i></span>
-            <small>{{drop.content.comments.length}}</small>
+              <span class="icon is-small">
+                <i class="fa fa-comments"></i>
+              </span>
+              <small>{{drop.content.comments.length}}</small>
             </span>
             <span class="level-item" *ngIf="!!drop.content['content_likes.count']">
-                <span class="icon is-small"><i class="fa fa-heart"></i></span>
-            <small>{{drop.content.likes.length}}</small>
+              <span class="icon is-small">
+                <i class="fa fa-heart"></i>
+              </span>
+              <small>{{drop.content.likes.length}}</small>
             </span>
           </div>
         </nav>
@@ -236,7 +272,8 @@
         [specs]="{ width: drop.content.media[0].sizes.small.w, height: drop.content.media[0].sizes.small.h}"></datawhore-drop-image> -->
       </div>
       <div class="media-content">
-        <div class="content"><small>{{drop.timestamp | amDateFormat:'dddd, MMMM Do YYYY @ hh:MMa'}}</small>
+        <div class="content">
+          <small>{{drop.timestamp | amDateFormat:'dddd, MMMM Do YYYY @ hh:MMa'}}</small>
           <div class="is-flex-inline">
             {{drop.content.caption }}
           </div>
@@ -244,8 +281,10 @@
         <nav class="level is-mobile">
           <div class="level-left">
             <span class="level-item" *ngIf="!!drop.content.favorite_count">
-              <span class="icon is-small"><i class="fa fa-heart"></i></span>
-            <small>{{drop.content.favorite_count}}</small>
+              <span class="icon is-small">
+                <i class="fa fa-heart"></i>
+              </span>
+              <small>{{drop.content.favorite_count}}</small>
             </span>
           </div>
         </nav>
@@ -265,23 +304,30 @@
       </div>
       <div class="media-content">
         <div class="content">
-          <p><small>{{drop.content.date | date:'short'}}</small>
+          <p>
+            <small>{{drop.content.date | date:'short'}}</small>
             <br>{{drop.content.caption }}
           </p>
         </div>
         <nav class="level is-mobile">
           <div class="level-left">
             <span class="level-item">
-                <span class="icon is-small"><i class="fa fa-comments"></i></span>
-            <small>{{drop.content.count_comments}}</small>
+              <span class="icon is-small">
+                <i class="fa fa-comments"></i>
+              </span>
+              <small>{{drop.content.count_comments}}</small>
             </span>
             <span class="level-item">
-                <span class="icon is-small"><i class="fa fa-heart"></i></span>
-            <small>{{drop.content.count_likes}}</small>
+              <span class="icon is-small">
+                <i class="fa fa-heart"></i>
+              </span>
+              <small>{{drop.content.count_likes}}</small>
             </span>
             <span class="level-item" *ngIf="drop.content.location_name">
-                <span class="icon is-small"><i class="fa fa-map-marker"></i></span>
-            <small>{{drop.content.location_name}}</small>
+              <span class="icon is-small">
+                <i class="fa fa-map-marker"></i>
+              </span>
+              <small>{{drop.content.location_name}}</small>
             </span>
           </div>
         </nav>

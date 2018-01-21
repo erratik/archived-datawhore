@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "test": "make test"
+    "test": "make test",
+    "debug": "node --nolazy --inspect-brk=5858 ./bin/www"
   },
   "repository": {
     "type": "git",

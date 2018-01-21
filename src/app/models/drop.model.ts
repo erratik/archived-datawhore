@@ -5,7 +5,8 @@ export class Drop {
         public space: string,
         public type: string,
         public content: any,
-        public timestamp: any) {
+        public timestamp: any,
+        public story?: any) {
 
         this.content = this.sanitizeDrop();
     }
@@ -14,7 +15,7 @@ export class Drop {
 
         Object.keys(this.content).forEach(prop => {
             switch (prop) {
-                case "date":
+                case 'date':
                     this.content[prop] = this.timestamp;
                   break;
 

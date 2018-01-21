@@ -12,6 +12,7 @@ import { SpaceItemService } from '../../../shared/services/space-item/space-item
 import { Drop } from 'app/models/drop.model';
 import * as _ from 'lodash';
 import { DimensionSchema } from 'app/models/dimension-schema.model';
+import { Rain } from 'app/models/rain.model';
 
 @Component({
   selector: 'datawhore-cloud',
@@ -45,8 +46,8 @@ export class CloudComponent implements OnInit {
 
     this.getSpaces$.subscribe(() => {
       // debugger;
-
-      // this.newDrops = [];
+      this.drops = this.rainService.enrichDrops(this.drops);
+      this.isLoadingSpaces = false;
     });
 
   }
@@ -68,7 +69,6 @@ export class CloudComponent implements OnInit {
       })
       .switchMap((spaces) => this.rainService.getCloudDrops(options))
       .do((cloudDrops) => {
-
         this.drops = [];
 
         this.dropsBySpace = this.dropsBySpace.map(dropSpace => {
@@ -79,20 +79,11 @@ export class CloudComponent implements OnInit {
             return dropSpace;
           }
         }).filter(d => d);
-
-
       })
-      .do(() => {
-
-        const getRain$ = this.rainService.getRain(this.dropsBySpace.map(({ name }) => name));
-        getRain$.subscribe((rain) => {
-          // console.log(rain);
-          // console.log(this.rainService.rain);
-          this.drops = this.rainService.enrichDrops(this.drops);
-          this.isLoadingSpaces = false;
-
-        });
-        return this.spaces;
+      .switchMap(() => this.rainService.getRain(this.dropsBySpace.map(({ name }) => name)))
+      .do((rain) => {
+          this.rainService.rain = rain;
+          return this.spaces;
       });
   }
 

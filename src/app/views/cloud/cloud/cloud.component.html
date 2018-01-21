@@ -1,32 +1,32 @@
 <section class="section">
     <div class="container">
 
-            <div class="columns">
-                    
-                                <div class="column" *ngIf="drops.length">
-            <div class="is-flex">
-
-                    <ul class="is-flex center" class="drop-counter is-flex is-filling center">
-                            <li *ngFor="let space of dropsBySpace | orderBy:'count'" [ngStyle]="{'flex': getDropFlex(space)} " class="is-flex">
-                                <div class="is-flex-inline">
-                                    <datawhore-space-icon [space]="space._id"></datawhore-space-icon>
-                                    <div>{{space.count}}</div>
-                                </div>
-                            </li>
-                            
-                        </ul>
-        
-            </div>
-                <!-- <datawhore-line-chart [data]="dropsBySpace"></datawhore-line-chart> -->
-            </div>
-            </div>
         <div class="columns">
 
-                <a (click)="getMoreDrops()" class="button is-info is-small is-pulled-right is-marginless"> fetch more drops</a>
+            <div class="column" *ngIf="drops.length">
+                <div class="is-flex">
+
+                    <ul class="is-flex center" class="drop-counter is-flex is-filling center">
+                        <li *ngFor="let space of dropsBySpace | orderBy:'count'" [ngStyle]="{'flex': getDropFlex(space)} " class="is-flex">
+                            <div class="is-flex-inline">
+                                <datawhore-space-icon [space]="space._id"></datawhore-space-icon>
+                                <div>{{space.count}}</div>
+                            </div>
+                        </li>
+
+                    </ul>
+
+                </div>
+                <!-- <datawhore-line-chart [data]="dropsBySpace"></datawhore-line-chart> -->
+            </div>
+        </div>
+        <div class="columns">
+
+            <a (click)="getMoreDrops()" class="button is-info is-small is-pulled-right is-marginless"> fetch more drops</a>
             <div class="column" *ngIf="drops.length">
 
-                <datawhore-drop-atomic *ngFor="let drop of drops | orderBy:'timestamp':false" [type]="drop.type" [drop]="drop"></datawhore-drop-atomic> 
-                
+                <datawhore-drop-atomic *ngFor="let drop of drops | orderBy:'timestamp':false" [type]="drop.type" [drop]="drop"></datawhore-drop-atomic>
+
                 <hr>
 
             </div>
