@@ -1,4 +1,5 @@
-<div [ngSwitch]="drop.space">
+<div [ngSwitch]="drop.space" ng-class="drop.space">
+
   <div class="is-flex" *ngSwitchDefault>
     <div class="is-flex center date">
       <datawhore-image-figure [size]="16" [src]="spaceIconImage"></datawhore-image-figure>
@@ -10,10 +11,10 @@
 
   <div class="is-flex" *ngSwitchCase="'moves'">
 
-    <details>
+    <!-- <details>
       <summary>drop raw content</summary>
       <pre>{{drop | json}}</pre>
-    </details>
+    </details> -->
     <article class="media">
       <div class="media-left">
         <datawhore-image-figure [size]="16" [src]="spaceIconImage"></datawhore-image-figure>
@@ -30,13 +31,13 @@
             <div class="is-flex-inline" *ngSwitchCase="'place'">
               <span class="icon is-small">
                 <i class="fa fa-{{(segment.place && segment.place.type === 'unknown') ? 'map-pin' : segment.place.type}}" *ngIf="segment.place"></i>
-              </span> {{(segment.place)?segment.place.name:''}} ({{segment.startTime | amDateFormat:'hh:mma' }} to {{segment.endTime
-              | amDateFormat:'hh:mma' }})
+              </span> {{(segment.place)?segment.place.name:''}} ({{segment.startTime | amDateFormat:'h:mma' }} to {{segment.endTime
+              | amDateFormat:'h:mma' }})
             </div>
             <div class="is-flex-inline" *ngSwitchDefault>
               <span class="icon is-small">
                 <i class="fa fa-folder"></i>
-              </span> {{segment.type}} ({{segment.startTime | amDateFormat:'hh:mma' }} to {{segment.endTime | amDateFormat:'hh:mma'
+              </span> {{segment.type}} ({{segment.startTime | amDateFormat:'h:mma' }} to {{segment.endTime | amDateFormat:'h:mma'
               }})
             </div>
             <ul>
@@ -77,7 +78,7 @@
 
           </div>
         </div>
-        <small>{{drop.timestamp | amDateFormat:'dddd, MMMM Do YYYY @ hh:mma'}}</small>
+        <small>{{drop.timestamp | amDateFormat:'dddd, MMMM Do YYYY @ h:mma'}}</small>
         <nav class="level is-mobile">
           <div class="level-left">
 
@@ -191,7 +192,7 @@
       <div class="media-content">
         <div class="content">
           <p>
-            <small>{{drop.timestamp | amDateFormat:'dddd, MMMM Do YYYY @ hh:mma'}}</small>
+            <small>{{drop.timestamp | amDateFormat:'dddd, MMMM Do YYYY @ h:mma'}}</small>
             <!--<strong>John Smith</strong> <small>@johnsmith</small> -->
             <br>{{drop.content.caption }}
           </p>
@@ -228,17 +229,22 @@
 
   <div class="is-flex" *ngSwitchCase="'swarm'">
     <article class="media">
-      <div class="media-left" *ngIf="!!drop.content['content_photos.items'] && drop.content['content_photos.items'].length">
-        <datawhore-drop-image [size]="64" [src]="drop.content['content_photos.items']" [classes]="['is-shadowed']" [space]="drop.space"
-          [specs]="{ width: 300, height: 400}"></datawhore-drop-image>
+      <div class="media-left">
+        <datawhore-image-figure *ngIf="drop.content.venue_categories && !drop.content['content_photos']" [size]="16" [src]="drop.content.venue_categories[0].icon.prefix + 'bg_32' + drop.content.venue_categories[0].icon.suffix "></datawhore-image-figure>
+
       </div>
       <div class="media-content">
         <div class="content">
-          <small>{{drop.timestamp | amDateFormat:'dddd, MMMM Do YYYY @ hh:MMa'}}</small>
+          <small>{{drop.timestamp | amDateFormat:'dddd, MMMM Do YYYY @ h:mma'}}</small>
           <div class="is-flex-inline">
+            <datawhore-image-figure *ngIf="drop.content.venue_categories && !!drop.content['content_photos']" [size]="16" [src]="drop.content.venue_categories[0].icon.prefix + 'bg_32' + drop.content.venue_categories[0].icon.suffix "></datawhore-image-figure>
 
-            <datawhore-image-figure *ngIf="drop.content.venue_categories" [size]="16" [src]="drop.content.venue_categories[0].icon.prefix + 'bg_32' + drop.content.venue_categories[0].icon.suffix "></datawhore-image-figure>
             {{drop.content.caption }}
+
+            <div class="" *ngIf="!!drop.content['content_photos.items'] && drop.content['content_photos.items'].length">
+              <datawhore-drop-image [size]="64" [src]="drop.content['content_photos.items']" [classes]="['is-shadowed']" [space]="drop.space"
+                [specs]="{ width: 300, height: 400}"></datawhore-drop-image>
+            </div>
           </div>
         </div>
         <nav class="level is-mobile">
@@ -273,7 +279,7 @@
       </div>
       <div class="media-content">
         <div class="content">
-          <small>{{drop.timestamp | amDateFormat:'dddd, MMMM Do YYYY @ hh:MMa'}}</small>
+          <small>{{drop.timestamp | amDateFormat:'dddd, MMMM Do YYYY @ h:mma'}}</small>
           <div class="is-flex-inline">
             {{drop.content.caption }}
           </div>

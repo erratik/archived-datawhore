@@ -1,4 +1,3 @@
-
 export class Drop {
     constructor(
         public id: string,
@@ -6,7 +5,8 @@ export class Drop {
         public type: string,
         public content: any,
         public timestamp: any,
-        public story?: any) {
+        public story?: any,
+        public inSegment?: boolean) {
 
         this.content = this.sanitizeDrop();
     }

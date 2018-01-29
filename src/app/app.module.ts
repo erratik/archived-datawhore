@@ -5,15 +5,15 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { RouterModule, Routes } from '@angular/router';
-import { MomentModule } from 'angular2-moment';
+import { FileSelectDirective, FileDropDirective } from 'ng2-file-upload';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { ChartsModule } from 'ng2-charts';
 import { ColorPickerModule } from 'ngx-color-picker';
 import { NgDatepickerModule } from 'ng2-datepicker';
-
+// import { TJsonViewerModule } from 't-json-viewer';
+import { MomentModule } from 'angular2-moment';
 import * as _ from 'lodash';
 
-import { FileSelectDirective, FileDropDirective } from 'ng2-file-upload';
 
 import { SpacesService } from './services/spaces.service';
 import { OauthSettingsService } from './services/space/oauth-settings.service';
@@ -59,6 +59,7 @@ import { BaseChartComponent } from './shared/ui/charts/base-chart/base-chart.com
 import { ColorPickerComponent } from './shared/ui/tools/color-picker/color-picker.component';
 import { DayViewerComponent } from './views/cloud/day-viewer/day-viewer.component';
 import { DatePickerComponent } from './shared/ui/tools/date-picker/date-picker.component';
+import { RenderJsonPipe } from './shared/pipes/render-json.pipe';
 
 const appRoutes: Routes = [
     {
@@ -97,6 +98,7 @@ const appRoutes: Routes = [
         ChartsModule,
         ColorPickerModule,
         NgDatepickerModule,
+        // TJsonViewerModule,
         // NgSemanticModule,
         RouterModule.forRoot(appRoutes)
     ],
@@ -137,7 +139,8 @@ const appRoutes: Routes = [
         BaseChartComponent,
         ColorPickerComponent,
         DayViewerComponent,
-        DatePickerComponent
+        DatePickerComponent,
+        RenderJsonPipe
     ],
     providers: [
         SpacesService,

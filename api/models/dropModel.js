@@ -28,7 +28,7 @@ const DropSchema = {
                 if (result) {
 
                     const dropDocId = result._id;
-                    
+
                     const timestampQuery = (!!params.query && !!params.query.max) ? { 'drops.timestamp': { $lt: Number(params.query.max) } } : { 'drops.timestamp': { $lt: Date.now() } };
                     if (!!params.query && !!params.query.min) {
                         timestampQuery['drops.timestamp']['$gt'] = Number(params.query.min);
@@ -61,7 +61,7 @@ const DropSchema = {
                             }
                         ],
                         getTimestamp: [
-                            { $match: {  } },
+                            { $match: {} },
                             { $unwind: "$drops" },
                             { $match: timestampQuery },
                             { $sort: { 'drops.timestamp': -1 } },
@@ -94,8 +94,8 @@ const DropSchema = {
                                 } else if (params.space === 'all') {
                                     drops = docs;
                                 }
-                            } else  {
-                                
+                            } else {
+
                                 console.log('empty aggregate query result for: ', query)
                                 drops = [];
                             }
@@ -201,10 +201,25 @@ const DropSchema = {
 
                     return drop;
 
-                }).filter(drop => !existingDropTimestamps.includes(Number(drop.timestamp)));
+                });
+
+                if (space !== 'moves') {
+                    drops = drops.filter(drop => !existingDropTimestamps.includes(Number(drop.timestamp)));
+                }
+
+                if (space == 'moves') {
+                    that.findOneAndUpdate(
+                        { space: space },
+                        { $pull: { drops: { timestamp: { $in: drops.map(drop => drop.timestamp) }, type } } },
+                        { multi: true },
+                        (err, updated) => {
+                            // debugger;
+
+                        });
+                }
 
                 if (drops.length) {
-                    
+
                     that.findOneAndUpdate(
                         { space: space },
                         { $addToSet: { drops: { $each: drops } } },

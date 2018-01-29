@@ -1,5 +1,6 @@
 <div class="columns">
 
+  <!-- TODO: make sidebar for day-viewer component -->
   <div class="column is-quarter">
 
     <div class="column">
@@ -7,6 +8,7 @@
       <p>Viewing: {{selectedTimestamp | amDateFormat:'dddd, MMMM Do YYYY'}}</p>
       <hr>
 
+      <!-- TODO: make date-explorer component -->
       <div class="is-flex date-picker-wrapper">
         <button (click)="changeDateRange('-1')">previous day</button>
         <datawhore-date-picker class="is-flex center" date="selectedDate" (onDateRangeChange)="changeDateRange($event)"></datawhore-date-picker>
@@ -27,7 +29,7 @@
 
         </ul>
 
-      <div class="button is-loading" *ngIf="isLoadingSpaces">Loading...</div>
+        <div class="button is-loading" *ngIf="isLoadingSpaces">Loading...</div>
 
       </div>
 
@@ -35,11 +37,11 @@
     </div>
   </div>
   <div class="column is-three-quarters">
-    <div class="column" *ngIf="!drops.length && !isLoadingSpaces">
+    <div class="column" *ngIf="isLoadingSpaces">
 
-      <div class="button is-loading">Loading...</div>
+      <div class="is-loading"></div>
     </div>
-    <div class="column storyline" *ngIf="storyline">
+    <div class="column storyline" *ngIf="storyline && !isLoadingSpaces">
       <!-- TODO: make storyline component -->
       <article class="media">
         <div class="media-left">
@@ -60,43 +62,48 @@
                 <hr>
 
               </div>
-              <pre>{{storyline.drops | json}}</pre>
 
             </div>
 
-            <ul *ngSwitchDefault>
-              <li *ngFor="let segment of storyline.segments" [ngSwitch]="segment.type">
+            <!-- <datawhore-drop-atomic *ngFor="let drop of storyline.drops | orderBy:'timestamp':false" [type]="drop.type" [drop]="drop"></datawhore-drop-atomic> -->
+            <!-- <pre>{{storyDrops  | json}}</pre> -->
 
-                <div class="is-flex-inline" *ngSwitchCase="'place'">
+
+            <div *ngSwitchDefault>
+              <div *ngFor="let segment of storyItems" [ngSwitch]="segment.type" class="segment">
+
+                <div class="is-flex-inline" *ngSwitchCase="'place'" class="place">
 
                   <span class="icon is-small">
                     <i class="fa fa-{{(segment.place && segment.place.type === 'unknown') ? 'map-pin' : segment.place.type}}" *ngIf="segment.place"></i>
-                  </span> {{(segment.place)?segment.place.name:''}} ({{segment.startTime | amDateFormat:'hh:mma' }} to {{segment.endTime
-                  | amDateFormat:'hh:mma' }})
+                  </span> {{(segment.place)?segment.place.name:''}} ({{segment.startTime | amDateFormat:'h:mma' }} to {{segment.endTime
+                  | amDateFormat:'h:mma' }})
+
+                  <div class="is-flex-inline" *ngSwitchDefault>
+                    <span class="icon is-small">
+                      <i class="fa fa-folder"></i>
+                    </span> {{segment.type}} ({{segment.startTime | amDateFormat:'h:mma' }} to {{segment.endTime | amDateFormat:'h:mma'}})
+                  </div>
+                  
+                  <div *ngFor="let item of segment.items | orderBy:'timestamp':true">
+                    
+                      <div *ngIf="item.activity" class="activity">
+                          was
+                          <b>{{item.activity}}</b> during
+                          <b>{{item.duration | amDuration:'seconds'}}</b> over
+                          <em>{{item.distance}}</em> meters ({{item.startTime | amDateFormat:'h:mma' }} to {{item.endTime | amDateFormat:'h:mma'}}) - {{item.timestamp}} - {{item.startTime}}
+                          <div *ngFor="let drop of item.drops | orderBy:'timestamp':false">
+                            <datawhore-drop-atomic [type]="drop.type" [drop]="drop"></datawhore-drop-atomic>
+                          </div>
+                      </div>
+                      <div *ngIf="item.space && !isActivityDrop(item, segment.activities)">
+                          <datawhore-drop-atomic [type]="item.type" [drop]="item" ></datawhore-drop-atomic>
+                      </div>
+                  </div>
+
                 </div>
-                <div class="is-flex-inline" *ngSwitchDefault>
-                  <span class="icon is-small">
-                    <i class="fa fa-folder"></i>
-                  </span> {{segment.type}} ({{segment.startTime | amDateFormat:'hh:mma' }} to {{segment.endTime | amDateFormat:'hh:mma'
-                  }})
-                </div>
-
-                <ul>
-                  <li *ngFor="let ac of segment.activities">
-                    was
-                    <b>{{ac.activity}}</b> during
-                    <b>{{ac.duration | amDuration:'seconds'}}</b> over
-                    <em>{{ac.distance}}</em>m
-                    <div *ngFor="let drop of segment.drops | orderBy:'timestamp':false">
-                      <!-- <div *ngFor="let drop of segment.drops | orderBy:'timestamp':false" [ngClass]="{'is-hidden': !display[drop.space].visible}"> -->
-                      <datawhore-drop-atomic [type]="drop.type" [drop]="drop"></datawhore-drop-atomic>
-                    </div>
-
-                  </li>
-                </ul>
-
-              </li>
-            </ul>
+              </div>
+            </div>
           </div>
 
 
