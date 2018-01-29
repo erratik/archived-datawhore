@@ -111,17 +111,10 @@ export class DayViewerComponent extends CloudComponent implements OnInit {
           return activity;
         });
         story.items = !!story.drops ? story.activities.concat(story.drops) : story.activities;
-        // item.content.segments = item.content.segments.map(segment => {
-
-        //   // delete segment.activities;
-        //   // delete segment.drops;
-        //   return segment;
-        // });
-        debugger;
+        
       }
       return story;
     });
-    // debugger;
   }
 
 
