@@ -1,6 +1,5 @@
 import { Storyline } from '../../../models/storyline.model';
 import { Drop } from '../../../models/drop.model';
-import * as console from 'console';
 import { Observable } from 'rxjs/Rx';
 import { CloudComponent } from '../cloud/cloud.component';
 import { SpaceItemService } from '../../../shared/services/space-item/space-item.service';
@@ -102,16 +101,74 @@ export class DayViewerComponent extends CloudComponent implements OnInit {
 
   public compileContent(): any {
     this.storyItems = this.storyline.drops.concat(this.storyline.segments);
-
-    this.storyItems = this.storyItems.map(story => {
+    const groupLimits = [
+      {
+        space: 'spotify',
+        type: 'rain.audio',
+        limit: 3,
+      }
+    ];
+    this.storyItems = this.storyItems.map((story, i) => {
 
       if (!!story.activities) {
+
         story.activities = story.activities.map(activity => {
           activity.timestamp = activity.startTime;
           return activity;
         });
+
         story.items = !!story.drops ? story.activities.concat(story.drops) : story.activities;
-        
+
+        // tslint:disable-next-line:prefer-const
+        let itemGroups = [];
+        let cycle;
+
+        story.items = story.items.filter(item => {
+          cycle = !!item.activity ? item.activity : cycle;
+          console.log(cycle, item.space);
+          debugger;
+          if (!!item.space) {
+
+
+            cycle = item.space;
+            if (groupLimits.map(o => o.space).includes(item.space) && !this.isActivityDrop(item, story.activities)) {
+
+              // tslint:disable-next-line:prefer-const
+              let spaceGroup = itemGroups.filter(grp => grp.space === item.space)[0];
+
+              if (!!spaceGroup) {
+
+                spaceGroup.items.push(item);
+              } else {
+                // debugger;
+                itemGroups.push({ space: item.space, items: [item], type: 'group' });
+              }
+
+              return false;
+
+            }
+          } else {
+
+            cycle = item.activity;
+            // debugger;
+            return true;
+          }
+        });
+
+        itemGroups = itemGroups.map(itemGroup => {
+
+          // itemGroup.items = itemGroup.items.map(drop =>this.isBetween(drop));
+
+          debugger;
+
+          itemGroup.timestamp = Math.min.apply(Math, itemGroup.items.map(o => o.timestamp));
+          return itemGroup;
+        }).sort((a, b) => a.timestamp - b.timestamp);
+
+        // debugger;
+        story.items = itemGroups.concat(story.items);
+
+        // debugger;
       }
       return story;
     });
@@ -124,12 +181,18 @@ export class DayViewerComponent extends CloudComponent implements OnInit {
       const startTime = Number(moment(activities[i].startTime).format('x'));
       const endTime = Number(moment(activities[i].endTime).format('x'));
 
-      inActivity = drop.timestamp >= startTime && drop.timestamp <= endTime;
+      inActivity = drop.timestamp > startTime && drop.timestamp < endTime;
       // debugger;
 
     }
     // debugger;
     return inActivity;
+  }
+
+  public isBetween(drop: Drop, activity: any): boolean {
+    const startTime = Number(moment(activity.startTime).format('x'));
+    const endTime = Number(moment(activity.endTime).format('x'));
+    return drop.timestamp > startTime && drop.timestamp < endTime;
   }
 
 

@@ -26,40 +26,46 @@ import { HeaderComponent } from './wrapper/header/header.component';
 import { ContainerComponent } from './wrapper/container/container.component';
 import { FooterComponent } from './wrapper/footer/footer.component';
 
-import { SettingsViewComponent } from './views/settings/settings.component';
-import { EditSpacesComponent } from './views/spaces/edit-spaces/edit-spaces.component';
 
-import { ValuesPipe } from './shared/pipes/values-pipe.pipe';
-import { SpaceViewComponent } from './views/spaces/view-space/view-space.component';
 import { SpaceConfigComponent } from './shared/component/space-config/space-config.component';
 import { DimensionListComponent } from './shared/component/dimensions/dimensions-list/dimensions-list.component';
 import { DimensionFormComponent } from './shared/component/dimensions/dimensions-form/dimensions-form.component';
 import { SpaceItemComponent } from './shared/component/space-item/space-item.component';
+
 import { SchemaValuePipe } from './shared/pipes/schema-value.pipe';
-import { ProfileFormComponent } from './views/profile/profile-form/profile-form.component';
+import { ValuesPipe } from './shared/pipes/values-pipe.pipe';
 import { OrderByPipe } from './shared/pipes/order-by.pipe';
-import { AddSpaceComponent } from './views/spaces/add-space/add-space.component';
 import { PopulateMatchesPipe } from './shared/pipes/populate-matches.pipe';
-import { RainFormComponent } from './views/rain/rain-form/rain-form.component';
-import { RainConfigsComponent } from './views/rain/rain-configs/rain-configs/rain-configs.component';
-import { DropsComponent } from './views/drops/drops/drops.component';
-import { DropAtomicComponent } from './views/drops/drop-atomic/drop-atomic.component';
 import { KeyPipe } from './shared/pipes/key-pipe.pipe';
 import { OrderDropByPipe } from './shared/pipes/order-drop-by.pipe';
+import { SegmentFilterPipe } from './shared/pipes/segment-filter.pipe';
+import { RenderJsonPipe } from './shared/pipes/render-json.pipe';
+
 import { ImageFigureComponent } from './shared/directives/image-figure/image-figure.component';
-import { ProfileConfigComponent } from './views/profile/profile-config/profile-config.component';
 import { DropImageComponent } from './shared/directives/drop-image/drop-image.component';
-import { CloudComponent } from './views/cloud/cloud/cloud.component';
-import { DropCloudComponent } from './views/cloud/drop-cloud/drop-cloud.component';
 import { SpaceIconComponent } from './shared/directives/space-icon/space-icon.component';
 import { LineChartComponent } from './shared/ui/charts/line-chart/line-chart.component';
 import { PieChartAdvancedComponent } from './shared/ui/charts/pie-chart--advanced/pie-chart--advanced.component';
 import { DonutChartComponent } from './shared/ui/charts/donut-chart/donut-chart.component';
 import { BaseChartComponent } from './shared/ui/charts/base-chart/base-chart.component';
+
 import { ColorPickerComponent } from './shared/ui/tools/color-picker/color-picker.component';
-import { DayViewerComponent } from './views/cloud/day-viewer/day-viewer.component';
 import { DatePickerComponent } from './shared/ui/tools/date-picker/date-picker.component';
-import { RenderJsonPipe } from './shared/pipes/render-json.pipe';
+
+import { RainFormComponent } from './views/rain/rain-form/rain-form.component';
+import { SettingsViewComponent } from './views/settings/settings.component';
+import { EditSpacesComponent } from './views/spaces/edit-spaces/edit-spaces.component';
+import { AddSpaceComponent } from './views/spaces/add-space/add-space.component';
+import { SpaceViewComponent } from './views/spaces/view-space/view-space.component';
+import { ProfileFormComponent } from './views/profile/profile-form/profile-form.component';
+import { RainConfigsComponent } from './views/rain/rain-configs/rain-configs/rain-configs.component';
+import { DropAtomicComponent } from './views/drops/drop-atomic/drop-atomic.component';
+import { ProfileConfigComponent } from './views/profile/profile-config/profile-config.component';
+import { DropsComponent } from './views/drops/drops/drops.component';
+import { DropCloudComponent } from './views/cloud/drop-cloud/drop-cloud.component';
+import { CloudComponent } from './views/cloud/cloud/cloud.component';
+import { DayViewerComponent } from './views/cloud/day-viewer/day-viewer.component';
+import { MapComponent } from './views/cloud/map/map.component';
 
 const appRoutes: Routes = [
     {
@@ -84,6 +90,9 @@ const appRoutes: Routes = [
     },
     {
         path: 'settings', component: SettingsViewComponent
+    },
+    {
+        path: 'threejs', component: MapComponent
     },
 ];
 
@@ -140,7 +149,9 @@ const appRoutes: Routes = [
         ColorPickerComponent,
         DayViewerComponent,
         DatePickerComponent,
-        RenderJsonPipe
+        RenderJsonPipe,
+        MapComponent,
+        SegmentFilterPipe
     ],
     providers: [
         SpacesService,
