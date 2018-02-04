@@ -1,18 +1,19 @@
 import { HexToRgb } from '../../../utils/hex-to-rgb.util';
 import { Observable } from 'rxjs/Rx';
 import { any } from 'codelyzer/util/function';
-import { RainService } from '../../../services/rain/rain.service';
+import { RainService } from '../../../services/rain.service';
 import { Component, OnInit } from '@angular/core';
 import { SpacesService } from '../../../services/spaces.service';
 import { Space } from '../../../models/space.model';
 import 'rxjs/add/operator/map';
 import { Router } from '@angular/router';
-import { OauthSettingsService } from '../../../services/space/oauth-settings.service';
+import { OauthSettingsService } from '../../../services/oauth-settings.service';
 import { SpaceItemService } from '../../../shared/services/space-item/space-item.service';
 import { Drop } from 'app/models/drop.model';
 import * as _ from 'lodash';
 import { DimensionSchema } from 'app/models/dimension-schema.model';
 import { Rain } from 'app/models/rain.model';
+import { StoryService } from 'app/services/story.service';
 
 @Component({
   selector: 'datawhore-cloud',
@@ -36,7 +37,8 @@ export class CloudComponent implements OnInit {
   constructor(public spacesService: SpacesService,
     public spaceItemService: SpaceItemService,
     public rainService: RainService,
-    public router: Router) {
+    public router: Router,
+    public storyService?: StoryService) {
   }
 
   ngOnInit() {

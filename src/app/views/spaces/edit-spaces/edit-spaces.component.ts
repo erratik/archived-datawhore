@@ -4,7 +4,7 @@ import { SpacesService } from '../../../services/spaces.service';
 import { Space } from '../../../models/space.model';
 import 'rxjs/add/operator/map';
 import { Router } from '@angular/router';
-import { OauthSettingsService } from '../../../services/space/oauth-settings.service';
+import { OauthSettingsService } from '../../../services/oauth-settings.service';
 import { SpaceItemService } from '../../../shared/services/space-item/space-item.service';
 
 @Component({

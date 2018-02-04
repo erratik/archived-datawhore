@@ -16,10 +16,10 @@ import { Space } from '../../../../models/space.model';
 import { SpacesService } from '../../../../services/spaces.service';
 import { DimensionSchema } from '../../../../models/dimension-schema.model';
 import { SpaceItemService } from '../../../../shared/services/space-item/space-item.service';
-import { RainService } from '../../../../services/rain/rain.service';
+import { RainService } from '../../../../services/rain.service';
 import { SpaceConfigComponent } from "app/shared/component/space-config/space-config.component";
-import { OauthSettingsService } from "app/services/space/oauth-settings.service";
-import { ProfileService } from "app/services/profile/profile.service";
+import { OauthSettingsService } from "app/services/oauth-settings.service";
+import { ProfileService } from "app/services/profile.service";
 
 const objectPath = require('object-path');
 

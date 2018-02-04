@@ -5,12 +5,12 @@ import {SpacesService} from '../../../services/spaces.service';
 import {SpaceOauthSettings} from '../../../models/space-settings.model';
 import {Paths} from '../../../classes/paths.class';
 import {Observable} from 'rxjs';
-import {OauthSettingsService} from '../../../services/space/oauth-settings.service';
-import {ProfileService} from '../../../services/profile/profile.service';
+import {OauthSettingsService} from '../../../services/oauth-settings.service';
+import {ProfileService} from '../../../services/profile.service';
 import {Profile} from '../../../models/profile.model';
 import {SpaceItemComponent} from '../space-item/space-item.component';
 import {SpaceItemService} from '../../services/space-item/space-item.service';
-import {RainService} from '../../../services/rain/rain.service';
+import {RainService} from '../../../services/rain.service';
 import {FileUploader} from 'ng2-file-upload';
 
 

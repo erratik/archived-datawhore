@@ -1,8 +1,8 @@
 import { SpacesService } from '../../../services/spaces.service';
-import { RainService } from '../../../services/rain/rain.service';
+import { RainService } from '../../../services/rain.service';
 import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { DimensionFormComponent } from '../../../shared/component/dimensions/dimensions-form/dimensions-form.component';
-import { ProfileService } from '../../../services/profile/profile.service';
+import { ProfileService } from '../../../services/profile.service';
 import { DimensionSchema } from '../../../models/dimension-schema.model';
 const objectPath = require('object-path');
 

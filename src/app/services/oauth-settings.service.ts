@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
-import {Paths} from '../../classes/paths.class';
+import {Paths} from '../classes/paths.class';
 import {Http, Response, Headers, RequestOptions} from '@angular/http';
-import {Space} from '../../models/space.model';
+import {Space} from '../models/space.model';
 import {Observable} from 'rxjs';
-import {SpaceOauthSettings, OauthSettings, OauthExtras} from '../../models/space-settings.model';
+import {SpaceOauthSettings, OauthSettings, OauthExtras} from '../models/space-settings.model';
 
 @Injectable()
 export class OauthSettingsService {

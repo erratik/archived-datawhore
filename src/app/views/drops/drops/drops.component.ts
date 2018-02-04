@@ -2,13 +2,13 @@ import { ActivatedRoute } from '@angular/router';
 import { RainConfigsComponent } from '../../rain/rain-configs/rain-configs/rain-configs.component';
 import { SpaceItemService } from '../../../shared/services/space-item/space-item.service';
 import { SpacesService } from '../../../services/spaces.service';
-import { RainService } from '../../../services/rain/rain.service';
+import { RainService } from '../../../services/rain.service';
 import { Space } from '../../../models/space.model';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import * as _ from 'lodash';
-import { ProfileService } from 'app/services/profile/profile.service';
-import { OauthSettingsService } from 'app/services/space/oauth-settings.service';
+import { ProfileService } from 'app/services/profile.service';
+import { OauthSettingsService } from 'app/services/oauth-settings.service';
 
 @Component({
   selector: 'datawhore-drops',

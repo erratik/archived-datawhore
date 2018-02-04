@@ -5,7 +5,7 @@ import { CloudComponent } from '../cloud/cloud.component';
 import { SpaceItemService } from '../../../shared/services/space-item/space-item.service';
 import { Router } from '@angular/router';
 import { SpacesService } from '../../../services/spaces.service';
-import { RainService } from '../../../services/rain/rain.service';
+import { RainService } from '../../../services/rain.service';
 import { Component, OnInit } from '@angular/core';
 import * as moment from 'moment';
 import { Segment } from 'app/models/segment.model';
@@ -193,11 +193,6 @@ export class DayViewerComponent extends CloudComponent implements OnInit {
     const startTime = Number(moment(activity.startTime).format('x'));
     const endTime = Number(moment(activity.endTime).format('x'));
     return drop.timestamp > startTime && drop.timestamp < endTime;
-  }
-
-
-  public nextDayIsFuture(): boolean {
-    return Number(moment(this.selectedTimestamp).add(1, 'day').startOf('day').format('x')) >= Date.now();
   }
 
   public changeDateRange(value: any): void {

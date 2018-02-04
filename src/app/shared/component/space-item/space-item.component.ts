@@ -3,9 +3,9 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import {Dimension} from '../../../models/profile.model';
 import {RainDimension} from '../../../models/rain.model';
 import {Space} from '../../../models/space.model';
-import {ProfileService} from '../../../services/profile/profile.service';
+import {ProfileService} from '../../../services/profile.service';
 import {SpacesService} from '../../../services/spaces.service';
-import {RainService} from '../../../services/rain/rain.service';
+import {RainService} from '../../../services/rain.service';
 import {Observable} from 'rxjs';
 const objectPath = require('object-path');
 

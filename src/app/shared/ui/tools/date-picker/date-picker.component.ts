@@ -13,10 +13,11 @@ import * as moment from 'moment';
 export class DatePickerComponent implements OnInit {
 
   @Input() public date: Date;
+  @Input() public selectedTimestamp: any;
   @Output() public onDateRangeChange: EventEmitter<number> = new EventEmitter<number>();
 
   public options: DatepickerOptions = {
-    minYear: 1970,
+    minYear: 2011,
     maxYear: 2030, // Maximal selectable date
     displayFormat: 'MMM D[,] YYYY',
     barTitleFormat: 'MMMM YYYY',
@@ -34,5 +35,8 @@ export class DatePickerComponent implements OnInit {
     this.onDateRangeChange.emit(d);
   }
 
+  public nextDayIsFuture(): boolean {
+    return Number(moment(this.selectedTimestamp).add(1, 'day').startOf('day').format('x')) >= Date.now();
+  }
 
 }

@@ -2,13 +2,13 @@ import * as console from 'console';
 import { window } from 'rxjs/operator/window';
 import { Space } from '../../../models/space.model';
 import { SpacesService } from '../../../services/spaces.service';
-import { OauthSettingsService } from '../../../services/space/oauth-settings.service';
+import { OauthSettingsService } from '../../../services/oauth-settings.service';
 import { SpaceItemService } from '../../../shared/services/space-item/space-item.service';
-import { ProfileService } from '../../../services/profile/profile.service';
+import { ProfileService } from '../../../services/profile.service';
 import { ActivatedRoute } from '@angular/router';
 import { Profile } from '../../../models/profile.model';
 import { SpaceConfigComponent } from '../../../shared/component/space-config/space-config.component';
-import { RainService } from '../../../services/rain/rain.service';
+import { RainService } from '../../../services/rain.service';
 import { DimensionSchema } from '../../../models/dimension-schema.model';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 

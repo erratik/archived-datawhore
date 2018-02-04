@@ -1,4 +1,4 @@
-import { RainService } from './rain/rain.service';
+import { RainService } from './rain.service';
 import { Space } from '../models/space.model';
 import { Injectable } from '@angular/core';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';

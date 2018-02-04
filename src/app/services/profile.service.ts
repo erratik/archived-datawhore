@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
 import {Http, Response, RequestOptions, Headers} from '@angular/http';
 import {Observable} from 'rxjs';
-import {Space} from '../../models/space.model';
-import {SpaceItemService} from '../../shared/services/space-item/space-item.service';
+import {Space} from '../models/space.model';
+import {SpaceItemService} from '../shared/services/space-item/space-item.service';
 
 @Injectable()
 export class ProfileService extends SpaceItemService {

@@ -3,8 +3,8 @@ import {Component, Input, EventEmitter, Output} from '@angular/core';
 import {Space} from '../../../../models/space.model';
 import {Dimension} from '../../../../models/profile.model';
 import { Rain, RainDimension } from '../../../../models/rain.model';
-import {ProfileService} from '../../../../services/profile/profile.service';
-import {RainService} from '../../../../services/rain/rain.service';
+import {ProfileService} from '../../../../services/profile.service';
+import {RainService} from '../../../../services/rain.service';
 import {SpacesService} from '../../../../services/spaces.service';
 import * as _ from 'lodash';
 

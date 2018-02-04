@@ -16,10 +16,11 @@ import * as _ from 'lodash';
 
 
 import { SpacesService } from './services/spaces.service';
-import { OauthSettingsService } from './services/space/oauth-settings.service';
-import { ProfileService } from './services/profile/profile.service';
+import { OauthSettingsService } from './services/oauth-settings.service';
+import { ProfileService } from './services/profile.service';
 import { SpaceItemService } from './shared/services/space-item/space-item.service';
-import { RainService } from './services/rain/rain.service';
+import { RainService } from './services/rain.service';
+import { StoryService } from './services/story.service';
 
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './wrapper/header/header.component';
@@ -159,6 +160,7 @@ const appRoutes: Routes = [
         SpaceItemService,
         ProfileService,
         RainService,
+        StoryService,
         SchemaValuePipe
     ],
     bootstrap: [AppComponent]

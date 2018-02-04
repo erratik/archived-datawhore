@@ -1,10 +1,10 @@
-import { Drop } from '../../models/drop.model';
-import { DimensionSchema } from '../../models/dimension-schema.model';
+import { Drop } from '..//models/drop.model';
+import { DimensionSchema } from '..//models/dimension-schema.model';
 import { Injectable } from '@angular/core';
 import { Http, Response, RequestOptions, Headers } from '@angular/http';
 import { Observable } from 'rxjs';
-import { SpaceItemService } from '../../shared/services/space-item/space-item.service';
-import { Rain, RainDimension } from '../../models/rain.model';
+import { SpaceItemService } from '../shared/services/space-item/space-item.service';
+import { Rain, RainDimension } from '..//models/rain.model';
 const objectPath = require('object-path');
 import * as _ from 'lodash';
 
@@ -13,6 +13,7 @@ export class RainService extends SpaceItemService {
 
     public type = 'rain';
     public dimensions = {};
+    public types = {};
     public rain: Rain[] = [];
     public drops: any = {};
     public rainSchemas: any[] = [];
@@ -27,12 +28,14 @@ export class RainService extends SpaceItemService {
                 const rainResponse = res.json();
 
                 const _spaces = rainResponse.map(rainRes => rainRes.space);
-
                 _spaces.forEach(space => {
 
                     this.rain[space] = rainResponse.filter(s => s.space === space).map(rain => {
-
                         const types = _.groupBy(rain.dimensions, 'type');
+                        
+                        this.types[space] = Object.keys(types);
+                        
+                        
                         return Object.keys(types).map(rainType => new Rain(
                             rain.space,
                             rain.dimensions.map((dims: RainDimension) => new RainDimension(dims.friendlyName, dims.schemaPath, dims.type, dims['_id'])),
@@ -112,6 +115,15 @@ export class RainService extends SpaceItemService {
 
         return drops.map((drop: Drop) => {
             const content = {};
+            Object.keys(this.types).forEach(spaceName => {
+                if (this.types[spaceName].includes(drop.type)) {
+                    drop.space = spaceName;
+                }
+                if (!!drop.content.retweeted) {
+                    drop.space = 'twitter';
+                }
+            });
+            // debugger;
             const dropProperties = this.rain[drop.space].filter(({ rainType }) => rainType === drop.type)[0].properties;
 
             dropProperties.forEach(({ friendlyName, schemaPath }) => {

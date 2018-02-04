@@ -8,12 +8,12 @@ import {SpaceConfigComponent} from '../../../shared/component/space-config/space
 import {Space} from '../../../models/space.model';
 import {Paths} from '../../../classes/paths.class';
 import {DimensionSchema} from '../../../models/dimension-schema.model';
-import {OauthSettingsService} from '../../../services/space/oauth-settings.service';
-import {ProfileService} from '../../../services/profile/profile.service';
+import {OauthSettingsService} from '../../../services/oauth-settings.service';
+import {ProfileService} from '../../../services/profile.service';
 import {Profile} from '../../../models/profile.model';
 import {Rain, RainDimension} from '../../../models/rain.model';
 import {SpaceItemService} from '../../../shared/services/space-item/space-item.service';
-import {RainService} from '../../../services/rain/rain.service';
+import {RainService} from '../../../services/rain.service';
 import { Observable } from 'rxjs';
 
 @Component({
