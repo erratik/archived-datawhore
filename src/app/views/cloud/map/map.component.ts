@@ -32,7 +32,8 @@ export class MapComponent extends CloudComponent implements OnInit {
 
 
   ngOnInit() {
-    this.getSpaces(() => this.getStory());
+    // this.getSpaces(() => this.getStory());
+    this.getStory();
   }
 
   public getSpaces(callback = null): void {
@@ -41,7 +42,6 @@ export class MapComponent extends CloudComponent implements OnInit {
       .switchMap(() => this.rainService.getRain([]))
       .do((rain) => {
         this.rainService.rain = rain;
-        debugger;
         return this.spaces;
       });
 
@@ -67,26 +67,23 @@ export class MapComponent extends CloudComponent implements OnInit {
     const getStories$ = this.storyService.getStory(options).do((stories) => { this.stories = stories; });
 
     getStories$.subscribe(stories => {
-      // console.log(this);
-      // if (!!callback) {
-      this.isLoadingSpaces = false;
       
       this.stories = stories.filter(story => story.content.date === moment(options.from || options.day).format('YYYYMMDD')).map(story => {
         story.content.segments = story.content.segments.map(segment => {
-          segment.activities = segment.activities.map(activity => {
-            activity.drops = this.rainService.enrichDrops(activity.drops);
-            return activity;
-          });
-          segment.drops = this.rainService.enrichDrops(segment.drops);
+
+          segment.items = !!segment.place ? segment.activities.concat(segment.place.drops) : segment.activities;
+          // delete segment.place.drops;
+          delete segment.activities;
+          debugger;
           return segment;
         });
         return story;
       });
 
+        this.isLoadingSpaces = false;
+
     });
 
   }
-
-
 
 }

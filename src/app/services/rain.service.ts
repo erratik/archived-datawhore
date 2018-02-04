@@ -112,18 +112,10 @@ export class RainService extends SpaceItemService {
     }
 
     public enrichDrops(drops = null): Drop[] {
-
+        // TODO: move all drop enriching logic to logikawa api
         return drops.map((drop: Drop) => {
             const content = {};
-            Object.keys(this.types).forEach(spaceName => {
-                if (this.types[spaceName].includes(drop.type)) {
-                    drop.space = spaceName;
-                }
-                if (!!drop.content.retweeted) {
-                    drop.space = 'twitter';
-                }
-            });
-            // debugger;
+            
             const dropProperties = this.rain[drop.space].filter(({ rainType }) => rainType === drop.type)[0].properties;
 
             dropProperties.forEach(({ friendlyName, schemaPath }) => {

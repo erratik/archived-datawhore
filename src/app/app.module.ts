@@ -67,6 +67,7 @@ import { DropCloudComponent } from './views/cloud/drop-cloud/drop-cloud.componen
 import { CloudComponent } from './views/cloud/cloud/cloud.component';
 import { DayViewerComponent } from './views/cloud/day-viewer/day-viewer.component';
 import { MapComponent } from './views/cloud/map/map.component';
+import { InTimeframePipe } from './shared/pipes/in-timeframe.pipe';
 
 const appRoutes: Routes = [
     {
@@ -152,7 +153,8 @@ const appRoutes: Routes = [
         DatePickerComponent,
         RenderJsonPipe,
         MapComponent,
-        SegmentFilterPipe
+        SegmentFilterPipe,
+        InTimeframePipe
     ],
     providers: [
         SpacesService,
