@@ -67,23 +67,29 @@ export class MapComponent extends CloudComponent implements OnInit {
     const getStories$ = this.storyService.getStory(options).do((stories) => { this.stories = stories; });
 
     getStories$.subscribe(stories => {
-      
       this.stories = stories.filter(story => story.content.date === moment(options.from || options.day).format('YYYYMMDD')).map(story => {
         story.content.segments = story.content.segments.map(segment => {
-
+          segment.activities = segment.activities ? segment.activities : [];
           segment.items = !!segment.place ? segment.activities.concat(segment.place.drops) : segment.activities;
-          // delete segment.place.drops;
           delete segment.activities;
-          debugger;
           return segment;
         });
         return story;
       });
-
-        this.isLoadingSpaces = false;
+      this.selectedTimestamp = Number(moment(options.from || options.day).format('x'));
+      this.isLoadingSpaces = false;
 
     });
 
   }
 
+  public changeDateRange(timestamp: any): void {
+
+    this.stories = [];
+    this.isLoadingSpaces = true;
+    debugger;
+    this.getStory({day: moment(timestamp).format('YYYYMMDD')});
+
+
+  }
 }

@@ -6,6 +6,8 @@
 		<div class="column">
 
 			<p>Viewing: {{selectedTimestamp | amDateFormat:'dddd, MMMM Do YYYY'}}</p>
+
+			{{selectedTimestamp}}
 			<hr>
 
 			<!-- TODO: make date-explorer component -->
@@ -35,60 +37,29 @@
 	</div>
 
 	<div class="column is-three-quarters">
-		<div class="column" *ngIf="isLoadingSpaces">
 
-			<div class="is-loading"></div>
-
-		</div>
+		<div class="column" *ngIf="isLoadingSpaces"><div class="is-loading"></div></div>
 
 		<div *ngFor="let story of stories | orderBy:'timestamp':true">
-			
 
 			<div *ngFor="let segment of story.content.segments" [ngSwitch]="segment.type">
-				
-				<div>
 
-						<div *ngSwitchCase="'place'" class="place">
-							<span class="icon is-small">
-								<i class="fa fa-{{(segment.place && segment.place.type === 'unknown') ? 'map-pin' : segment.place.type}}" *ngIf="segment.place"></i>
-							</span>
-							<span>{{(segment.place)?segment.place.name:''}} ({{segment.startTime | amDateFormat:'YYYYMMDD - h:mma' }} to {{segment.endTime| amDateFormat:'YYYYMMDD - h:mma'
-								}})</span>
+				<div *ngSwitchCase="'place'" class="place">
+					<span class="icon is-small">
+						<i class="fa fa-{{(segment.place && segment.place.type === 'unknown') ? 'map-pin' : segment.place.type}}" *ngIf="segment.place"></i>
+					</span>
+					<span>{{(segment.place)?segment.place.name:''}} ({{segment.startTime | amDateFormat:'h:mma' }} to {{segment.endTime|
+						amDateFormat:'h:mma' }})
+					</span>
+					<datawhore-segment [segment]="segment"></datawhore-segment>
+				</div>
 
-								<!-- TODO: make this into a component, already used twice -->
-								<div *ngFor="let item of segment.items | orderBy:'timestamp':true | inTimeframe:segment">
-									<div *ngIf="item.activity" class="activity">
-										was
-										<b>{{item.activity}}</b> during
-										<b>{{item.duration | amDuration:'seconds'}}</b>
-										<em>{{item.distance}}</em> meters ({{item.startTime | amDateFormat:'YYYYMMDD - h:mma' }} to {{item.endTime | amDateFormat:'YYYYMMDD - h:mma'}})
-										<div *ngFor="let drop of item.drops | orderBy:'timestamp':true">
-											<datawhore-drop-atomic [type]="drop.type" [drop]="drop"></datawhore-drop-atomic>
-										</div>
-									</div>
-									<datawhore-drop-atomic [type]="item.type" [drop]="item" *ngIf="item.type"></datawhore-drop-atomic>
-								</div>
-						</div>
-	
-						<div *ngSwitchDefault>
-								<div *ngFor="let item of segment.items | orderBy:'timestamp':true | inTimeframe:segment">
-									
-									<div *ngIf="item.activity" class="activity">
-										was
-										<b>{{item.activity}}</b> during
-										<b>{{item.duration | amDuration:'seconds'}}</b>
-										<em>{{item.distance}}</em> meters ({{item.startTime | amDateFormat:'YYYYMMDD - h:mma' }} to {{item.endTime | amDateFormat:'YYYYMMDD - h:mma'}})
-										<div *ngFor="let drop of item.drops | orderBy:'timestamp':true">
-											<datawhore-drop-atomic [type]="drop.type" [drop]="drop"></datawhore-drop-atomic>
-										</div>
-									</div>
-									<datawhore-drop-atomic [type]="item.type" [drop]="item" *ngIf="item.type"></datawhore-drop-atomic>
-									
-								</div>
-							</div>
-					</div>
+				<div *ngSwitchDefault>
+					<datawhore-segment [segment]="segment"></datawhore-segment>
+				</div>
+
 			</div>
-
+			
 		</div>
+
 	</div>
-</div>

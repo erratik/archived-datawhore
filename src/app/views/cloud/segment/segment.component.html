@@ -1,0 +1,11 @@
+<div *ngFor="let item of segment.items | orderBy:'timestamp':true | inTimeframe:segment">
+  <div *ngIf="item.activity" class="activity">
+    was <b>{{item.activity}}</b> during
+    <b>{{item.duration | amDuration:'seconds'}}</b>
+    <em>{{item.distance}}</em> meters ({{item.startTime | amDateFormat:'YYYYMMDD - h:mma' }} to {{item.endTime | amDateFormat:'YYYYMMDD - h:mma'}})
+    <div *ngFor="let drop of item.drops | orderBy:'timestamp':true">
+      <datawhore-drop-atomic [type]="drop.type" [drop]="drop"></datawhore-drop-atomic>
+    </div>
+  </div>
+  <datawhore-drop-atomic [type]="item.type" [drop]="item" *ngIf="item.type"></datawhore-drop-atomic>
+</div>

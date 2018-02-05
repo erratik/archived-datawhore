@@ -12,7 +12,7 @@ import * as moment from 'moment';
 
 export class DatePickerComponent implements OnInit {
 
-  @Input() public date: Date;
+  @Input() public date: any;
   @Input() public selectedTimestamp: any;
   @Output() public onDateRangeChange: EventEmitter<number> = new EventEmitter<number>();
 
@@ -30,8 +30,11 @@ export class DatePickerComponent implements OnInit {
     this.date = new Date();
   }
 
-  public changeDate(date: number): void {
-    const d = Number(date);
+  public changeDate(input: number | string): void {
+
+    this.date = typeof input !== 'number' ? moment(this.date)[input](1, 'day').startOf('day') : new Date(input);
+    debugger;
+    const d = Number(this.date);
     this.onDateRangeChange.emit(d);
   }
 

@@ -68,6 +68,7 @@ import { CloudComponent } from './views/cloud/cloud/cloud.component';
 import { DayViewerComponent } from './views/cloud/day-viewer/day-viewer.component';
 import { MapComponent } from './views/cloud/map/map.component';
 import { InTimeframePipe } from './shared/pipes/in-timeframe.pipe';
+import { SegmentComponent } from './views/cloud/segment/segment.component';
 
 const appRoutes: Routes = [
     {
@@ -154,7 +155,8 @@ const appRoutes: Routes = [
         RenderJsonPipe,
         MapComponent,
         SegmentFilterPipe,
-        InTimeframePipe
+        InTimeframePipe,
+        SegmentComponent
     ],
     providers: [
         SpacesService,

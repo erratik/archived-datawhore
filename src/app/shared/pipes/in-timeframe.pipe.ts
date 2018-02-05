@@ -7,7 +7,7 @@ export class InTimeframePipe implements PipeTransform {
 
   transform(input: any, segment: any): any {
 
-    return input.filter(itm => itm.timestamp > segment.startTime && itm.timestamp < segment.endTime);
+    return !!input && input.filter(itm => itm.timestamp > segment.startTime && itm.timestamp < segment.endTime);
   }
 
 }

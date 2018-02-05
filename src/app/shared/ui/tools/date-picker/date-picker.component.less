@@ -2,32 +2,36 @@
 
   flex: 1 0 auto;
   justify-content: center;
-  margin-right: 3rem;
   
   /deep/ input.ngx-datepicker-input {
       position: absolute;
-      width: 1.8rem !important;
-      height: 1.8rem;
+      width: 1.5rem !important;
+      height: 1.5rem;
       display: block;
       background: transparent;
       color: transparent;
       cursor: pointer;
       padding: 0 !important;
       border: none !important;
-      margin-left: 3px;
+      z-index: 5;
+      left: 25px;
   }
 
+  /deep/ .ngx-datepicker-calendar-container {
+    z-index: 10;
+  }
 }
 
 .date-picker {
   position: relative;
   align-self: normal;
+  flex: 1 0 auto;
 }
 
 .open-calendar-trigger {
   position: absolute;
   top: 0;
-  left: 10px;
+  left: 33%;
   z-index: 1;
 }
 
