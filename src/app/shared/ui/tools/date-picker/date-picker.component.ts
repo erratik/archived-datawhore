@@ -32,8 +32,11 @@ export class DatePickerComponent implements OnInit {
 
   public changeDate(input: number | string): void {
 
-    this.date = typeof input !== 'number' ? moment(this.date)[input](1, 'day').startOf('day') : new Date(input);
-    debugger;
+    if (typeof input === 'string') {
+       this.date = moment(this.date)[input](1, 'days').startOf('day');
+    } else {
+      this.date = moment(this.date).startOf('day');
+    }
     const d = Number(this.date);
     this.onDateRangeChange.emit(d);
   }

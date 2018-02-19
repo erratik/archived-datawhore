@@ -59,19 +59,20 @@
   </div>
 
   <div class="is-flex" *ngSwitchCase="'spotify'">
+
     <article class="media">
-      <div class="media-left" *ngIf="!!drop.content.album_images && drop.content.album_images.length">
-        <datawhore-image-figure *ngIf="drop.content.album_images" [size]="16" [src]="drop.content.album_images[2].url" [classes]="['is-circle', 'is-shadowed']"
+      <div class="media-left">
+        <datawhore-image-figure *ngIf="drop.content.track_album_image" [size]="16" [src]="drop.content.track_album_image" [classes]="['is-circle', 'is-shadowed']"
           class="is-marginless"></datawhore-image-figure>
       </div>
       <div class="media-content">
         <div class="content">
           <div class="is-flex-inline">
 
-            <div class="caption" *ngIf="drop.content.track_name">
+            <div class="caption" *ngIf="drop.content.caption">
               <p>Played
-                <strong>{{drop.content.track_name}}</strong> by
-                <strong>{{drop.content.track_artists[0].name}}</strong>
+                <strong>{{drop.content.caption}}</strong> by
+                <strong>{{drop.content.track_artist}}</strong>
               </p>
               <small>{{drop.content.album_name}}</small>
             </div>
@@ -272,10 +273,16 @@
   </div>
 
   <div class="is-flex" *ngSwitchCase="'twitter'">
-    <article class="media">
-      <div class="media-left" *ngIf="!!drop.content.media && drop.content.media.length">
+    <article class="media" [ngSwitch]="drop.content.retweeted">
+      <div class="media-left">
         <!-- <datawhore-drop-image [size]="64" [src]="drop.content.media[0].media_url" [classes]="['is-shadowed']" [space]="drop.space" 
         [specs]="{ width: drop.content.media[0].sizes.small.w, height: drop.content.media[0].sizes.small.h}"></datawhore-drop-image> -->
+        <datawhore-image-figure [size]="16" [src]="drop.content.retweeted_status_user_image_url" [classes]="['is-circle', 'is-shadowed']" class="is-marginless" *ngSwitchCase="true"></datawhore-image-figure>
+        
+        <figure class="image is-16x16 is- is-circle is-shadowed" *ngSwitchCase="false">
+          <img src="{{drop.content.profile_image_url}}">
+        </figure>
+        <!-- <pre>{{drop.content | json}}</pre> -->
       </div>
       <div class="media-content">
         <div class="content">
@@ -290,7 +297,7 @@
               <span class="icon is-small">
                 <i class="fa fa-heart"></i>
               </span>
-              <small>{{drop.content.favorite_count}}</small>
+              <small>{{drop.content.favorite_count}} </small>
             </span>
           </div>
         </nav>

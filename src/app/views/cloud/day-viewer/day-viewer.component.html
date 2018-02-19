@@ -1,161 +1,74 @@
 <div class="columns">
+
+    <!-- TODO: make sidebar for day-viewer component -->
+    <div class="column is-quarter">
   
-  <!-- TODO: make sidebar for day-viewer component -->
-  <div class="column is-quarter">
-    
-    <div class="column">
-      
-      <p>Viewing: {{selectedTimestamp | amDateFormat:'dddd, MMMM Do YYYY'}}</p>
-      <hr>
-      
-      <!-- TODO: make date-explorer component -->
-      <div class="is-flex date-picker-wrapper">
-        <datawhore-date-picker class="is-flex center" date="selectedDate" (onDateRangeChange)="changeDateRange($event)"></datawhore-date-picker>
-      </div>
-      
-      <hr>
-      <div class="is-flex" *ngIf="!isLoadingSpaces">
+      <div class="column">
+  
+        <p>Viewing:
+          <br>{{selectedTimestamp | amDateFormat:'dddd, MMMM Do YYYY'}}</p>
+  
+        <hr>
+  
+        <!-- TODO: make date-explorer component -->
+        <div class="is-flex date-picker-wrapper">
+          <datawhore-date-picker class="is-flex center" date="selectedDate" [selectedTimestamp]="selectedTimestamp" (onDateRangeChange)="changeDateRange($event)"></datawhore-date-picker>
+        </div>
+        <hr>
+  
+        <datawhore-simple-message [message]="message" [status]="status"></datawhore-simple-message>
+        <datawhore-stacked-bar-horizontal [data]="stats" *ngIf="stats"></datawhore-stacked-bar-horizontal>
         <!-- TODO: make drop-counter component -->
-        <ul class="is-flex center" class="drop-counter is-flex is-filling center">
-          <li *ngFor="let space of dropsBySpace | orderBy:'count'" (click)="toggleSpaceDrops(space.name)" [ngStyle]="{'flex': getDropFlex(space), 'background-color': space.color}"
-          class="is-flex" [ngClass]="{'has-hidden-drops': dropsHidden(space.name)}">
-          <div class="is-flex-inline">
-            <datawhore-space-icon [space]="space.name" [classes]="['is-circle']"></datawhore-space-icon>
-            <div>{{space.count}}</div>
-          </div>
-        </li>
+        <!-- 
+        <div class="is-flex" *ngIf="!isLoadingSpaces">
+          <ul class="is-flex center" class="drop-counter is-flex is-filling center">
+            <li *ngFor="let space of dropsBySpace | orderBy:'count'" (click)="toggleSpaceDrops(space.name)" [ngStyle]="{'flex': getDropFlex(space), 'background-color': space.color}"
+            class="is-flex">
+            <div class="is-flex-inline">
+              <datawhore-space-icon [space]="space.name" [classes]="['is-circle']"></datawhore-space-icon>
+              <div>{{space.count}}</div>
+            </div>
+          </li>
+        </ul>
         
-      </ul>
-      
-      <div class="button is-loading" *ngIf="isLoadingSpaces">Loading...</div>
-      
-    </div>
-    
-    
-  </div>
-</div>
-<div class="column is-three-quarters">
-  <div class="column" *ngIf="isLoadingSpaces">
-    
-    <div class="is-loading"></div>
-  </div>
-  <div class="column storyline" *ngIf="storyline && !isLoadingSpaces">
-    <!-- TODO: make storyline component -->
-    <article class="media">
-      <div class="media-left">
-        <!-- <datawhore-image-figure [size]="16" [src]="spaceIconImage"></datawhore-image-figure> -->
+        <div class="button is-loading" *ngIf="isLoadingSpaces">Loading...</div>
+        
+      </div> -->
+  
+  
       </div>
-      <div class="media-content">
-        <div class="content" [ngSwitch]="hasSegments()">
-          <!-- <pre>{{storyline|json}}</pre> -->
-          <!-- <p>{{storyData.content.date | amDateFormat:'dddd, MMMM Do YYYY'}} Storyline</p> -->
-          <div *ngSwitchCase="false">
-            <cite>This day has no segments from moves. Drops will be displayed by timestamp.</cite>
-            
-            <!-- TODO: this is duplicated from the cloud.component: make it into a component. include a filter. -->
-            <div class="column" *ngIf="storyline.drops">
-              
-              <datawhore-drop-atomic *ngFor="let drop of storyline.drops | orderBy:'timestamp':false" [type]="drop.type" [drop]="drop"></datawhore-drop-atomic>
-              
-              <hr>
-              
-            </div>
-            
-          </div>
-          
-          <!-- <datawhore-drop-atomic *ngFor="let drop of storyline.drops | orderBy:'timestamp':false" [type]="drop.type" [drop]="drop"></datawhore-drop-atomic> -->
-          <!-- <pre>{{storyDrops  | json}}</pre> -->
-          
-          
-          <div *ngSwitchDefault>
-            <div *ngFor="let segment of storyItems | segmentFilter:'rain':true" [ngSwitch]="segment.type">
-              {{segment.type}}
-              <!-- 
-                <div class="is-flex-inline" *ngSwitchDefault>
-                  
-                </div> -->
-                <div>
-                  
-                  <div *ngSwitchCase="'place'" class="place">
-                    <span class="icon is-small">
-                      <i class="fa fa-{{(segment.place && segment.place.type === 'unknown') ? 'map-pin' : segment.place.type}}" *ngIf="segment.place"></i>
-                    </span> 
-                    <span>{{(segment.place)?segment.place.name:''}} ({{segment.startTime | amDateFormat:'h:mma' }} to {{segment.endTime| amDateFormat:'h:mma' }})</span>
-                  </div>
-                  
-                  <div class="is-flex-inline" *ngSwitchDefault>
-                    <span class="icon is-small">
-                      <i class="fa fa-folder"></i>
-                    </span> {{segment.type}} ({{segment.startTime | amDateFormat:'h:mma' }} to {{segment.endTime | amDateFormat:'h:mma'}})
-                  </div>
-                  
-                  <div *ngFor="let item of segment.items | orderBy:'timestamp':true">
-                    
-                    <div *ngIf="item.activity" class="activity">
-                      was
-                      <b>{{item.activity}}</b> during
-                      <b>{{item.duration | amDuration:'seconds'}}</b> over
-                      <em>{{item.distance}}</em> meters ({{item.startTime | amDateFormat:'h:mma' }} to {{item.endTime | amDateFormat:'h:mma'}})
-                      <div *ngFor="let drop of item.drops | orderBy:'timestamp':true">
-                        <datawhore-drop-atomic [type]="drop.type" [drop]="drop"></datawhore-drop-atomic>
-                      </div>
-                    </div>
-                    <div *ngIf="item.type === 'group'">
-                      
-                      <article class="media">
-                        <div class="media-left">
-                          <datawhore-space-icon [space]="item.space" [classes]="['is-circle']"></datawhore-space-icon>
-                        </div>
-                        <div class="media-content">
-                          <div class="content">
-                            <div class="is-flex-inline">
-                              
-                              <div class="caption">
-                                <p>Played
-                                  <strong>{{item.items.length}}</strong> tracks by
-                                  <strong></strong>
-                                </p>
-                                <small></small>
-                              </div>
-                              
-                            </div>
-                            <button class="button is-primary" (click)="item.isExpanded = !item.isExpanded">see all</button>
-                            <div *ngIf="item.isExpanded">
-                              <div *ngFor="let item of item.items | orderBy:'timestamp':true">
-                                <datawhore-drop-atomic [type]="item.type" [drop]="item"></datawhore-drop-atomic>
-                              </div>
-                            </div>
-                          </div>
-                          <small>{{item.timestamp | amDateFormat:'dddd, MMMM Do YYYY @ h:mma'}}</small>
-                          <nav class="level is-mobile">
-                            <div class="level-left">
-                              
-                            </div>
-                          </nav>
-                        </div>
-                        <div class="media-right">
-                          <datawhore-image-figure [size]="16" [src]="spaceIconImage"></datawhore-image-figure>
-                        </div>
-                      </article>
-                    </div>
-                    <div *ngIf="item.type !== 'group' && item.space">
-                      <datawhore-drop-atomic [type]="item.type" [drop]="item" *ngIf="!isActivityDrop(item, segment.activities)"></datawhore-drop-atomic>
-                    </div>
-                  </div>
-                  
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          
-        </div>
-        <div class="media-right">
-          <a class="delete is-small" (click)="deleteDrop()"></a>
-        </div>
-      </article>
-      
     </div>
-    
-  </div>
-</div>
+  
+    <div class="column is-three-quarters">
+  
+      <div class="column" *ngIf="isLoadingSpaces">
+        <div class="is-loading"></div>
+      </div>
+  
+      <div *ngFor="let story of stories | orderBy:'timestamp':true">
+        
+        <div *ngFor="let segment of story.content.segments" [ngSwitch]="segment.type">
+  
+          <div *ngSwitchCase="'place'" class="place">
+            <span class="icon is-small">
+              <i class="fa fa-{{(segment.place && segment.place.type === 'unknown') ? 'map-pin' : segment.place.type}}" *ngIf="segment.place"></i>
+            </span>
+            <span>{{(segment.place)?segment.place.name:''}} ({{segment.startTime | amDateFormat:'h:mma' }} to {{segment.endTime|
+              amDateFormat:'h:mma' }})
+            </span>
+            <datawhore-segment [segment]="segment"></datawhore-segment>
+          </div>
+  
+          <div *ngSwitchDefault>
+            <datawhore-segment [segment]="segment"></datawhore-segment>
+          </div>
+  
+        </div>
+        
+        <datawhore-drop-atomic [type]="story.type" [drop]="story" *ngIf="!story.content.segments"></datawhore-drop-atomic>
+
+      </div>
+  
+  
+    </div>
+  

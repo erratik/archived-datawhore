@@ -69,6 +69,7 @@ import { DayViewerComponent } from './views/cloud/day-viewer/day-viewer.componen
 import { MapComponent } from './views/cloud/map/map.component';
 import { InTimeframePipe } from './shared/pipes/in-timeframe.pipe';
 import { SegmentComponent } from './views/cloud/segment/segment.component';
+import { SimpleMessageComponent } from './shared/ui/messages/simple-message/simple-message.component';
 
 const appRoutes: Routes = [
     {
@@ -156,7 +157,8 @@ const appRoutes: Routes = [
         MapComponent,
         SegmentFilterPipe,
         InTimeframePipe,
-        SegmentComponent
+        SegmentComponent,
+        SimpleMessageComponent
     ],
     providers: [
         SpacesService,

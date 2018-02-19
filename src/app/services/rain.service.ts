@@ -32,10 +32,9 @@ export class RainService extends SpaceItemService {
 
                     this.rain[space] = rainResponse.filter(s => s.space === space).map(rain => {
                         const types = _.groupBy(rain.dimensions, 'type');
-                        
+
                         this.types[space] = Object.keys(types);
-                        
-                        
+
                         return Object.keys(types).map(rainType => new Rain(
                             rain.space,
                             rain.dimensions.map((dims: RainDimension) => new RainDimension(dims.friendlyName, dims.schemaPath, dims.type, dims['_id'])),
@@ -115,7 +114,7 @@ export class RainService extends SpaceItemService {
         // TODO: move all drop enriching logic to logikawa api
         return drops.map((drop: Drop) => {
             const content = {};
-            
+
             const dropProperties = this.rain[drop.space].filter(({ rainType }) => rainType === drop.type)[0].properties;
 
             dropProperties.forEach(({ friendlyName, schemaPath }) => {

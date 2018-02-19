@@ -18,7 +18,9 @@ export class MapComponent extends CloudComponent implements OnInit {
   public daterange = {};
   public selectedTimestamp = Date.now();
   public display = {};
-  // public storyData: Drop;
+  public stats = {};
+  public status = '';
+  public message = '';
   // public storyline: Storyline;
   public stories: any;
 
@@ -62,34 +64,28 @@ export class MapComponent extends CloudComponent implements OnInit {
 
   public getStory(options = null): void {
 
-    options = !!options ? options : { day: Date.now() };
+    options = !!options ? options : { day: moment(Date.now()).format('YYYYMMDD') };
 
-    const getStories$ = this.storyService.getStory(options).do((stories) => { this.stories = stories; });
+    const getStories$ = this.storyService.getStory(options).do((storyResponse) => {
+      this.stories = storyResponse.items;
+      this.stats = storyResponse.stats;
+      this.status = storyResponse.status;
+      this.message = storyResponse.msg;
 
-    getStories$.subscribe(stories => {
-      this.stories = stories.filter(story => story.content.date === moment(options.from || options.day).format('YYYYMMDD')).map(story => {
-        story.content.segments = story.content.segments.map(segment => {
-          segment.activities = segment.activities ? segment.activities : [];
-          segment.items = !!segment.place ? segment.activities.concat(segment.place.drops) : segment.activities;
-          delete segment.activities;
-          return segment;
-        });
-        return story;
-      });
       this.selectedTimestamp = Number(moment(options.from || options.day).format('x'));
       this.isLoadingSpaces = false;
+    });
+
+    getStories$.subscribe(stories => {
+      // this.stories = stories;
 
     });
 
   }
 
   public changeDateRange(timestamp: any): void {
-
     this.stories = [];
     this.isLoadingSpaces = true;
-    debugger;
-    this.getStory({day: moment(timestamp).format('YYYYMMDD')});
-
-
+    this.getStory({ day: moment(timestamp).format('YYYYMMDD') });
   }
 }
