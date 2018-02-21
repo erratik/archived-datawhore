@@ -1,15 +1,15 @@
-import { Storyline } from '../../../models/storyline.model';
-import { Drop } from '../../../models/drop.model';
+import { Storyline } from '../../../shared/models/storyline.model';
+import { Drop } from '../../../shared/models/drop.model';
 import { Observable } from 'rxjs/Rx';
 import { CloudComponent } from '../cloud/cloud.component';
-import { SpaceItemService } from '../../../shared/services/space-item/space-item.service';
+import { SpaceItemService } from '../../../shared/services/space-item.service';
 import { Router } from '@angular/router';
-import { SpacesService } from '../../../services/spaces.service';
-import { RainService } from '../../../services/rain.service';
+import { SpacesService } from '../../../shared/services/spaces.service';
+import { RainService } from '../../../shared/services/rain.service';
 import { Component, OnInit } from '@angular/core';
 import * as moment from 'moment';
-import { Segment } from 'app/models/segment.model';
-import { StoryService } from 'app/services/story.service';
+import { Segment } from '../../../shared/models/segment.model';
+import { StoryService } from '../../../shared/services/story.service';
 
 
 @Component({
@@ -19,14 +19,14 @@ import { StoryService } from 'app/services/story.service';
 })
 export class DayViewerComponent extends CloudComponent implements OnInit {
 
-  
+
   public daterange = {};
   public selectedTimestamp = Date.now();
   public display = {};
   public stats = null;
   public status = '';
   public message = '';
-  // public storyline: Storyline;
+
   public stories: any;
 
   constructor(spacesService: SpacesService,

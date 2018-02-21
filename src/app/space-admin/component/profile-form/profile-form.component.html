@@ -1,0 +1,19 @@
+
+<div>
+    <hr>
+    <label class="label is-inline-flex">
+        <a class="icon is-warning" (click)="toggleOverrideSchema =! toggleOverrideSchema"><i class="fa fa-gavel"></i></a>
+        <span>Override object path to profile schema</span>
+    </label>
+    <div class="control has-addons" *ngIf="toggleOverrideSchema">
+        <input #override class="input is-expanded" type="text" placeholder="Enter object path (a.b.c)"
+               [(ngModel)]="overrideSchemaPath">
+        <a class="button is-success" *ngIf="override.value"
+           (click)="saveRawProfile(override.value)">
+            Save
+        </a>
+    </div>
+</div>
+<hr>
+<dimension-list [model]="model.propertyBucket"></dimension-list>
+<a (click)="saveProfile()" class="button is-success is-small" *ngIf="haveDimsChanged()">Save</a>

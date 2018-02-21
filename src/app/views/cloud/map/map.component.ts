@@ -1,13 +1,16 @@
 import * as moment from 'moment';
 import { Component, OnInit } from '@angular/core';
-import { CloudComponent } from 'app/views/cloud/cloud/cloud.component';
 import { Router } from '@angular/router';
-import { RainService } from 'app/services/rain.service';
-import { SpaceItemService } from 'app/shared/services/space-item/space-item.service';
-import { SpacesService } from 'app/services/spaces.service';
-import { HexToRgb } from 'app/utils/hex-to-rgb.util';
-import { StoryService } from 'app/services/story.service';
-import { Logger } from 'app/shared/ui/ng2-threejs/src/common/log.service';
+
+import { Logger } from '../../../shared/services/common';
+import { RainService } from '../../../shared/services/rain.service';
+import { SpaceItemService } from '../../../shared/services/space-item.service';
+import { SpacesService } from '../../../shared/services/spaces.service';
+import { StoryService } from '../../../shared/services/story.service';
+import { CloudComponent } from '../../cloud/cloud/cloud.component';
+
+import { HexToRgb } from '../../../utils/hex-to-rgb.util';
+
 
 @Component({
   selector: 'datawhore-map',

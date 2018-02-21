@@ -9,7 +9,7 @@
                     <ul class="is-flex center" class="drop-counter is-flex is-filling center">
                         <li *ngFor="let space of dropsBySpace | orderBy:'count'" [ngStyle]="{'flex': getDropFlex(space)} " class="is-flex">
                             <div class="is-flex-inline">
-                                <datawhore-space-icon [space]="space._id"></datawhore-space-icon>
+                                <space-icon [space]="space._id"></space-icon>
                                 <div>{{space.count}}</div>
                             </div>
                         </li>

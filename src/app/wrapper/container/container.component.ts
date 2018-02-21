@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'datawhore-container',
+  selector: 'datawhore-app',
   templateUrl: './container.component.html',
   styleUrls: ['./container.component.less']
 })

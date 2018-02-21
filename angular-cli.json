@@ -18,7 +18,6 @@
       "main": "main.ts",
       "test": "test.ts",
       "tsconfig": "tsconfig.json",
-      "prefix": "datawhore",
       "mobile": false,
       "styles": [
         "../node_modules/bulma/css/bulma.css",

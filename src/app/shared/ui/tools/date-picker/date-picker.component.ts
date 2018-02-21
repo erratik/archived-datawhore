@@ -1,10 +1,10 @@
-import { SpacesService } from '../../../../services/spaces.service';
+import { SpacesService } from '../../../../shared/services/spaces.service';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { DatepickerOptions } from 'ng2-datepicker';
 import * as moment from 'moment';
 
 @Component({
-  selector: 'datawhore-date-picker',
+  selector: 'date-picker',
   templateUrl: './date-picker.component.html',
   styleUrls: ['./date-picker.component.less']
 })

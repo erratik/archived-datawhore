@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'datawhore-space-icon',
+  selector: 'space-icon',
   templateUrl: './space-icon.component.html',
   styleUrls: ['./space-icon.component.less']
 })

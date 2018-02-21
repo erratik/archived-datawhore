@@ -1,0 +1,61 @@
+<section class="hero is-dark">
+    <div class="hero-body" *ngIf="space">
+        <div class="container">
+            <div></div>
+            <div class="heading">
+                <h2 class="is-flex">
+                    <a (click)="uploadImage=!uploadImage">
+                        <figure class="image is-32x32">
+                            <space-icon [space]="space.name" [size]="32"></space-icon>
+                        </figure>
+                    </a>
+                    {{space?.name}}
+                </h2>
+            </div>
+            <div class="space-last-modified is-inline-flex">
+                <span class="icon is-small" *ngIf="space?.oauth">
+                    <i class="fa fa-{{(space.oauth.connected)? 'check' : 'exclamation'}}-circle is-{{(space.oauth.connected)? 'success' : 'danger'}}"></i>
+                    
+                </span>
+                <small>
+                    Last modified: {{space.modified | date:'medium'}}
+                </small>
+            </div>
+            <hr>
+            <div class="is-flex">
+
+                <figure class="image is-24x24 is-circle" *ngIf="space?.avatar"><img src="{{space.avatar}}"></figure>
+                <span *ngIf="space?.username">@{{space.username}}</span>
+
+            </div>
+            <p *ngIf="space?.description">{{space.description}}</p>
+
+        </div>
+    </div>
+</section>
+<section class="hero-body">
+    <div class="container" *ngIf="space?.oauth" [ngSwitch]="activeTab">
+        <div class="tabs">
+            <ul>
+                <li (click)="setActiveTab('profile')" [class.is-active]="activeTab === 'profile'" *ngIf="space.oauth.connected"><a>Profile</a></li>
+                <li (click)="setActiveTab('rain')" [class.is-active]="activeTab === 'rain'" *ngIf="space.oauth.connected"><a>Rain</a></li>
+                <li (click)="setActiveTab('space')" [class.is-active]="activeTab === 'space'"><a>Space</a></li>
+                <li (click)="setActiveTab('drops')" [class.is-active]="activeTab === 'drops'"><a>Drops</a></li>
+            </ul>
+        </div>
+        <div class="tab profile" *ngSwitchDefault>
+            <datawhore-profile-config [space]="space" (onUpdateSpace)="updateSpace($event)"></datawhore-profile-config>
+        </div>
+        <div class="tab space" *ngSwitchCase="'rain'">
+            <rain-config [spaceOauthSettings]="spaceOauthSettings" [space]="space"></rain-config>
+        </div>
+        <div class="tab space" *ngSwitchCase="'space'">
+            <datawhore-space-config (onRemoveSpace)="removeSpace()" (onUpdateSpace)="updateSpace($event)" (onToggleEditSpace)="toggleEditSpace()"></datawhore-space-config>
+        </div>
+
+        <div class="tab space" *ngSwitchCase="'drops'">
+            <datawhore-drops [space]="space" class="columns"></datawhore-drops>
+        </div>
+
+    </div>
+</section>

@@ -2,11 +2,11 @@ import { BaseChartComponent } from '../base-chart/base-chart.component';
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'datawhore-donut-chart',
+  selector: 'chart-doughnut',
   templateUrl: './donut-chart.component.html',
   styleUrls: ['./donut-chart.component.css']
 })
-export class DonutChartComponent extends BaseChartComponent implements OnInit, OnChanges {
+export class DoughnutChartComponent extends BaseChartComponent implements OnInit, OnChanges {
 
   public chartType = 'doughnut';
   public options = {
@@ -15,7 +15,7 @@ export class DonutChartComponent extends BaseChartComponent implements OnInit, O
   };
 
   public colors: Array<any> = [{ backgroundColor: ['#CCCCCC'] }];
- 
+
   @Input() color: string = null;
 
   constructor() { super(); }

@@ -1,4 +1,4 @@
-import { SpacesService } from '../../../../services/spaces.service';
+import { SpacesService } from '../../../../shared/services/spaces.service';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 @Component({

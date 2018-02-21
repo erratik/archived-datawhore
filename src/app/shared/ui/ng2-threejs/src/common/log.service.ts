@@ -1,12 +1,12 @@
-import {Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 
-const noop = () => {};
+const noop = () => { };
 const con: Console = console || {} as any;
 
 // Polyfill console for unsupported browsers
 class ConsolePolyfill {
 
-  trace(...args: any[]) : void {
+  trace(...args: any[]): void {
     const target = con.debug || con.log || noop;
     target.apply(con, args);
   }
@@ -30,21 +30,21 @@ class ConsolePolyfill {
     const target = con.error || con.log || noop;
     target.apply(con, args);
   }
-};
+}
 
 @Injectable()
 export class Logger {
   private namespace: string;
   private console: ConsolePolyfill = new ConsolePolyfill();
 
-  constructor() {
-    this.namespace = 'DEFAULT';
-  }
-
   static formatMessage(level: string, message: string): string {
     const timestamp = new Date().toISOString();
     return `[${timestamp}] [${level}] ${message}`;
   }
+  constructor() {
+    this.namespace = 'DEFAULT';
+  }
+
 
   named(namespace: string) {
     const logger = new Logger();
@@ -52,7 +52,7 @@ export class Logger {
     return logger;
   }
 
-  trace(message: string, ...args: any[]) : void {
+  trace(message: string, ...args: any[]): void {
     const formattedMessage = Logger.formatMessage('TRACE', message);
     this.console.trace(formattedMessage, ...args);
   }

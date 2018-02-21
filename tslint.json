@@ -100,7 +100,7 @@
     ],
 
     "directive-selector": [true, "attribute", "datawhore-directive", "camelCase"],
-    "component-selector": [true, "element", "datawhore", "kebab-case"],
+    "component-selector": [false, "element", "datawhore", "kebab-case"],
     "use-input-property-decorator": true,
     "use-output-property-decorator": true,
     "use-host-property-decorator": true,

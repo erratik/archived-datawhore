@@ -1,21 +1,23 @@
 import { ActivatedRoute } from '@angular/router';
-import { RainConfigsComponent } from '../../rain/rain-configs/rain-configs/rain-configs.component';
-import { SpaceItemService } from '../../../shared/services/space-item/space-item.service';
-import { SpacesService } from '../../../services/spaces.service';
-import { RainService } from '../../../services/rain.service';
-import { Space } from '../../../models/space.model';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import * as _ from 'lodash';
-import { ProfileService } from "app/services/profile.service";
-import { OauthSettingsService } from "app/services/oauth-settings.service";
+
+import { SpaceItemService } from '../../../shared/services/space-item.service';
+import { SpacesService } from '../../../shared/services/spaces.service';
+import { RainService } from '../../../shared/services/rain.service';
+import { Space } from '../../../shared/models/space.model';
+
+import { ProfileService } from '../../../shared/services/profile.service';
+import { RainConfigComponent } from '../../../space-admin/component/rain-configs/rain-configs.component';
+import { OauthSettingsService } from '../../../space-admin/services/oauth-settings.service';
 
 @Component({
   selector: 'datawhore-drop-cloud',
   templateUrl: './drop-cloud.component.html',
   styleUrls: ['./drop-cloud.component.less']
 })
-export class DropCloudComponent extends RainConfigsComponent implements OnInit, OnDestroy {
+export class DropCloudComponent extends RainConfigComponent implements OnInit, OnDestroy {
 
 
   @Input() public space: Space;
@@ -61,7 +63,7 @@ export class DropCloudComponent extends RainConfigsComponent implements OnInit, 
     // debugger;
     this.getDrops$ = this.rainService.getCloudDrops(options).do((drops) => {
       this.drops = _.groupBy(drops, 'type');
-      console.log(this.drops)
+      console.log(this.drops);
       // this.activeTab =  dropType;
     });
 
@@ -88,8 +90,8 @@ export class DropCloudComponent extends RainConfigsComponent implements OnInit, 
 
     this.deleteDrops$ = this.rainService.deleteDrops([drop], this.space.name).do((drops) => {
       // this.drops = _.groupBy(drops, 'type');
-      console.log(drops)
-      debugger;
+      console.log(drops);
+      // debugger;
     });
 
     this.deleteDrops$.subscribe((newDrops) => {

@@ -1,12 +1,12 @@
 import { pbkdf2 } from 'crypto';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import {Dimension} from '../../../models/profile.model';
-import {RainDimension} from '../../../models/rain.model';
-import {Space} from '../../../models/space.model';
-import {ProfileService} from '../../../services/profile.service';
-import {SpacesService} from '../../../services/spaces.service';
-import {RainService} from '../../../services/rain.service';
 import {Observable} from 'rxjs';
+import {Dimension} from '../../../shared/models/profile.model';
+import {RainDimension} from '../../../shared/models/rain.model';
+import {Space} from '../../../shared/models/space.model';
+import {ProfileService} from '../../../shared/services/profile.service';
+import {SpacesService} from '../../../shared/services/spaces.service';
+import {RainService} from '../../../shared/services/rain.service';
 const objectPath = require('object-path');
 
 @Component({
@@ -56,7 +56,7 @@ export class SpaceItemComponent implements OnInit, OnDestroy {
     }
 
     protected isItemLinked(property): boolean {
-        debugger;
+        // debugger;
         return this.space[property.friendlyName] === objectPath.get(this.schema, property.schemaPath);
     }
 }

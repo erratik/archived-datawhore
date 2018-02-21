@@ -1,20 +1,23 @@
 import { HexToRgb } from '../../../utils/hex-to-rgb.util';
 import { Observable } from 'rxjs/Rx';
 import { any } from 'codelyzer/util/function';
-import { RainService } from '../../../services/rain.service';
-import { Component, OnInit } from '@angular/core';
-import { SpacesService } from '../../../services/spaces.service';
-import { Space } from '../../../models/space.model';
 import 'rxjs/add/operator/map';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { OauthSettingsService } from '../../../services/oauth-settings.service';
-import { SpaceItemService } from '../../../shared/services/space-item/space-item.service';
-import { Drop } from 'app/models/drop.model';
+
 import * as _ from 'lodash';
-import { DimensionSchema } from 'app/models/dimension-schema.model';
-import { Rain } from 'app/models/rain.model';
-import { StoryService } from 'app/services/story.service';
-import { Logger } from 'app/shared/ui/ng2-threejs/src/common/log.service';
+
+import { Logger } from '../../../shared/services/common';
+import { Space } from '../../../shared/models/space.model';
+import { Drop } from '../../../shared/models/drop.model';
+import { DimensionSchema } from '../../../shared/models/dimension-schema.model';
+import { Rain } from '../../../shared/models/rain.model';
+import { StoryService } from '../../../shared/services/story.service';
+import { RainService } from '../../../shared/services/rain.service';
+import { SpacesService } from '../../../shared/services/spaces.service';
+import { SpaceItemService } from '../../../shared/services/space-item.service';
+
+import { OauthSettingsService } from '../../../space-admin/services/oauth-settings.service';
 
 @Component({
   selector: 'datawhore-cloud',
@@ -100,7 +103,7 @@ export class CloudComponent implements OnInit {
   }
 
   public getMoreDrops(): any {
-    let newDrops = [];
+    const newDrops = [];
 
     this.options.max = _.minBy(this.drops, (o) => o['timestamp'])['timestamp'];
 
