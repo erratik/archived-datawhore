@@ -42,35 +42,5 @@
   </div>
 
   <div class="column is-three-quarters">
-
-    <div class="column" *ngIf="isLoadingSpaces">
-      <div class="is-loading"></div>
-    </div>
-
-    <div *ngFor="let story of stories | orderBy:'timestamp':true">
-			
-      <div *ngFor="let segment of story.content.segments" [ngSwitch]="segment.type">
-
-        <div *ngSwitchCase="'place'" class="place">
-          <span class="icon is-small">
-            <i class="fa fa-{{(segment.place && segment.place.type === 'unknown') ? 'map-pin' : segment.place.type}}" *ngIf="segment.place"></i>
-          </span>
-          <span>{{(segment.place)?segment.place.name:''}} ({{segment.startTime | amDateFormat:'h:mma' }} to {{segment.endTime|
-            amDateFormat:'h:mma' }})
-					</span>
-          <datawhore-segment [segment]="segment"></datawhore-segment>
-        </div>
-
-        <div *ngSwitchDefault>
-          <datawhore-segment [segment]="segment"></datawhore-segment>
-        </div>
-
-      </div>
-<!-- {{story.content.segments }} -->
-      <datawhore-drop-atomic [type]="story.type" [drop]="story" *ngIf="!story.content.segments"></datawhore-drop-atomic>
-			<!-- <pre>{{ story | json }}</pre> -->
-			<hr/>
-    </div>
-
-
+map
   </div>
