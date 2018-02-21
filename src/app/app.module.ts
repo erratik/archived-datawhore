@@ -80,6 +80,11 @@ import { MomentModule } from 'angular2-moment';
 // import { SimpleMessageComponent } from './shared/ui/messages/simple-message/simple-message.component';
 
 // import { SpaceAdminModule } from './space-admin/space-admin.module';
+
+import { HeaderComponent } from './shared/ui/wrapper/header/header.component';
+import { ContainerComponent } from './shared/ui/wrapper/container/container.component';
+import { FooterComponent } from './shared/ui/wrapper/footer/footer.component';
+
 import { DropsComponent } from './shared/component/drops/drops/drops.component';
 import { SpaceItemComponent } from './shared/component/space-item/space-item.component';
 import { DropAtomicComponent } from './shared/component/drops/drop-atomic/drop-atomic.component';
@@ -105,6 +110,9 @@ import { RainService } from './shared/services/rain.service';
   imports: [BrowserModule, SpaceAdminRoutingModule, MomentModule],
   declarations: [
     routingComponents,
+    HeaderComponent,
+    ContainerComponent,
+    FooterComponent,
     AppComponent,
     DropsComponent,
     DropAtomicComponent,

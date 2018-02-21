@@ -5,8 +5,6 @@ import { SpaceAdminModule } from './space-admin.module';
 import { SpaceViewComponent } from '../space-admin/views/spaces/view-space/view-space.component';
 import { EditSpacesComponent } from '../space-admin/views/spaces/edit-spaces/edit-spaces.component';
 
-import { ProfileConfigComponent } from '../space-admin/component/profile-config/profile-config.component';
-
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'spaces' },
@@ -22,8 +20,7 @@ export class SpaceAdminRoutingModule { }
 
 export const routingComponents = [
   EditSpacesComponent,
-  SpaceViewComponent,
-  ProfileConfigComponent
+  SpaceViewComponent
 ];
 // const appRoutes: Routes = [
 //   {

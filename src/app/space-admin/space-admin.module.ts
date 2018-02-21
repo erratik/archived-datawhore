@@ -16,9 +16,6 @@ import { FileSelectDirective, FileDropDirective } from 'ng2-file-upload';
 
 import { OauthSettingsService } from './services/oauth-settings.service';
 
-import { HeaderComponent } from '../wrapper/header/header.component';
-import { ContainerComponent } from '../wrapper/container/container.component';
-import { FooterComponent } from '../wrapper/footer/footer.component';
 import { DoughnutChartComponent } from '../shared/ui/charts/donut-chart/donut-chart.component';
 import { ColorPickerComponent } from '../shared/ui/tools/color-picker/color-picker.component';
 import { DatePickerComponent } from '../shared/ui/tools/date-picker/date-picker.component';
@@ -46,25 +43,19 @@ import { DimensionFormComponent } from '../space-admin/component/dimensions/dime
     NgDatepickerModule
   ],
   declarations: [
-    FileSelectDirective,
-    HeaderComponent,
-    ContainerComponent,
-    FooterComponent,
     AddSpaceComponent,
-    ProfileFormComponent,
+    ProfileConfigComponent,
+    FileSelectDirective,
     SpaceConfigComponent,
     RainConfigComponent,
     DimensionListComponent,
     DimensionFormComponent,
     DoughnutChartComponent,
-    ColorPickerComponent
+    ColorPickerComponent,
   ],
   exports: [
-    HeaderComponent,
-    ContainerComponent,
-    FooterComponent,
     AddSpaceComponent,
-    ProfileFormComponent,
+    ProfileConfigComponent,
     SpaceConfigComponent,
     RainConfigComponent,
     DimensionListComponent,
