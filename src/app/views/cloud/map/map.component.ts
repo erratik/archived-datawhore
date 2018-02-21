@@ -7,6 +7,7 @@ import { SpaceItemService } from 'app/shared/services/space-item/space-item.serv
 import { SpacesService } from 'app/services/spaces.service';
 import { HexToRgb } from 'app/utils/hex-to-rgb.util';
 import { StoryService } from 'app/services/story.service';
+import { Logger } from 'app/shared/ui/ng2-threejs/src/common/log.service';
 
 @Component({
   selector: 'datawhore-map',
@@ -24,17 +25,20 @@ export class MapComponent extends CloudComponent implements OnInit {
   // public storyline: Storyline;
   public stories: any;
 
+  public log: Logger;
+
   constructor(spacesService: SpacesService,
     spaceItemService: SpaceItemService,
     rainService: RainService,
     router: Router,
-    storyService: StoryService) {
-    super(spacesService, spaceItemService, rainService, router, storyService);
+    storyService: StoryService,
+    log: Logger) {
+    super(spacesService, spaceItemService, rainService, router, storyService, log);
+    this.log = log;
   }
 
-
   ngOnInit() {
-    // this.getSpaces(() => this.getStory());
+    this.log.info('Loaded home');
     this.getStory();
   }
 

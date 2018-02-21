@@ -14,6 +14,7 @@ import * as _ from 'lodash';
 import { DimensionSchema } from 'app/models/dimension-schema.model';
 import { Rain } from 'app/models/rain.model';
 import { StoryService } from 'app/services/story.service';
+import { Logger } from 'app/shared/ui/ng2-threejs/src/common/log.service';
 
 @Component({
   selector: 'datawhore-cloud',
@@ -38,7 +39,8 @@ export class CloudComponent implements OnInit {
     public spaceItemService: SpaceItemService,
     public rainService: RainService,
     public router: Router,
-    public storyService?: StoryService) {
+    public storyService?: StoryService,
+    public log?: Logger) {
   }
 
   ngOnInit() {

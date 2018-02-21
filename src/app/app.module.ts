@@ -10,7 +10,10 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { ChartsModule } from 'ng2-charts';
 import { ColorPickerModule } from 'ngx-color-picker';
 import { NgDatepickerModule } from 'ng2-datepicker';
-// import { TJsonViewerModule } from 't-json-viewer';
+
+import { ThreeJSComponentsModule } from './shared/ui/ng2-threejs/src';
+import { Logger } from './shared/ui/ng2-threejs/src/common/log.service';
+
 import { MomentModule } from 'angular2-moment';
 import * as _ from 'lodash';
 
@@ -109,6 +112,7 @@ const appRoutes: Routes = [
         ChartsModule,
         ColorPickerModule,
         NgDatepickerModule,
+        ThreeJSComponentsModule,
         // TJsonViewerModule,
         // NgSemanticModule,
         RouterModule.forRoot(appRoutes)
@@ -166,6 +170,7 @@ const appRoutes: Routes = [
         ProfileService,
         RainService,
         StoryService,
+        Logger,
         SchemaValuePipe
     ],
     bootstrap: [AppComponent]

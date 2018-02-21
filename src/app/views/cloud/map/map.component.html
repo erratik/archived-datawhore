@@ -19,32 +19,13 @@
       <datawhore-simple-message [message]="message" [status]="status"></datawhore-simple-message>
       <!-- TODO: make drop-counter component -->
       
-			
-			
-			<div *ngIf="!isLoadingSpaces">
-				<ul class="is-flex center" class="drop-counter is-flex is-filling center">	{{stats|json}}
-					
-				
-					<li *ngFor="let space of stats | orderBy:'count'" (click)="toggleSpaceDrops(space.name)" [ngStyle]="{'flex': getDropFlex(space), 'background-color': space.color}"
-					class="is-flex">
-					<div class="is-flex-inline">
-						<datawhore-space-icon [space]="space.name" [classes]="['is-circle']"></datawhore-space-icon>
-						<div>{{space.count}}</div>
-					</div>
-				</li>
-			</ul>
-			<div class="is-flex button is-loading" *ngIf="isLoadingSpaces">Loading...</div>
-			
-		</div>
-
-
     </div>
   </div>
 
   <div class="column is-three-quarters">
 
-			<!-- <div>
-					<h1>Maptesting</h1>
+			<div>
+					<h1>Map testing</h1>
 					<scene #scene [clearColor]="'#000'">
 						<camera [x]="40" [y]="40" [z]="40" [aspectRatio]="scene.width / scene.height" [target]="scene" >
 						</camera>
@@ -54,6 +35,6 @@
 							<material [color]="'#dddddd'" [wireframe]="true"></material>
 						</mesh>
 					</scene>
-				</div> -->
+				</div>
 
   </div>
