@@ -37,10 +37,19 @@
     <div class="container" *ngIf="space?.oauth" [ngSwitch]="activeTab">
         <div class="tabs">
             <ul>
-                <li (click)="setActiveTab('profile')" [class.is-active]="activeTab === 'profile'" *ngIf="space.oauth.connected"><a>Profile</a></li>
-                <li (click)="setActiveTab('rain')" [class.is-active]="activeTab === 'rain'" *ngIf="space.oauth.connected"><a>Rain</a></li>
-                <li (click)="setActiveTab('space')" [class.is-active]="activeTab === 'space'"><a>Space</a></li>
-                <li (click)="setActiveTab('drops')" [class.is-active]="activeTab === 'drops'"><a>Drops</a></li>
+
+                    
+                <li *ngIf="space.oauth.connected" [class.is-active]="activeTab === 'profile'"><a [routerLink]="['/space', space.name, {tab: 'profile'}]">Profile</a></li>
+                <!-- <li (click)="setActiveTab('profile')" [class.is-active]="activeTab === 'profile'" *ngIf="space.oauth.connected"><a>Profile</a></li> -->
+                <!-- <li (click)="setActiveTab('rain')" [class.is-active]="activeTab === 'rain'" *ngIf="space.oauth.connected"><a>Rain</a></li> -->
+                <li *ngIf="space.oauth.connected" [class.is-active]="activeTab === 'rain'"><a [routerLink]="['/space', space.name, {tab: 'rain'}]">Rain</a></li>
+                
+                <!-- <li (click)="setActiveTab('space')" [class.is-active]="activeTab === 'space'"><a>Space</a></li> -->
+                <li [class.is-active]="activeTab === 'space'"><a [routerLink]="['/space', space.name, {tab: 'space'}]">Space</a></li>
+                
+                <!-- <li (click)="setActiveTab('drops')" [class.is-active]="activeTab === 'drops'"><a>Drops</a></li> -->
+                <li [class.is-active]="activeTab === 'drops'"><a [routerLink]="['/space', space.name, {tab: 'drops'}]">Drops</a></li>
+                
             </ul>
         </div>
         <div class="tab profile" *ngSwitchDefault>

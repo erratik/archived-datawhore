@@ -1,19 +1,19 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
-import {FileUploader} from 'ng2-file-upload';
-import {Observable} from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FileUploader } from 'ng2-file-upload';
+import { Observable } from 'rxjs';
 
-import {Paths} from '../../../shared/classes/paths.class';
-import {Space} from '../../../shared/models/space.model';
-import {SpaceOauthSettings} from '../../../shared/models/space-settings.model';
-import {Profile} from '../../../shared/models/profile.model';
-import {SpacesService} from '../../../shared/services/spaces.service';
-import {ProfileService} from '../../../shared/services/profile.service';
-import {SpaceItemService} from '../../../shared/services/space-item.service';
-import {RainService} from '../../../shared/services/rain.service';
-import {SpaceItemComponent} from '../../../shared/component/space-item/space-item.component';
+import { Paths } from '../../../shared/classes/paths.class';
+import { Space } from '../../../shared/models/space.model';
+import { SpaceOauthSettings } from '../../../shared/models/space-settings.model';
+import { Profile } from '../../../shared/models/profile.model';
+import { SpacesService } from '../../../shared/services/spaces.service';
+import { ProfileService } from '../../../shared/services/profile.service';
+import { SpaceItemService } from '../../../shared/services/space-item.service';
+import { RainService } from '../../../shared/services/rain.service';
+import { SpaceItemComponent } from '../../../shared/component/space-item/space-item.component';
 
-import {OauthSettingsService} from '../../services/oauth-settings.service';
+import { OauthSettingsService } from '../../services/oauth-settings.service';
 
 @Component({
     selector: 'datawhore-space-config',
@@ -35,19 +35,21 @@ export class SpaceConfigComponent implements OnInit {
     @Output() public onToggleEditSpace: EventEmitter<any> = new EventEmitter<any>();
     @ViewChild(SpaceItemComponent) public spaceItemComponent;
 
-    constructor(public spacesService: SpacesService,
-                public spaceItemService?: SpaceItemService,
-                public activatedRoute?: ActivatedRoute,
-                public rainService?: RainService,
-                public profileService?: ProfileService,
-                public oauthService?: OauthSettingsService,
-                public router?: Router) {
+    constructor(
+        public router: Router,
+        public spacesService: SpacesService,
+        public spaceItemService?: SpaceItemService,
+        public activatedRoute?: ActivatedRoute,
+        public rainService?: RainService,
+        public profileService?: ProfileService,
+        public oauthService?: OauthSettingsService) {
 
         this.retrieveSpace$ = this.activatedRoute.params.do(params => params)
             .mergeMap(params => this.spacesService.getSpace(params['space']))
             .switchMap(space => this.oauthService.getOauthSettings(space.name))
             .do(oauth => {
                 this.space = this.spacesService.space;
+                
                 this.space.oauth = oauth;
                 this.gotOauthSettings.emit(this.space.oauth);
             });
@@ -56,7 +58,7 @@ export class SpaceConfigComponent implements OnInit {
     ngOnInit() {
         this.setSpace();
 
-        this.uploader = new FileUploader({url: `${Paths.DATAWHORE_API_URL}/upload/${this.space.name}/space/icon`});
+        this.uploader = new FileUploader({ url: `${Paths.DATAWHORE_API_URL}/upload/${this.space.name}/space/icon` });
         this.uploader.onCompleteItem = (item, response, status) => {
             if (status === 200) {
                 const res = JSON.parse(response);

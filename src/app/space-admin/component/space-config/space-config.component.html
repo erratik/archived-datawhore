@@ -9,7 +9,7 @@
 
     <div class="control">
       <div class="label">Description</div>
-      <!-- <textarea [(ngModel)]="space.description" class="textarea"></textarea> -->
+      <textarea [(ngModel)]="space.description" class="textarea"></textarea>
       <a class="button is-success" (click)="onUpdateSpace.emit()">
         <span>Save</span>
       </a>
@@ -99,7 +99,7 @@
       </div>
       <p class="control">
         <label class="checkbox">
-          <!-- <input #passportEnabled type="checkbox" [(ngModel)]="isPassportCapable" (change)="addLegacySettings()"> Passport enabled? ( -->
+          <input #passportEnabled type="checkbox" [(ngModel)]="isPassportCapable" (change)="addLegacySettings()"> Passport enabled? (
           <a class="is-primary" href="http://passportjs.org/">check here</a>)
         </label>
       </p>

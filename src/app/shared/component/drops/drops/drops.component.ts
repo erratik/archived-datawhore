@@ -1,4 +1,4 @@
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import * as _ from 'lodash';
@@ -27,17 +27,19 @@ export class DropsComponent extends RainConfigComponent implements OnInit, OnDes
   public getDrops$: Observable<any> = new Observable<any>();
   public moreDrops$: Observable<any> = new Observable<any>();
   public deleteDrops$: Observable<any> = new Observable<any>();
-  public activeTab;
+  public schema;
   public model;
 
   public overrideRainName: any = {};
 
-  constructor(spacesService: SpacesService,
+  constructor(
+    router: Router,
+    spacesService: SpacesService,
     spaceItemService: SpaceItemService,
     activatedRoute: ActivatedRoute,
     rainService: RainService,
     profileService: ProfileService) {
-    super(spacesService, spaceItemService, activatedRoute, rainService, profileService);
+    super(router, spacesService, spaceItemService, activatedRoute, rainService, profileService);
   }
 
   ngOnDestroy() {
@@ -50,7 +52,7 @@ export class DropsComponent extends RainConfigComponent implements OnInit, OnDes
 
     this.getRainSchemas$.subscribe(() => {
       this.rain = this.rainService.rain;
-      this.activeTab = this.rainService.type = this.rain[this.space.name].length ? this.rain[this.space.name][0].rainType : this.activeTab;
+      this.schema = this.rainService.type = this.rain[this.space.name].length ? this.rain[this.space.name][0].rainType : this.schema;
 
 
       if (this.rain[this.space.name].length) {
@@ -69,7 +71,7 @@ export class DropsComponent extends RainConfigComponent implements OnInit, OnDes
 
     this.getDrops$ = this.rainService.getDrops(this.space.name, options).do((drops) => {
       this.drops = _.groupBy(drops, 'type');
-      this.activeTab = dropType;
+      this.schema = dropType;
     });
 
     this.getDrops$.subscribe();
@@ -91,7 +93,7 @@ export class DropsComponent extends RainConfigComponent implements OnInit, OnDes
   }
 
   public setActiveTab(dropType: string): void {
-    this.activeTab = this.rainService.type = dropType;
+    this.schema = this.rainService.type = dropType;
     this.rainService.drops[this.space.name] = null;
     this.getSomeDrops(dropType);
 

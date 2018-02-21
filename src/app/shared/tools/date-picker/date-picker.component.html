@@ -1,0 +1,6 @@
+<a class="icon fa fa-arrow-circle-left" (click)="changeDate('subtract')"></a>
+<div class="date-picker">
+  <i class="open-calendar-trigger icon fa fa-calendar"></i>
+  <ng-datepicker [(ngModel)]="date" (ngModelChange)="changeDate($event)"></ng-datepicker>
+</div>
+<a class="icon fa fa-arrow-circle-right" (click)="changeDate('add')" *ngIf="!nextDayIsFuture()"></a>

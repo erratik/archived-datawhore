@@ -2,13 +2,14 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 import { SpaceAdminModule } from './space-admin.module';
-import { SpaceViewComponent } from '../space-admin/views/spaces/view-space/view-space.component';
-import { EditSpacesComponent } from '../space-admin/views/spaces/edit-spaces/edit-spaces.component';
 
+import { EditSpacesComponent } from '../space-admin/views/spaces/edit-spaces/edit-spaces.component';
+import { SpaceViewComponent } from '../space-admin/views/spaces/view-space/view-space.component';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'spaces' },
-  { path: 'spaces', component: EditSpacesComponent }
+  { path: 'spaces', component: EditSpacesComponent },
+  { path: 'space/:space', component: SpaceViewComponent }
 ];
 
 @NgModule({
@@ -24,21 +25,10 @@ export const routingComponents = [
 ];
 // const appRoutes: Routes = [
 //   {
-//       path: '',
-//       redirectTo: 'spaces',
-//       pathMatch: 'full'
-//   },
-//   {
 //       path: 'login', component: EditSpacesComponent
 //   },
 //   {
-//       path: 'spaces', component: EditSpacesComponent
-//   },
-//   {
 //       path: 'cloud', component: DayViewerComponent
-//   },
-//   {
-//       path: 'space/:space', component: SpaceViewComponent
 //   },
 //   {
 //       path: 'settings', component: SettingsViewComponent

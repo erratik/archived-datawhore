@@ -1,4 +1,4 @@
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import * as _ from 'lodash';
@@ -29,17 +29,19 @@ export class DropCloudComponent extends RainConfigComponent implements OnInit, O
   public getDrops$: Observable<any> = new Observable<any>();
   public moreDrops$: Observable<any> = new Observable<any>();
   public deleteDrops$: Observable<any> = new Observable<any>();
-  public activeTab;
+  public schema;
   public model;
 
   public overrideRainName: any = {};
 
-  constructor(spacesService: SpacesService,
-              spaceItemService: SpaceItemService,
-              activatedRoute: ActivatedRoute,
-              rainService: RainService,
-              profileService: ProfileService) {
-      super(spacesService, spaceItemService, activatedRoute, rainService, profileService);
+  constructor(
+    router: Router,
+    spacesService: SpacesService,
+    spaceItemService: SpaceItemService,
+    activatedRoute: ActivatedRoute,
+    rainService: RainService,
+    profileService: ProfileService) {
+    super(router, spacesService, spaceItemService, activatedRoute, rainService, profileService);
   }
 
   ngOnDestroy() {

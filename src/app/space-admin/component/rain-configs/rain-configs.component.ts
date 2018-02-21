@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { Observable } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
     Component,
     EventEmitter,
@@ -23,6 +23,7 @@ import { OauthSettingsService } from '../../services/oauth-settings.service';
 import { SpaceConfigComponent } from '../../component/space-config/space-config.component';
 
 import { RainFormComponent } from '../rain-form/rain-form.component';
+import { SchemaTabs } from '../../classes/constants.class';
 
 const objectPath = require('object-path');
 
@@ -32,7 +33,7 @@ const objectPath = require('object-path');
     styleUrls: ['./rain-configs.component.less'],
     providers: [SpacesService]
 })
-export class RainConfigComponent extends SpaceConfigComponent implements OnChanges, OnInit {
+export class RainConfigComponent extends SpaceConfigComponent implements OnInit {
 
     public rainSchemas: any[] = [];
     public rain: Rain[] = [];
@@ -41,8 +42,11 @@ export class RainConfigComponent extends SpaceConfigComponent implements OnChang
     @ViewChild(RainFormComponent) public rainForm: RainFormComponent;
     public getRainSchemas$ = new Observable<any>();
 
+    public activeSchema: string;
     public activeTab: string;
-    public activeSubTab = 'configs';
+    public schemaTabs = SchemaTabs;
+    public activeSchemaTab = SchemaTabs.config;
+
     public isFetchingSchema = false;
     public hasSchemas = false;
 
@@ -53,37 +57,49 @@ export class RainConfigComponent extends SpaceConfigComponent implements OnChang
     public overrideSchemaPath: boolean;
     public newContentPath: string;
 
-    constructor(spacesService: SpacesService,
+    constructor(
+        router: Router,
+        spacesService: SpacesService,
         spaceItemService: SpaceItemService,
         activatedRoute: ActivatedRoute,
         rainService: RainService,
         profileService: ProfileService) {
-        super(spacesService, spaceItemService, activatedRoute, rainService, profileService);
+        super(router, spacesService, spaceItemService, activatedRoute, rainService, profileService);
     }
 
     ngOnInit() {
 
-        this.getRainSchemas$ = this.getRawRain()
-            .switchMap(() => this.getSpaceRain());
+        this.getRainSchemas$ = this.spaceItemService.fetchSchema(this.space.name, 'rain').do((rain) => {
+            this.rainService.rainSchemas = rain.map(rainSchema => this.toSchema(rainSchema));
+        })
+        .switchMap(() => {
+            return this.activatedRoute.params;
+        })
+        .do((params) => {
+            this.activeTab = params['tab'];
+            this.activeSchema = params['schema'];
+            this.activeSchemaTab = params['subtab'];
+        })
+        .switchMap(() => this.getSpaceRain());
 
         this.getRainSchemas$.subscribe(() => {
-            this.activeTab = this.rainSchemas.length ? this.rainSchemas[0].type : this.activeTab;
+
             this.rainSchemas = this.rainService.rainSchemas;
             this.rain = this.rainService.rain;
 
             if (this.rainSchemas.length) {
-                this.rainService.type = this.rainSchemas[0].type;
-                this.rainService.rainSchemas = this.rainService.rainSchemas.map(rainSchema => {
+
+                // TODO: yuck. so much for nothing. rethink this
+                this.rainSchemas = this.rainSchemas.map(rainSchema => {
                     this.overrideRainName[rainSchema.type] = rainSchema.type;
                     return rainSchema;
                 });
+
+            } else {
+                this.router.navigate(['/space', { tab: this.activeTab, schema: 'new-schema' }]);
             }
         });
 
-    }
-
-    ngOnChanges() {
-        // this.getActiveTab();
     }
 
     public getSpaceRain(): any {
@@ -91,17 +107,6 @@ export class RainConfigComponent extends SpaceConfigComponent implements OnChang
         });
     }
 
-    public getRawRain(): any {
-        return this.spaceItemService.fetchSchema(this.space.name, 'rain').do((rain) => {
-            this.rainService.rainSchemas = rain.map(rainSchema => this.toSchema(rainSchema));
-            this.getActiveTab();
-            this.activeSubTab = 'config';
-        });
-    }
-
-    public getSchemaByType(schemaType): any {
-        return this.rainSchemas.filter(({ type }) => type === schemaType)[0];
-    }
 
     public writeRain(index: number, type: any = 'rain'): any {
 
@@ -197,20 +202,33 @@ export class RainConfigComponent extends SpaceConfigComponent implements OnChang
         });
     }
 
+    public isAddingSchema(): boolean {
+        return this.activeSchema === 'new-schema' && this.activeTab === 'rain';
+    }
+
+    public subtabActive(schemaTab: SchemaTabs): boolean {
+        return schemaTab === this.activeSchemaTab;
+    }
+
     public setActiveTab(tabName: string): void {
-        this.activeTab = this.rainService.type = tabName;
-        this.activeSubTab = 'config';
+        // this.activeSchema = this.rainService.type = tabName;
+        // this.activeSchemaTab = SchemaTabs[tabName];
     }
 
     public getActiveTab(): any {
         const activeTab = this.rainService.rainSchemas.length ? this.rainService.rainSchemas[0].type : 'new-schema';
-        return this.activeTab = activeTab;
+        return this.activeSchema = activeTab;
 
     }
 
-    public getRainProperties(rainType: string): any {
-        const schema = this.rainService.rain.filter(r => r.rainType === rainType)[0];
-        return schema ? schema.properties : [];
+    public getSchemaByType(): any {
+        const schema = this.rainService.rain[this.space.name].filter(r => r.rainType === this.activeSchema);
+        return !!schema ? schema : null;
+    }
+
+    public getRainProperties(): any {
+        const [props] = this.getSchemaByType();
+        return !!props ? props.properties : null;
     }
 
     public hasOverridePath(schema): boolean {

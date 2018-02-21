@@ -1,6 +1,6 @@
 import * as console from 'console';
 import { window } from 'rxjs/operator/window';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 
 import { Space } from '../../../shared/models/space.model';
@@ -28,13 +28,15 @@ export class ProfileConfigComponent extends SpaceConfigComponent implements OnIn
     protected activeTab = 'rain';
     @Output() public onUpdateSpace: EventEmitter<any> = new EventEmitter<any>();
 
-    constructor(spacesService: SpacesService,
+    constructor(
+        router: Router,
+        spacesService: SpacesService,
         spaceItemService: SpaceItemService,
         activatedRoute: ActivatedRoute,
         rainService: RainService,
         profileService: ProfileService,
         oauthService: OauthSettingsService) {
-        super(spacesService, spaceItemService, activatedRoute, rainService, profileService, oauthService);
+        super(router, spacesService, spaceItemService, activatedRoute, rainService, profileService, oauthService);
     }
 
 
