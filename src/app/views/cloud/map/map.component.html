@@ -43,34 +43,17 @@
 
   <div class="column is-three-quarters">
 
-    <div class="column" *ngIf="isLoadingSpaces">
-      <div class="is-loading"></div>
-    </div>
-
-    <div *ngFor="let story of stories | orderBy:'timestamp':true">
-			
-      <div *ngFor="let segment of story.content.segments" [ngSwitch]="segment.type">
-
-        <div *ngSwitchCase="'place'" class="place">
-          <span class="icon is-small">
-            <i class="fa fa-{{(segment.place && segment.place.type === 'unknown') ? 'map-pin' : segment.place.type}}" *ngIf="segment.place"></i>
-          </span>
-          <span>{{(segment.place)?segment.place.name:''}} ({{segment.startTime | amDateFormat:'h:mma' }} to {{segment.endTime|
-            amDateFormat:'h:mma' }})
-					</span>
-          <datawhore-segment [segment]="segment"></datawhore-segment>
-        </div>
-
-        <div *ngSwitchDefault>
-          <datawhore-segment [segment]="segment"></datawhore-segment>
-        </div>
-
-      </div>
-<!-- {{story.content.segments }} -->
-      <datawhore-drop-atomic [type]="story.type" [drop]="story" *ngIf="!story.content.segments"></datawhore-drop-atomic>
-			<!-- <pre>{{ story | json }}</pre> -->
-			<hr/>
-    </div>
-
+			<!-- <div>
+					<h1>Maptesting</h1>
+					<scene #scene [clearColor]="'#000'">
+						<camera [x]="40" [y]="40" [z]="40" [aspectRatio]="scene.width / scene.height" [target]="scene" >
+						</camera>
+						<axis></axis>
+						<mesh>
+							<geometry [width]="5" [height]="5" [depth]="5"></geometry>
+							<material [color]="'#dddddd'" [wireframe]="true"></material>
+						</mesh>
+					</scene>
+				</div> -->
 
   </div>

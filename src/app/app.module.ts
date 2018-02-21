@@ -47,6 +47,7 @@ import { DropImageComponent } from './shared/directives/drop-image/drop-image.co
 import { SpaceIconComponent } from './shared/directives/space-icon/space-icon.component';
 import { LineChartComponent } from './shared/ui/charts/line-chart/line-chart.component';
 import { PieChartAdvancedComponent } from './shared/ui/charts/pie-chart--advanced/pie-chart--advanced.component';
+import { StackedBarHorizontalComponent } from './shared/ui/charts/stacked-bar-horizontal/stacked-bar-horizontal.component';
 import { DonutChartComponent } from './shared/ui/charts/donut-chart/donut-chart.component';
 import { BaseChartComponent } from './shared/ui/charts/base-chart/base-chart.component';
 
@@ -84,10 +85,7 @@ const appRoutes: Routes = [
         path: 'spaces', component: EditSpacesComponent
     },
     {
-        path: 'cloud', component: CloudComponent
-    },
-    {
-        path: 'cloud/viewer', component: DayViewerComponent
+        path: 'cloud', component: DayViewerComponent
     },
     {
         path: 'space/:space', component: SpaceViewComponent
@@ -148,6 +146,7 @@ const appRoutes: Routes = [
         SpaceIconComponent,
         LineChartComponent,
         PieChartAdvancedComponent,
+        StackedBarHorizontalComponent,
         DonutChartComponent,
         BaseChartComponent,
         ColorPickerComponent,
